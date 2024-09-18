@@ -177,6 +177,7 @@ public class MuPDFReaderView extends ReaderView {
             }
             case Selecting: {
                 if (pageView != null) {
+                    //ambu
                     pageView.selectText(e1.getX(), e1.getY(), e2.getX(), e2.getY());
                 }
                 return true;
@@ -209,10 +210,21 @@ public class MuPDFReaderView extends ReaderView {
     public void onLongPress(MotionEvent e) {
         super.onLongPress(e);
         //  MuPDFView pageView = (MuPDFView) getDisplayedView();
-        switch (mMode) {
-            case Viewing:
-                onLongPress();
-            default:
+//        switch (mMode) {
+//            case Viewing:
+//                onLongPress();
+//            default:
+//        }
+        if (this.mMode == Mode.Selecting)
+        {
+            mMode=Mode.Viewing;
+        }else {
+            mMode=Mode.Selecting;
+            final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+
+            pageView.selectText(e.getX(), e.getY(), e.getX(), e.getY());
+
+
         }
     }
 
@@ -220,6 +232,7 @@ public class MuPDFReaderView extends ReaderView {
     public boolean onTouchEvent(final MotionEvent event) {
 //        if (this.mMode == Mode.Drawing || this.mMode == Mode.Selecting) {
         if (this.mMode == Mode.Selecting) {
+
             final float x = event.getX();
             final float y = event.getY();
             switch (event.getAction()) {

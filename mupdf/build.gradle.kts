@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-parcelize")
+
 }
 
 android {
@@ -15,6 +17,7 @@ android {
         ndk {
             abiFilters.addAll(listOf("armeabi", "armeabi-v7a", "x86", "mips", "x86_64", "arm64-v8a"))
         }
+
     }
     sourceSets {
         getByName("main") {

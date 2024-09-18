@@ -13,6 +13,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -241,12 +242,16 @@ public abstract class PageView extends ViewGroup {
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
                         paint.setColor(HIGHLIGHT_COLOR);
                         for (final RectF rect : PageView.this.mSearchBoxes) {
+                            Log.d("chakka","yaaaa1111");
+
                             canvas.drawRect(rect.left * scale, rect.top * scale, rect.right * scale, rect.bottom * scale, paint);
                         }
                     }
                     if (!PageView.this.mIsBlank && PageView.this.mLinks != null && PageView.this.mHighlightLinks) {
                         paint.setColor(PageView.this.LINK_COLOR);
                         for (final LinkInfo link : PageView.this.mLinks) {
+                            Log.d("chakka","yaaaa2222");
+
                             canvas.drawRect(link.rect.left * scale, link.rect.top * scale, link.rect.right * scale, link.rect.bottom * scale, paint);
                         }
                     }
@@ -254,6 +259,7 @@ public abstract class PageView extends ViewGroup {
                         int color = getInkColor();
                         paint.setColor(Color.argb(123, Color.red(color), Color.green(color), Color.blue(color)));
                         paint.setColor(HIGHLIGHT_COLOR);
+                        Log.d("chakka","yaaaa33333");
 
                         PageView.this.processSelectedText(new TextProcessor() {
                             RectF rect;
@@ -271,6 +277,8 @@ public abstract class PageView extends ViewGroup {
                             @Override
                             public void onEndLine() {
                                 if (!this.rect.isEmpty()) {
+                                    Log.d("chakka","yaaa4444");
+
                                     canvas.drawRect(this.rect.left * scale, this.rect.top * scale, this.rect.right * scale, this.rect.bottom * scale, paint);
 //                                    left = this.rect.left * scale;
 //                                    top = this.rect.top * scale;
@@ -288,6 +296,8 @@ public abstract class PageView extends ViewGroup {
                         paint.setStyle(Paint.Style.STROKE);
                         paint.setStrokeWidth(4.0f);
                         paint.setColor(BOX_COLOR);
+                        Log.d("chakka","yaaaa55555");
+
                         canvas.drawRect(PageView.this.mItemSelectBox.left * scale, PageView.this.mItemSelectBox.top * scale, PageView.this.mItemSelectBox.right * scale, PageView.this.mItemSelectBox.bottom * scale, paint);
                     }
                     if (PageView.this.mDrawing != null) {
@@ -322,6 +332,8 @@ public abstract class PageView extends ViewGroup {
                         }
                         paint.setStyle(Paint.Style.STROKE);
                         canvas.drawPath(path, paint);
+                        Log.d("chakka","yaaaa66666");
+
                     }
                 }
             });
