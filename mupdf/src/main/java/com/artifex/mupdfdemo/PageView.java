@@ -137,6 +137,8 @@ public abstract class PageView extends ViewGroup {
         this.mSelectBox = null;
         this.mText = null;
         this.mItemSelectBox = null;
+
+        Log.d("nullified","yes1");
     }
 
     public void releaseResources() {
@@ -563,6 +565,8 @@ public abstract class PageView extends ViewGroup {
 
     public void deselectText() {
         this.mSelectBox = null;
+        Log.d("nullified","yes2");
+
         this.mSearchView.invalidate();
         Log.d("INVALIDATEunda","24");
 
@@ -585,18 +589,109 @@ public abstract class PageView extends ViewGroup {
         once=-1;
     }
 
+    public void selectTeext(final float x0, final float y0, final float x1, final float y1) {
+        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
+        final float docRelX0 = (x0 - this.getLeft()) / scale;
+        final float docRelY0 = (y0 - this.getTop()) / scale;
+        final float docRelX2 = (x1 - this.getLeft()) / scale;
+        final float docRelY2 = (y1 - this.getTop()) / scale;
+
+        // Create a new RectF for the new selection
+        RectF newSelectBox;
+        if (docRelY0 <= docRelY2) {
+            newSelectBox = new RectF(docRelX0, docRelY0, docRelX2, docRelY2);
+        } else {
+            newSelectBox = new RectF(docRelX2, docRelY2, docRelX0, docRelY0);
+        }
+
+        // Perform the union only if the new box is below or above the existing mSelectBox
+        if (this.mSelectBox != null) {
+            boolean isBelow = newSelectBox.top > this.mSelectBox.bottom;
+            boolean isAbove = newSelectBox.bottom < this.mSelectBox.top;
+
+            if (isBelow || isAbove) {
+                this.mSelectBox.union(newSelectBox);  // Merge only if it's below or above
+            }
+        } else {
+            this.mSelectBox = newSelectBox;  // First selection
+        }
+
+        Log.d("check", "mSelectBox>" + mSelectBox.left + "<>" + mSelectBox.bottom);
+        this.mSearchView.invalidate();
+        Log.d("INVALIDATEunda", "23");
+
+        if (this.mGetText == null) {
+            (this.mGetText = new AsyncTask<Void, Void, TextWord[][]>() {
+                protected TextWord[][] doInBackground(final Void... params) {
+                    return PageView.this.getText();
+                }
+
+                protected void onPostExecute(final TextWord[][] result) {
+                    PageView.this.mText = result;
+                    PageView.this.mSearchView.invalidate();
+                    Log.d("INVALIDATEunda", "22");
+                }
+            }).execute(new Void[0]);
+        }
+    }
+
+
     public void selectText(final float x0, final float y0, final float x1, final float y1) {
         final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
         final float docRelX0 = (x0 - this.getLeft()) / scale;
         final float docRelY0 = (y0 - this.getTop()) / scale;
         final float docRelX2 = (x1 - this.getLeft()) / scale;
         final float docRelY2 = (y1 - this.getTop()) / scale;
+        RectF newSelectBox;
         if (docRelY0 <= docRelY2) {
-            this.mSelectBox = new RectF(docRelX0, docRelY0, docRelX2, docRelY2);
+            newSelectBox = new RectF(docRelX0, docRelY0, docRelX2, docRelY2);
         } else {
-            this.mSelectBox = new RectF(docRelX2, docRelY2, docRelX0, docRelY0);
+            newSelectBox = new RectF(docRelX2, docRelY2, docRelX0, docRelY0);
         }
-        Log.d("check","mSelectBox>"+mSelectBox.left+"<>"+mSelectBox.bottom);
+
+
+        // If mSelectBox is already defined, merge it with the new select box
+        if (this.mSelectBox != null) {
+            boolean isBelow = newSelectBox.top > this.mSelectBox.bottom;  // new selection is below the old one
+            boolean isAbove = newSelectBox.bottom < this.mSelectBox.top;  // new selection is above the old one
+//Log.d("kokokoko","isAbove"+isAbove+"isbelow"+isBelow);
+
+            float mSelectBoxLeft = mSelectBox.left;
+            float newSelectBoxLeft = newSelectBox.left;
+
+            Log.d("kplp","mSelectBoxLeft>"+mSelectBoxLeft+"newSelectBoxLeft>"+newSelectBoxLeft);
+            if (newSelectBox.bottom < mSelectBox.top) {
+                Log.d("kokokoko", "before");
+            }
+            else if (mSelectBox.bottom < newSelectBox.top) {
+                Log.d("kokokoko", "after");
+            }
+            else if (newSelectBox.bottom == mSelectBox.top || mSelectBox.bottom == newSelectBox.top) {
+                Log.d("kokokoko", "adjacent");
+            }
+            else {
+                Log.d("kokokoko", "between/overlap");
+            }
+            this.mSelectBox.union(newSelectBox);  // Union combines the new selection with the previous one
+            Log.d("checkopz","mSelectBox>"+mSelectBox.left+"<bottom>"+mSelectBox.bottom+"<top>"+mSelectBox.top+"<right>"+mSelectBox.right);
+            Log.d("checkopz","newSelectBox>"+newSelectBox.left+"<bottom>"+newSelectBox.bottom+"<top>"+newSelectBox.top+"<right>"+newSelectBox.right);
+
+        } else {
+
+            this.mSelectBox = newSelectBox;  // First selection
+            float mSelectBoxLeft = mSelectBox.left;
+            float newSelectBoxLeft = newSelectBox.left;
+            Log.d("kplp","mSelectBoxLeft>"+mSelectBoxLeft+"newSelectBoxLeft>"+newSelectBoxLeft);
+
+            Log.d("checkopz","mSelectBox>"+mSelectBox.left+"<bottom>"+mSelectBox.bottom+"<top>"+mSelectBox.top+"<right>"+mSelectBox.right);
+            Log.d("checkopz","newSelectBox>"+newSelectBox.left+"<bottom>"+newSelectBox.bottom+"<top>"+newSelectBox.top+"<right>"+newSelectBox.right);
+
+        }
+//        if (docRelY0 <= docRelY2) {
+//            this.mSelectBox = new RectF(docRelX0, docRelY0, docRelX2, docRelY2);
+//        } else {
+//            this.mSelectBox = new RectF(docRelX2, docRelY2, docRelX0, docRelY0);
+//        }
         this.mSearchView.invalidate();
         Log.d("INVALIDATEunda","23");
 
@@ -610,6 +705,7 @@ public abstract class PageView extends ViewGroup {
                     PageView.this.mText = result;
                     PageView.this.mSearchView.invalidate();
                     Log.d("INVALIDATEunda","22");
+
 
                 }
             }).execute(new Void[0]);

@@ -1,6 +1,7 @@
 package com.artifex.mupdfdemo;
 
 import android.graphics.RectF;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +18,7 @@ class TextSelector {
     public void select(TextProcessor tp) {
         if (mText == null || mSelectBox == null)
             return;
-
+        Log.d("selctnew",""+mSelectBox.left);
         ArrayList<TextWord[]> lines = new ArrayList<TextWord[]>();
         for (TextWord[] line : mText)
             if (line[0].bottom > mSelectBox.top && line[0].top < mSelectBox.bottom)
