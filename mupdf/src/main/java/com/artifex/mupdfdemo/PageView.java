@@ -634,7 +634,85 @@ public abstract class PageView extends ViewGroup {
             }).execute(new Void[0]);
         }
     }
+    public void selbectText(final float x0, final float y0, final float x1, final float y1) {
+        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
+        final float docRelX0 = (x0 - this.getLeft()) / scale;
+        final float docRelY0 = (y0 - this.getTop()) / scale;
+        final float docRelX2 = (x1 - this.getLeft()) / scale;
+        final float docRelY2 = (y1 - this.getTop()) / scale;
+        RectF newSelectBox = new RectF(
+                Math.min(docRelX0, docRelX2),
+                Math.min(docRelY0, docRelY2),
+                Math.max(docRelX0, docRelX2),
+                Math.max(docRelY0, docRelY2)
+        );
 
+        if (this.mSelectBox != null) {
+            // Extend the existing selection box to include the new selection
+            this.mSelectBox.set(
+                    Math.min(mSelectBox.left, newSelectBox.left),
+                    Math.min(mSelectBox.top, newSelectBox.top),
+                    Math.max(mSelectBox.right, newSelectBox.right),
+                    Math.max(mSelectBox.bottom, newSelectBox.bottom)
+            );
+        } else {
+            this.mSelectBox = newSelectBox;  // First selection
+        }
+    }
+
+    int k=0;
+    // Define a tolerance for detecting clicks near edges or corners
+    private static final float EDGE_TOLERANCE = 60.0f; // Adjust this value as needed
+
+    // Method to check click position relative to the RectF
+    boolean isLeft=false;
+    private void checkClickPosition(float clickX, float clickY, RectF rect) {
+        // Calculate the corners of the RectF
+        float left = rect.left;
+        float top = rect.top;
+        float right = rect.right;
+        float bottom = rect.bottom;
+
+        // Check if the click is near the right bottom corner
+        if (Math.abs(clickX - right) <= EDGE_TOLERANCE && Math.abs(clickY - bottom) <= EDGE_TOLERANCE) {
+            System.out.println("Clicked near the right bottom corner");
+            isLeft=false;
+        }
+        // Check if the click is near the left top corner
+        else if (Math.abs(clickX - left) <= EDGE_TOLERANCE && Math.abs(clickY - top) <= EDGE_TOLERANCE) {
+            System.out.println("Clicked near the left top corner");
+            isLeft=true;
+        }
+        // Check if the click is near any other edge (optional)
+        else if (Math.abs(clickX - left) <= EDGE_TOLERANCE || Math.abs(clickX - right) <= EDGE_TOLERANCE ||
+                Math.abs(clickY - top) <= EDGE_TOLERANCE || Math.abs(clickY - bottom) <= EDGE_TOLERANCE) {
+            if(isLeft)
+            {
+                System.out.println("Clicked near an edge after LeftClick");
+
+            }else {
+                System.out.println("Clicked near an edge after Right");
+
+            }
+        }
+        else {
+
+            if(isLeft)
+            {
+                System.out.println("Clicked inside the RectF but not near edges LEFT");
+
+            }else {
+                System.out.println("Clicked inside the RectF but not near edges RIGHT");
+
+            }
+        }
+    }
+
+    // Example usage
+    public void onUserClick(float clickX, float clickY) {
+        RectF myRect = new RectF(229.5f, 611.2064f, 686.6694f, 769.499f);
+        checkClickPosition(clickX, clickY, myRect);
+    }
 
     public void selectText(final float x0, final float y0, final float x1, final float y1) {
         final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
@@ -652,39 +730,14 @@ public abstract class PageView extends ViewGroup {
 
         // If mSelectBox is already defined, merge it with the new select box
         if (this.mSelectBox != null) {
-            boolean isBelow = newSelectBox.top > this.mSelectBox.bottom;  // new selection is below the old one
-            boolean isAbove = newSelectBox.bottom < this.mSelectBox.top;  // new selection is above the old one
-//Log.d("kokokoko","isAbove"+isAbove+"isbelow"+isBelow);
 
-            float mSelectBoxLeft = mSelectBox.left;
-            float newSelectBoxLeft = newSelectBox.left;
-
-            Log.d("kplp","mSelectBoxLeft>"+mSelectBoxLeft+"newSelectBoxLeft>"+newSelectBoxLeft);
-            if (newSelectBox.bottom < mSelectBox.top) {
-                Log.d("kokokoko", "before");
-            }
-            else if (mSelectBox.bottom < newSelectBox.top) {
-                Log.d("kokokoko", "after");
-            }
-            else if (newSelectBox.bottom == mSelectBox.top || mSelectBox.bottom == newSelectBox.top) {
-                Log.d("kokokoko", "adjacent");
-            }
-            else {
-                Log.d("kokokoko", "between/overlap");
-            }
+            checkClickPosition(docRelX2, docRelY2, this.mSelectBox);
             this.mSelectBox.union(newSelectBox);  // Union combines the new selection with the previous one
-            Log.d("checkopz","mSelectBox>"+mSelectBox.left+"<bottom>"+mSelectBox.bottom+"<top>"+mSelectBox.top+"<right>"+mSelectBox.right);
-            Log.d("checkopz","newSelectBox>"+newSelectBox.left+"<bottom>"+newSelectBox.bottom+"<top>"+newSelectBox.top+"<right>"+newSelectBox.right);
+            Log.d("mSelectBoxvalue",""+mSelectBox);
 
         } else {
 
             this.mSelectBox = newSelectBox;  // First selection
-            float mSelectBoxLeft = mSelectBox.left;
-            float newSelectBoxLeft = newSelectBox.left;
-            Log.d("kplp","mSelectBoxLeft>"+mSelectBoxLeft+"newSelectBoxLeft>"+newSelectBoxLeft);
-
-            Log.d("checkopz","mSelectBox>"+mSelectBox.left+"<bottom>"+mSelectBox.bottom+"<top>"+mSelectBox.top+"<right>"+mSelectBox.right);
-            Log.d("checkopz","newSelectBox>"+newSelectBox.left+"<bottom>"+newSelectBox.bottom+"<top>"+newSelectBox.top+"<right>"+newSelectBox.right);
 
         }
 //        if (docRelY0 <= docRelY2) {
