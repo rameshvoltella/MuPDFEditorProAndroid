@@ -210,22 +210,24 @@ public class MuPDFReaderView extends ReaderView {
     public void onLongPress(MotionEvent e) {
         super.onLongPress(e);
         //  MuPDFView pageView = (MuPDFView) getDisplayedView();
-//        switch (mMode) {
-//            case Viewing:
-//                onLongPress();
-//            default:
-//        }
-        if (this.mMode == Mode.Selecting)
+        switch (mMode) {
+            case Viewing:
+                onLongPress();
+            default:
+        }
+       /* if (this.mMode == Mode.Selecting)
         {
             mMode=Mode.Viewing;
+            final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+            pageView.resetSelection();
         }else {
             mMode=Mode.Selecting;
             final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
-
+            pageView.selectorFirstPoint(e.getX(), e.getY());
             pageView.selectText(e.getX(), e.getY(), e.getX(), e.getY());
 
 
-        }
+        }*/
     }
 
     @Override
@@ -254,6 +256,7 @@ public class MuPDFReaderView extends ReaderView {
                         final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
                         pageView.isTextSelected();
                         touch_up(x, y);
+
                     }
                     break;
             }

@@ -70,6 +70,8 @@ public abstract class PageView extends ViewGroup {
     private boolean mHighlightLinks;
     private ProgressBar mBusyIndicator;
     private final Handler mHandler;
+    int once=-1;
+    private PdfTextSelectionHelper textSelectionHelper = new PdfTextSelectionHelper();
 
     public PageView(final Context c, final Point parentSize, final Bitmap sharedHqBm) {
         super(c);
@@ -120,10 +122,13 @@ public abstract class PageView extends ViewGroup {
         if (this.mEntire != null) {
             this.mEntire.setImageBitmap((Bitmap) null);
             this.mEntire.invalidate();
+            Log.d("INVALIDATEunda","1111");
         }
         if (this.mPatch != null) {
             this.mPatch.setImageBitmap((Bitmap) null);
             this.mPatch.invalidate();
+            Log.d("INVALIDATEunda","22222");
+
         }
         this.mPatchViewSize = null;
         this.mPatchArea = null;
@@ -173,6 +178,8 @@ public abstract class PageView extends ViewGroup {
         this.mIsBlank = false;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
+            Log.d("INVALIDATEunda","4444");
+
         }
         this.mPageNumber = page;
         if (this.mEntire == null) {
@@ -183,6 +190,8 @@ public abstract class PageView extends ViewGroup {
         this.mSize = new Point((int) (size.x * this.mSourceScale), (int) (size.y * this.mSourceScale));
         this.mEntire.setImageBitmap((Bitmap) null);
         this.mEntire.invalidate();
+        Log.d("INVALIDATEunda","5555");
+
         (this.mGetLinkInfo = new AsyncTask<Void, Void, LinkInfo[]>() {
             protected LinkInfo[] doInBackground(final Void... v) {
                 return PageView.this.getLinkInfo();
@@ -192,6 +201,8 @@ public abstract class PageView extends ViewGroup {
                 PageView.this.mLinks = v;
                 if (PageView.this.mSearchView != null) {
                     PageView.this.mSearchView.invalidate();
+                    Log.d("INVALIDATEunda","31");
+
                 }
             }
         }).execute(new Void[0]);
@@ -201,6 +212,8 @@ public abstract class PageView extends ViewGroup {
                 PageView.this.setBackgroundColor(-1);
                 PageView.this.mEntire.setImageBitmap((Bitmap) null);
                 PageView.this.mEntire.invalidate();
+                Log.d("INVALIDATEunda","30");
+
                 if (PageView.this.mBusyIndicator == null) {
                     PageView.this.mBusyIndicator = new ProgressBar(PageView.this.mContext);
                     PageView.this.mBusyIndicator.setIndeterminate(true);
@@ -223,6 +236,8 @@ public abstract class PageView extends ViewGroup {
                 PageView.this.mBusyIndicator = null;
                 PageView.this.mEntire.setImageBitmap(PageView.this.mEntireBm);
                 PageView.this.mEntire.invalidate();
+                Log.d("INVALIDATEunda","29");
+
                 PageView.this.setBackgroundColor(0);
             }
         }).execute(new Void[0]);
@@ -233,12 +248,84 @@ public abstract class PageView extends ViewGroup {
 //                private Float right = null;
 //                private Float bottom = null;
 //                private RectF rectF = null;
+                RectF rectMain,rectMain2;
+                private RectF lastCircleRect = null; // Track the last circle's position
+                float initialHandleY2 = -1;  // Initialize it to an invalid value
+                RectF firstRect;
 
                 protected void onDraw(final Canvas canvas) {
                     super.onDraw(canvas);
                     final float scale = PageView.this.mSourceScale * this.getWidth() / PageView.this.mSize.x;
                     PageView.this.current_scale = scale;
                     final Paint paint = new Paint();
+                    final Paint circlePaint = new Paint();
+                    paint.setColor(Color.RED);
+                    circlePaint.setColor(Color.BLUE);  // Circle color
+                    circlePaint.setStyle(Paint.Style.FILL);
+
+                    // Draw the selection rectangle
+                    if (PageView.this.mSelectBox != null && PageView.this.mText != null) {
+                        int color = getInkColor();
+                        paint.setColor(Color.argb(123, Color.red(color), Color.green(color), Color.blue(color)));
+                        paint.setColor(HIGHLIGHT_COLOR);
+
+                        final RectF[] lastLineRect = {null};
+
+                        PageView.this.processSelectedText(new TextProcessor() {
+                            RectF rect;
+                            @Override
+                            public void onStartLine() {
+                                this.rect = new RectF();
+                                if (firstRect == null) {
+                                    firstRect = new RectF();
+                                }
+                            }
+
+                            @Override
+                            public void onWord(final TextWord word) {
+                                this.rect.union((RectF) word);
+                                if (firstRect.isEmpty()) {
+                                    firstRect = new RectF((RectF) word);  // Store the first word rect
+                                }
+                            }
+
+                            @Override
+                            public void onEndLine() {
+                                if (!this.rect.isEmpty()) {
+                                    // Store the current rect as the last rect
+                                    lastLineRect[0] = new RectF(this.rect);
+
+                                    // Draw the selection rectangle
+                                    canvas.drawRect(this.rect.left * scale, this.rect.top * scale, this.rect.right * scale, this.rect.bottom * scale, paint);
+                                }
+                            }
+                        });
+
+                        // Draw a circle at the start of the selection
+                        if (firstRect != null) {
+                            float startX = firstRect.left * scale;
+                            float startY = (firstRect.top + firstRect.bottom) / 2 * scale;  // Midpoint of the first word's height
+                            canvas.drawCircle(startX, startY, 20f, circlePaint);  // Adjust the radius as needed
+                        }
+
+                        // Draw a circle at the end of the selection
+                        if (lastLineRect[0] != null) {
+                            float endX = lastLineRect[0].right * scale;
+                            float endY = (lastLineRect[0].top + lastLineRect[0].bottom) / 2 * scale;  // Midpoint of the last word's height
+                            canvas.drawCircle(endX, endY, 20f, circlePaint);  // Adjust the radius as needed
+                        }
+                    }
+                }
+
+/*
+                protected void onDraw(final Canvas canvas) {
+                    super.onDraw(canvas);
+                    final float scale = PageView.this.mSourceScale * this.getWidth() / PageView.this.mSize.x;
+                    PageView.this.current_scale = scale;
+                    final Paint paint = new Paint();
+                    final Paint paint2 = new Paint();
+                    paint.setColor(Color.RED);
+
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
                         paint.setColor(HIGHLIGHT_COLOR);
                         for (final RectF rect : PageView.this.mSearchBoxes) {
@@ -260,33 +347,129 @@ public abstract class PageView extends ViewGroup {
                         paint.setColor(Color.argb(123, Color.red(color), Color.green(color), Color.blue(color)));
                         paint.setColor(HIGHLIGHT_COLOR);
                         Log.d("chakka","yaaaa33333");
-
+                        final RectF[] lastLineRect = {null};
                         PageView.this.processSelectedText(new TextProcessor() {
                             RectF rect;
-
+                            RectF lastRect; // Store the last line's RectF
                             @Override
                             public void onStartLine() {
+
+
                                 this.rect = new RectF();
+                                rectMain2=new RectF();
+                                RectF lastRect; // Store the last line's RectF
+                                if(once==0)
+                                {
+                                    rectMain=new RectF();
+
+                                }
+
+                            }
+                            // Method to clear the handle from the previous location
+                            private void clearPreviousHandle(Canvas canvas, RectF lastLineRect, float scale) {
+                                if (lastLineRect != null) {
+                                    float handleX = lastLineRect.right;
+                                    float handleY = (lastLineRect.top + lastLineRect.bottom) / 2;
+                                    float radius = 20f * scale; // Assuming the same radius used in drawStartHandle
+
+                                    // Clear the area where the previous handle was drawn (use background color)
+                                    Paint clearPaint = new Paint();
+                                    clearPaint.setColor(Color.RED); // Set this to the canvas background color
+                                    clearPaint.setStyle(Paint.Style.FILL);
+
+                                    // Draw a circle over the previous handle to erase it
+                                    canvas.drawCircle(handleX * scale, handleY * scale, radius, clearPaint);
+                                }
                             }
 
                             @Override
                             public void onWord(final TextWord word) {
                                 this.rect.union((RectF) word);
+//                                if(once==0) {
+                                    rectMain=((RectF) word);
+//                                    once = 1;
+//                                }
                             }
 
                             @Override
                             public void onEndLine() {
                                 if (!this.rect.isEmpty()) {
                                     Log.d("chakka","yaaa4444");
+                                    // Store the current rect as the last rect
+                                    Log.d("check","mSelectBoxthis.rect>"+this.rect.left* scale+"<>"+this.rect.bottom* scale);
 
+                                    lastLineRect[0] = new RectF(this.rect);
                                     canvas.drawRect(this.rect.left * scale, this.rect.top * scale, this.rect.right * scale, this.rect.bottom * scale, paint);
+                                    canvas.drawCircle(rectMain.left * scale, (rectMain.top + rectMain.bottom) / 2 * scale, 20f, paint2);
+
+//                                    textSelectionHelper.drawStartHandle(canvas,);
 //                                    left = this.rect.left * scale;
 //                                    top = this.rect.top * scale;
 //                                    right = this.rect.right * scale;
 //                                    bottom = this.rect.bottom * scale;
 //                                    rectF = new RectF(left, top, right, bottom);
-                                    selectedText = rect;
+                                    // Define the radius of the circles
+*/
+/*                                    float circleRadius = 30f; // Adjust the size as needed
+
+// Draw the left circle
+                                    canvas.drawCircle(rectMain.left * scale, (rectMain.top + rectMain.bottom) / 2 * scale, circleRadius, paint2);
+
+// Draw the right circle
+                                    canvas.drawCircle(this.rect.right * scale, (this.rect.top + this.rect.bottom) / 2 * scale, circleRadius, paint2);*//*
+
+//                                    if (lastRect != null) {
+//                                        float circleRadius = 30f; // Adjust the size as needed
+//
+//                                        // Draw the circle only at the right of the last line
+//                                        canvas.drawCircle(lastRect.right * scale, (lastRect.top + lastRect.bottom) / 2 * scale, circleRadius, paint2);
+//
+//                                        // Optionally, draw the circle at the left side of the first word in the first line
+//                                        canvas.drawCircle(rectMain.left * scale, (rectMain.top + rectMain.bottom) / 2 * scale, circleRadius, paint2);
+//                                    }
+                                    // After processing all the lines, draw the circle only on the last line
+//                                    if (lastLineRect[0] != null) {
+//                                        float circleRadius = 30f; // Adjust the size as needed
+//
+//                                        // Draw the circle only on the right of the last line
+//                                        canvas.drawCircle(lastLineRect[0].right * scale, (lastLineRect[0].top + lastLineRect[0].bottom) / 2 * scale, circleRadius, paint2);
+//
+//                                        // Optionally, draw the circle on the left side of the first word in the first line
+//                                        canvas.drawCircle(rectMain.left * scale, (rectMain.top + rectMain.bottom) / 2 * scale, circleRadius, paint2);
+//
+//                                        // Update lastCircleRect with the current circle's position
+//                                        lastCircleRect = new RectF(lastLineRect[0]);
+//                                    }
+//                                    if (lastCircleRect != null) {
+//                                        float circleRadius = 30f;
+//                                        canvas.drawCircle(lastCircleRect.right * scale, (lastCircleRect.top + lastCircleRect.bottom) / 2 * scale, circleRadius, paint);
+//                                    }
+//                                    selectedText = rect;
 //                                    PageView.this.setItemSelectBox(rect);
+                                    // Calculate the x and y positions for the handle
+                                    */
+/*float handleX = this.rect.left;  // You can adjust this to position on the left or right side
+                                    float handleY = (this.rect.top + this.rect.bottom) / 2;  // Midpoint of the top and bottom
+
+                                    float handleX2 = mSelectBox.left;  // You can adjust this to position on the left or right side
+                                    float handleY2 = (mSelectBox.top + mSelectBox.bottom) / 2;  // Midpoint of the top and bottom
+// If this is the first time drawing the handle, store the initial value
+                                    if (initialHandleY2 == -1) {
+                                        initialHandleY2 = (mSelectBox.top + mSelectBox.bottom) / 2;  // Calculate the midpoint
+                                    }
+
+// Use the stored initial value for handleY2, so it doesn't change on dragging
+                                    handleY2 = initialHandleY2;
+                                    // Call the drawStartHandle method with the calculated values
+                                    textSelectionHelper.drawStartHandle(canvas, handleX2, handleY2, scale);  // Adjust the scale to act as zoom
+
+                                    // Optionally draw the handle on the right of the last line
+                                    if (lastLineRect[0] != null) {
+                                        float handleRightX = lastLineRect[0].right;
+                                        float handleRightY = (lastLineRect[0].top + lastLineRect[0].bottom) / 2;
+                                        textSelectionHelper.drawEndHandle(canvas, handleRightX, handleRightY, scale);
+                                    }*//*
+
 
                                 }
                             }
@@ -336,6 +519,7 @@ public abstract class PageView extends ViewGroup {
 
                     }
                 }
+*/
             });
         }
         this.requestLayout();
@@ -345,6 +529,8 @@ public abstract class PageView extends ViewGroup {
         this.mSearchBoxes = searchBoxes;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
+            Log.d("INVALIDATEunda","27");
+
         }
     }
 
@@ -352,6 +538,8 @@ public abstract class PageView extends ViewGroup {
         this.mHighlightLinks = f;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
+            Log.d("INVALIDATEunda","26");
+
         }
     }
 
@@ -359,12 +547,33 @@ public abstract class PageView extends ViewGroup {
         this.LINK_COLOR = color;
         if (this.mHighlightLinks && this.mSearchView != null) {
             this.mSearchView.invalidate();
+            Log.d("INVALIDATEunda","25");
+
         }
     }
 
     public void deselectText() {
         this.mSelectBox = null;
         this.mSearchView.invalidate();
+        Log.d("INVALIDATEunda","24");
+
+    }
+    private float rectSize = 50f; // Size of the RectF
+    private RectF startPoint;
+    public void  selectorFirstPoint(final float x, final float y)
+    {
+        startPoint = new RectF(
+                x - rectSize / 2, // left
+                y - rectSize / 2, // top
+                x + rectSize / 2, // right
+                y + rectSize / 2  // bottom
+        );
+        once=0;
+    }
+
+    public void resetSelection()
+    {
+        once=-1;
     }
 
     public void selectText(final float x0, final float y0, final float x1, final float y1) {
@@ -378,7 +587,10 @@ public abstract class PageView extends ViewGroup {
         } else {
             this.mSelectBox = new RectF(docRelX2, docRelY2, docRelX0, docRelY0);
         }
+        Log.d("check","mSelectBox>"+mSelectBox.left+"<>"+mSelectBox.bottom);
         this.mSearchView.invalidate();
+        Log.d("INVALIDATEunda","23");
+
         if (this.mGetText == null) {
             (this.mGetText = new AsyncTask<Void, Void, TextWord[][]>() {
                 protected TextWord[][] doInBackground(final Void... params) {
@@ -388,6 +600,8 @@ public abstract class PageView extends ViewGroup {
                 protected void onPostExecute(final TextWord[][] result) {
                     PageView.this.mText = result;
                     PageView.this.mSearchView.invalidate();
+                    Log.d("INVALIDATEunda","22");
+
                 }
             }).execute(new Void[0]);
         }
@@ -404,6 +618,8 @@ public abstract class PageView extends ViewGroup {
         arc.add(new PointF(docRelX, docRelY));
         this.mDrawing.add(arc);
         this.mSearchView.invalidate();
+        Log.d("INVALIDATEunda","21");
+
     }
 
     public void continueDraw(final float x, final float y) {
@@ -414,12 +630,16 @@ public abstract class PageView extends ViewGroup {
             final ArrayList<PointF> arc = this.mDrawing.get(this.mDrawing.size() - 1);
             arc.add(new PointF(docRelX, docRelY));
             this.mSearchView.invalidate();
+            Log.d("INVALIDATEunda","20");
+
         }
     }
 
     public void cancelDraw() {
         this.mDrawing = null;
         this.mSearchView.invalidate();
+        Log.d("INVALIDATEunda","15");
+
     }
 
     protected PointF[][] getDraw() {
@@ -497,6 +717,8 @@ public abstract class PageView extends ViewGroup {
         this.mItemSelectBox = rect;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
+            Log.d("INVALIDATEunda","14");
+
         }
     }
 
@@ -538,6 +760,8 @@ public abstract class PageView extends ViewGroup {
                 this.mEntireMat.setScale(w / (float) this.mSize.x, h / (float) this.mSize.y);
                 this.mEntire.setImageMatrix(this.mEntireMat);
                 this.mEntire.invalidate();
+                Log.d("INVALIDATEunda","13");
+
             }
             this.mEntire.layout(0, 0, w, h);
         }
@@ -551,6 +775,8 @@ public abstract class PageView extends ViewGroup {
                 if (this.mPatch != null) {
                     this.mPatch.setImageBitmap((Bitmap) null);
                     this.mPatch.invalidate();
+                    Log.d("INVALIDATEunda","12");
+
                 }
             } else {
                 this.mPatch.layout(this.mPatchArea.left, this.mPatchArea.top, this.mPatchArea.right, this.mPatchArea.bottom);
@@ -569,6 +795,8 @@ public abstract class PageView extends ViewGroup {
             if (this.mPatch != null) {
                 this.mPatch.setImageBitmap((Bitmap) null);
                 this.mPatch.invalidate();
+                Log.d("INVALIDATEunda","eleven");
+
             }
         } else {
             final Point patchViewSize = new Point(viewArea.width(), viewArea.height());
@@ -604,6 +832,8 @@ public abstract class PageView extends ViewGroup {
                     PageView.this.mPatchArea = patchArea;
                     PageView.this.mPatch.setImageBitmap(PageView.this.mPatchBm);
                     PageView.this.mPatch.invalidate();
+                    Log.d("INVALIDATEunda","ten");
+
                     PageView.this.mPatch.layout(PageView.this.mPatchArea.left, PageView.this.mPatchArea.top, PageView.this.mPatchArea.right, PageView.this.mPatchArea.bottom);
                 }
             }).execute(new Void[0]);
@@ -624,6 +854,8 @@ public abstract class PageView extends ViewGroup {
             public void onPostExecute(final Void result) {
                 PageView.this.mEntire.setImageBitmap(PageView.this.mEntireBm);
                 PageView.this.mEntire.invalidate();
+                Log.d("INVALIDATEunda","99999");
+
             }
         }).execute(new Void[0]);
         this.updateHq(true);
@@ -639,6 +871,8 @@ public abstract class PageView extends ViewGroup {
         if (this.mPatch != null) {
             this.mPatch.setImageBitmap((Bitmap) null);
             this.mPatch.invalidate();
+            Log.d("INVALIDATEunda","88888");
+
         }
     }
 

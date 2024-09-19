@@ -23,6 +23,11 @@ public interface MuPDFView
 
     void selectText(final float p0, final float p1, final float p2, final float p3);
 
+    void selectorFirstPoint(final float p0, final float p1);
+
+    void resetSelection();
+
+
     void deselectText();
 
     boolean copySelection();

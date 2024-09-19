@@ -14,7 +14,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -29,11 +31,21 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.artifex.mupdfdemo.*
 import com.artifex.mupdfdemo.Annotation
 import com.artifex.mupdfdemo.Ext.Companion.onClick
+import com.artifex.mupdfdemo.Hit
+import com.artifex.mupdfdemo.MuPDFCore
+import com.artifex.mupdfdemo.MuPDFPageAdapter
+import com.artifex.mupdfdemo.MuPDFReaderView
+import com.artifex.mupdfdemo.MuPDFReaderViewListener
+import com.artifex.mupdfdemo.MuPDFView
+import com.artifex.mupdfdemo.OnPageChangeListener
+import com.artifex.mupdfdemo.OutlineActivityData
+import com.artifex.mupdfdemo.ReaderView
+import com.artifex.mupdfdemo.SearchTask
+import com.artifex.mupdfdemo.SearchTaskResult
+import com.artifex.mupdfdemo.SharedPreferencesUtil
 import com.example.myapplication.Constants.CONTINUE_MODE
 import com.example.myapplication.Constants.DARK
 import com.example.myapplication.Constants.DATA_CLASS_BUNDLE
@@ -64,25 +76,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
-import kotlin.Boolean
-import kotlin.ByteArray
-import kotlin.CharSequence
-import kotlin.Exception
-import kotlin.Float
-import kotlin.Int
-import kotlin.Long
-import kotlin.String
-import kotlin.Suppress
-import kotlin.also
-import kotlin.apply
-import kotlin.arrayOf
-import kotlin.getValue
-import kotlin.lazy
-import kotlin.let
-import kotlin.run
-import kotlin.takeIf
-import kotlin.toString
+import java.util.Date
 
 
 //    suspend fun getPdfDocumentsForAndroid11AndAbove(
@@ -816,10 +810,14 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                 binding.copyBtnSecond.x = xPos
                 binding.copyBtnSecond.y = currentY - binding.copyBtnSecond.height
                 binding.copyBtnSecond.invalidate()
+                Log.d("INVALIDATEunda", "3333")
+
             } else {
                 binding.copyBtnSecond.x = xPos
                 binding.copyBtnSecond.y = yPos - binding.copyBtnSecond.height
                 binding.copyBtnSecond.invalidate()
+                Log.d("INVALIDATEunda", "44444")
+
             }
 
         //  extractText() extract whole page text

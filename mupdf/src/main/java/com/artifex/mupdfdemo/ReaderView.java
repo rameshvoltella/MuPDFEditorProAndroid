@@ -5,6 +5,8 @@
 package com.artifex.mupdfdemo;
 
 import java.util.NoSuchElementException;
+
+import android.util.Log;
 import android.view.ViewGroup;
 
 import android.graphics.Point;
@@ -686,6 +688,8 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 }
             }
             this.invalidate();
+            Log.d("INVALIDATEunda","77777");
+
         }
     }
 

@@ -15,6 +15,11 @@ class PdfTextSelectionHelper {
         this.style = Paint.Style.FILL_AND_STROKE
         this.isAntiAlias = true
     }
+    private val selectionHandleColor2 = Paint().apply {
+        this.color = Color.TRANSPARENT
+        this.style = Paint.Style.FILL_AND_STROKE
+        this.isAntiAlias = true
+    }
     val strokeColorRed = Paint().apply {
         this.color = Color.parseColor("#ff4185")
         this.style = Paint.Style.STROKE
@@ -43,7 +48,7 @@ class PdfTextSelectionHelper {
     var touchState: TouchState = TouchState.IDLE
     enum class TouchState { StartHandlePressed, EndHandlePressed, IDLE }
 
-    private fun drawStartHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
+    public fun drawStartHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
         val mR = handleRoundRadius * zoom
         val mX = x * zoom
         val mY = y * zoom
@@ -55,7 +60,7 @@ class PdfTextSelectionHelper {
         path.close()
         canvas.drawPath(path, selectionHandleColor)
     }
-    private fun drawEndHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
+    public fun drawEndHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
         val mR = handleRoundRadius * zoom
         val mX = x * zoom
         val mY = y * zoom
@@ -66,6 +71,25 @@ class PdfTextSelectionHelper {
         path.lineTo(mX, mY + mR)
         path.close()
         canvas.drawPath(path, selectionHandleColor)
+    }
+    public fun drawEndTHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
+        // Make mR bigger by increasing the factor (e.g., by 1.5 times)
+        val mR = handleRoundRadius * zoom * 1.5f  // Adjust the scale for a bigger handle
+        val mX = x * zoom
+        val mY = y * zoom
+
+        // Draw a larger circle
+        canvas.drawCircle(mX + mR, mY + mR, mR, selectionHandleColor2)
+
+        // Adjust the path to match the bigger circle
+        val path = Path()
+        path.moveTo(mX, mY)
+        path.lineTo(mX + mR, mY)  // Increase mR here as well
+        path.lineTo(mX, mY + mR)  // Same here
+        path.close()
+
+        // Draw the larger path
+        canvas.drawPath(path, selectionHandleColor2)
     }
 
     fun drawSelection(startY: Float, canvas: Canvas, details: TextSelectionData, zoom: Float) {
