@@ -251,7 +251,6 @@ public abstract class PageView extends ViewGroup {
                 RectF rectMain,rectMain2;
                 private RectF lastCircleRect = null; // Track the last circle's position
                 float initialHandleY2 = -1;  // Initialize it to an invalid value
-                RectF firstRect;
 
                 protected void onDraw(final Canvas canvas) {
                     super.onDraw(canvas);
@@ -262,6 +261,7 @@ public abstract class PageView extends ViewGroup {
                     paint.setColor(Color.RED);
                     circlePaint.setColor(Color.BLUE);  // Circle color
                     circlePaint.setStyle(Paint.Style.FILL);
+                    final RectF[] firstRect = {null};
 
                     // Draw the selection rectangle
                     if (PageView.this.mSelectBox != null && PageView.this.mText != null) {
@@ -276,16 +276,16 @@ public abstract class PageView extends ViewGroup {
                             @Override
                             public void onStartLine() {
                                 this.rect = new RectF();
-                                if (firstRect == null) {
-                                    firstRect = new RectF();
+                                if (firstRect[0] == null) {
+                                    firstRect[0] = new RectF();
                                 }
                             }
 
                             @Override
                             public void onWord(final TextWord word) {
                                 this.rect.union((RectF) word);
-                                if (firstRect.isEmpty()) {
-                                    firstRect = new RectF((RectF) word);  // Store the first word rect
+                                if (firstRect[0].isEmpty()) {
+                                    firstRect[0] = new RectF((RectF) word);  // Store the first word rect
                                 }
                             }
 
@@ -302,17 +302,26 @@ public abstract class PageView extends ViewGroup {
                         });
 
                         // Draw a circle at the start of the selection
-                        if (firstRect != null) {
-                            float startX = firstRect.left * scale;
-                            float startY = (firstRect.top + firstRect.bottom) / 2 * scale;  // Midpoint of the first word's height
-                            canvas.drawCircle(startX, startY, 20f, circlePaint);  // Adjust the radius as needed
+                        if (firstRect[0] != null) {
+                            float startX = firstRect[0].left * scale;
+                            float startY = (firstRect[0].top + firstRect[0].bottom) / 2 * scale;  // Midpoint of the first word's height
+//                            canvas.drawCircle(startX, startY, 20f, circlePaint);  // Adjust the radius as needed
+//                            textSelectionHelper.drawStartHandle();
+                            float handleX = firstRect[0].left;  // You can adjust this to position on the left or right side
+                            float handleY = (firstRect[0].top + firstRect[0].bottom) / 2;  // Midpoint of the top and bottom
+
+                            // Call the drawStartHandle method with the calculated values
+                            textSelectionHelper.drawStartHandle(canvas, handleX, handleY, scale);
                         }
 
                         // Draw a circle at the end of the selection
                         if (lastLineRect[0] != null) {
                             float endX = lastLineRect[0].right * scale;
                             float endY = (lastLineRect[0].top + lastLineRect[0].bottom) / 2 * scale;  // Midpoint of the last word's height
-                            canvas.drawCircle(endX, endY, 20f, circlePaint);  // Adjust the radius as needed
+//                            canvas.drawCircle(endX, endY, 20f, circlePaint);  // Adjust the radius as needed
+                            float handleRightX = lastLineRect[0].right;
+                            float handleRightY = (lastLineRect[0].top + lastLineRect[0].bottom) / 2;
+                            textSelectionHelper.drawEndHandle(canvas, handleRightX, handleRightY, scale);
                         }
                     }
                 }
