@@ -1222,10 +1222,29 @@ public void selectEvent(MotionEvent e)
                 docRelXmaxSelection = Math.max(docRelXmaxSelection, Math.max(rect.right, docRelXmax));
                 docRelXminSelection = Math.min(docRelXminSelection, Math.min(rect.left, docRelXmin));
             }
+           /* if (!rect.isEmpty())
+            {
+                if(firstLineRect == null || firstLineRect.top > rect.top)
+                {
+                    if(firstLineRect == null) firstLineRect = new RectF();
+                    firstLineRect.set(rect);
+                }
+                if(lastLineRect == null || lastLineRect.bottom < rect.bottom)
+                {
+                    if(lastLineRect == null) lastLineRect = new RectF();
+                    lastLineRect.set(rect);
+                }
+
+
+                canvas.drawRect(rect.left*scale, rect.top*scale, rect.right*scale, rect.bottom*scale, selectBoxPaint);
+
+                docRelXmaxSelection = Math.max(docRelXmaxSelection,Math.max(rect.right,docRelXmax));
+                docRelXminSelection = Math.min(docRelXminSelection,Math.min(rect.left,docRelXmin));
+            }*/
         }
 
         public void onEndText() {
-            if (!firstLineRect.isEmpty() && !lastLineRect.isEmpty()) {
+           /* if (!firstLineRect.isEmpty() && !lastLineRect.isEmpty()) {
                 height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top,
                                         lastLineRect.bottom - lastLineRect.top),
                                 getResources().getDisplayMetrics().xdpi * 0.07f / scale),
@@ -1249,6 +1268,41 @@ public void selectEvent(MotionEvent e)
                 rightMarker.offset(lastLineRect.right * scale, lastLineRect.top * scale);
                 canvas.drawPath(leftMarker, selectMarkerPaint);
                 canvas.drawPath(rightMarker, selectMarkerPaint);
+            }*/
+            if(firstLineRect != null && lastLineRect != null)
+            {
+                height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top, lastLineRect.bottom - lastLineRect.top), getResources().getDisplayMetrics().xdpi*0.07f/scale), 4*getResources().getDisplayMetrics().xdpi*0.07f/scale);
+
+                leftMarkerRect.set(firstLineRect.left-0.9f*height,firstLineRect.top,firstLineRect.left,firstLineRect.top+1.9f*height);
+                rightMarkerRect.set(lastLineRect.right,lastLineRect.top,lastLineRect.right+0.9f*height,lastLineRect.top+1.9f*height);
+
+                if(height != oldHeight || true)
+                {
+                    leftMarker.rewind();
+                    leftMarker.moveTo(0f,0f);
+                    leftMarker.rLineTo(0f,1.9f*height*scale);
+                    leftMarker.rLineTo(-0.9f*height*scale,0f);
+                    leftMarker.rLineTo(0f,-0.9f*height*scale);
+                    leftMarker.close();
+
+                    rightMarker.rewind();
+                    rightMarker.moveTo(0f,0f);
+                    rightMarker.rLineTo(0f,1.9f*height*scale);
+                    rightMarker.rLineTo(0.9f*height*scale,0f);
+                    rightMarker.rLineTo(0f,-0.9f*height*scale);
+                    rightMarker.close();
+                    oldHeight = height;
+                }
+Log.d("ckckckc","firstLineRect"+firstLineRect);
+                Log.d("ckckckc","last"+lastLineRect);
+
+                leftMarker.offset(firstLineRect.left*scale, firstLineRect.top*scale);
+                rightMarker.offset(lastLineRect.right*scale, lastLineRect.top*scale);
+                canvas.drawPath(leftMarker, selectMarkerPaint);
+                canvas.drawPath(rightMarker, selectMarkerPaint);
+                //Undo the offset so that we can reuse the path
+                leftMarker.offset(-firstLineRect.left*scale, -firstLineRect.top*scale);
+                rightMarker.offset(-lastLineRect.right*scale, -lastLineRect.top*scale);
             }
 
             if (useSmartTextSelection) {
@@ -1316,4 +1370,25 @@ public void selectEvent(MotionEvent e)
     }
     private static final int ERASER_INNER_COLOR = 0xFFFFFFFF;
     private static final int ERASER_OUTER_COLOR = 0xFF000000;
+
+    public boolean hasTextSelected() {
+
+        class Boolean {
+            public boolean value;
+        }
+
+        final Boolean b = new Boolean();
+        b.value = false;
+
+        processSelectedText(new TextProcessor() {
+            public void onStartLine() {}
+            public void onWord(TextWord word) {
+                b.value = true;
+            }
+            public void onEndLine() {}
+            public void onEndText() {}
+        });
+        return b.value;
+    }
+
 }

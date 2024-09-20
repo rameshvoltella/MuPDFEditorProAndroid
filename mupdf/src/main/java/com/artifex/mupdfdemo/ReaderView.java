@@ -698,7 +698,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     public View getSelectedView() {
-        return null;
+        return mChildViews.get(mCurrent); //Can return null while waiting for onLayout()!
     }
 
     public void setAdapter(final Adapter adapter) {
