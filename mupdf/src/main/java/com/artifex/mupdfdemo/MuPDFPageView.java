@@ -327,6 +327,11 @@ public class MuPDFPageView extends PageView implements MuPDFView
                 Log.d("ffnet", "onEndLine: "+line);
                 text.append((CharSequence)this.line);
             }
+
+            @Override
+            public void onEndText() {
+
+            }
         });
         if (text.length() == 0) {
             return false;
@@ -357,6 +362,11 @@ public class MuPDFPageView extends PageView implements MuPDFView
                 if (text.length() > 0)
                     text.append('\n');
                 text.append(line);
+            }
+
+            @Override
+            public void onEndText() {
+
             }
         });
         if (text.length() == 0)
@@ -390,6 +400,11 @@ public class MuPDFPageView extends PageView implements MuPDFView
                     quadPoints.add(new PointF(this.rect.right, this.rect.top));
                     quadPoints.add(new PointF(this.rect.left, this.rect.top));
                 }
+            }
+
+            @Override
+            public void onEndText() {
+
             }
         });
         if (quadPoints.size() == 0) {

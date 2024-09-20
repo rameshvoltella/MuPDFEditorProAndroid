@@ -14,14 +14,13 @@ import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
 
 
 interface TextProcessor {
@@ -30,11 +29,19 @@ interface TextProcessor {
     void onWord(TextWord word);
 
     void onEndLine();
+
+
+    void onEndText();
 }
 
 public abstract class PageView extends ViewGroup {
     private static final float ITEM_SELECT_BOX_WIDTH = 4.0f;
     private static final int HIGHLIGHT_COLOR = 0x80ade1f6;
+    private static final int SELECTION_COLOR = 0x8033B5E5;
+    private static final int SELECTION_MARKER_COLOR = 0xFF33B5E5;
+    private static final int GRAYEDOUT_COLOR = 0x30000000;
+    private static final int SEARCHRESULTS_COLOR = 0x3033B5E5;
+    private static final int HIGHLIGHTED_SEARCHRESULT_COLOR = 0xFF33B5E5;
     private int LINK_COLOR;
     private static final int BOX_COLOR = -9868951;
     private int INK_COLOR;
@@ -71,6 +78,7 @@ public abstract class PageView extends ViewGroup {
     private ProgressBar mBusyIndicator;
     private final Handler mHandler;
     int once=-1;
+    private final TextSelectionDrawer textSelectionDrawer = new TextSelectionDrawer();
     private PdfTextSelectionHelper textSelectionHelper = new PdfTextSelectionHelper();
 
     public PageView(final Context c, final Point parentSize, final Bitmap sharedHqBm) {
@@ -139,6 +147,45 @@ public abstract class PageView extends ViewGroup {
         this.mItemSelectBox = null;
 
         Log.d("nullified","yes1");
+
+        highlightedSearchResultPaint.setColor(HIGHLIGHTED_SEARCHRESULT_COLOR);
+        highlightedSearchResultPaint.setStyle(Paint.Style.STROKE);
+        highlightedSearchResultPaint.setAntiAlias(true);
+
+        linksPaint.setColor(LINK_COLOR);
+        linksPaint.setStyle(Paint.Style.STROKE);
+        linksPaint.setStrokeWidth(0);
+
+        selectBoxPaint.setColor(SELECTION_COLOR);
+        selectBoxPaint.setStyle(Paint.Style.FILL);
+        selectBoxPaint.setStrokeWidth(0);
+
+        selectMarkerPaint.setColor(SELECTION_MARKER_COLOR);
+        selectMarkerPaint.setStyle(Paint.Style.FILL);
+        selectMarkerPaint.setStrokeWidth(0);
+
+        selectOverlayPaint.setColor(GRAYEDOUT_COLOR);
+        selectOverlayPaint.setStyle(Paint.Style.FILL);
+
+        itemSelectBoxPaint.setColor(BOX_COLOR);
+        itemSelectBoxPaint.setStyle(Paint.Style.STROKE);
+        itemSelectBoxPaint.setStrokeWidth(3);
+
+        drawingPaint.setAntiAlias(true);
+        drawingPaint.setDither(true);
+        drawingPaint.setStrokeJoin(Paint.Join.ROUND);
+        drawingPaint.setStrokeCap(Paint.Cap.ROUND);
+        drawingPaint.setStyle(Paint.Style.STROKE);
+
+        eraserInnerPaint.setAntiAlias(true);
+        eraserInnerPaint.setDither(true);
+        eraserInnerPaint.setStyle(Paint.Style.FILL);
+        eraserInnerPaint.setColor(ERASER_INNER_COLOR);
+
+        eraserOuterPaint.setAntiAlias(true);
+        eraserOuterPaint.setDither(true);
+        eraserOuterPaint.setStyle(Paint.Style.STROKE);
+        eraserOuterPaint.setColor(ERASER_OUTER_COLOR);
     }
 
     public void releaseResources() {
@@ -267,7 +314,7 @@ public abstract class PageView extends ViewGroup {
 
                     // Draw the selection rectangle
                     if (PageView.this.mSelectBox != null && PageView.this.mText != null) {
-                        int color = getInkColor();
+          /*              int color = getInkColor();
                         paint.setColor(Color.argb(123, Color.red(color), Color.green(color), Color.blue(color)));
                         paint.setColor(HIGHLIGHT_COLOR);
 
@@ -324,7 +371,11 @@ public abstract class PageView extends ViewGroup {
                             float handleRightX = lastLineRect[0].right;
                             float handleRightY = (lastLineRect[0].top + lastLineRect[0].bottom) / 2;
                             textSelectionHelper.drawEndHandle(canvas, handleRightX, handleRightY, scale);
-                        }
+                        }*/
+
+
+                        textSelectionDrawer.reset(canvas, scale);
+                        processSelectedText(textSelectionDrawer);
                     }
                 }
 
@@ -589,83 +640,14 @@ public abstract class PageView extends ViewGroup {
         once=-1;
     }
 
-    public void selectTeext(final float x0, final float y0, final float x1, final float y1) {
-        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
-        final float docRelX0 = (x0 - this.getLeft()) / scale;
-        final float docRelY0 = (y0 - this.getTop()) / scale;
-        final float docRelX2 = (x1 - this.getLeft()) / scale;
-        final float docRelY2 = (y1 - this.getTop()) / scale;
-
-        // Create a new RectF for the new selection
-        RectF newSelectBox;
-        if (docRelY0 <= docRelY2) {
-            newSelectBox = new RectF(docRelX0, docRelY0, docRelX2, docRelY2);
-        } else {
-            newSelectBox = new RectF(docRelX2, docRelY2, docRelX0, docRelY0);
-        }
-
-        // Perform the union only if the new box is below or above the existing mSelectBox
-        if (this.mSelectBox != null) {
-            boolean isBelow = newSelectBox.top > this.mSelectBox.bottom;
-            boolean isAbove = newSelectBox.bottom < this.mSelectBox.top;
-
-            if (isBelow || isAbove) {
-                this.mSelectBox.union(newSelectBox);  // Merge only if it's below or above
-            }
-        } else {
-            this.mSelectBox = newSelectBox;  // First selection
-        }
-
-        Log.d("check", "mSelectBox>" + mSelectBox.left + "<>" + mSelectBox.bottom);
-        this.mSearchView.invalidate();
-        Log.d("INVALIDATEunda", "23");
-
-        if (this.mGetText == null) {
-            (this.mGetText = new AsyncTask<Void, Void, TextWord[][]>() {
-                protected TextWord[][] doInBackground(final Void... params) {
-                    return PageView.this.getText();
-                }
-
-                protected void onPostExecute(final TextWord[][] result) {
-                    PageView.this.mText = result;
-                    PageView.this.mSearchView.invalidate();
-                    Log.d("INVALIDATEunda", "22");
-                }
-            }).execute(new Void[0]);
-        }
-    }
-    public void selbectText(final float x0, final float y0, final float x1, final float y1) {
-        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
-        final float docRelX0 = (x0 - this.getLeft()) / scale;
-        final float docRelY0 = (y0 - this.getTop()) / scale;
-        final float docRelX2 = (x1 - this.getLeft()) / scale;
-        final float docRelY2 = (y1 - this.getTop()) / scale;
-        RectF newSelectBox = new RectF(
-                Math.min(docRelX0, docRelX2),
-                Math.min(docRelY0, docRelY2),
-                Math.max(docRelX0, docRelX2),
-                Math.max(docRelY0, docRelY2)
-        );
-
-        if (this.mSelectBox != null) {
-            // Extend the existing selection box to include the new selection
-            this.mSelectBox.set(
-                    Math.min(mSelectBox.left, newSelectBox.left),
-                    Math.min(mSelectBox.top, newSelectBox.top),
-                    Math.max(mSelectBox.right, newSelectBox.right),
-                    Math.max(mSelectBox.bottom, newSelectBox.bottom)
-            );
-        } else {
-            this.mSelectBox = newSelectBox;  // First selection
-        }
-    }
 
     int k=0;
     // Define a tolerance for detecting clicks near edges or corners
-    private static final float EDGE_TOLERANCE = 60.0f; // Adjust this value as needed
+    private static final float EDGE_TOLERANCE = 100.0f; // Adjust this value as needed
 
     // Method to check click position relative to the RectF
     boolean isLeft=false;
+    SelectorMode selmode=SelectorMode.IDLEMODE;
     private void checkClickPosition(float clickX, float clickY, RectF rect) {
         // Calculate the corners of the RectF
         float left = rect.left;
@@ -677,11 +659,14 @@ public abstract class PageView extends ViewGroup {
         if (Math.abs(clickX - right) <= EDGE_TOLERANCE && Math.abs(clickY - bottom) <= EDGE_TOLERANCE) {
             System.out.println("Clicked near the right bottom corner");
             isLeft=false;
+            selmode=SelectorMode.DRAGGINGRIGHT;
         }
         // Check if the click is near the left top corner
         else if (Math.abs(clickX - left) <= EDGE_TOLERANCE && Math.abs(clickY - top) <= EDGE_TOLERANCE) {
             System.out.println("Clicked near the left top corner");
             isLeft=true;
+            selmode=SelectorMode.DRAGGINGLEFT;
+
         }
         // Check if the click is near any other edge (optional)
         else if (Math.abs(clickX - left) <= EDGE_TOLERANCE || Math.abs(clickX - right) <= EDGE_TOLERANCE ||
@@ -694,6 +679,18 @@ public abstract class PageView extends ViewGroup {
                 System.out.println("Clicked near an edge after Right");
 
             }
+
+            if(selmode==SelectorMode.IDLEMODE)
+            {
+                selmode=SelectorMode.DRAGGINGNEWAREA;
+            }else   if(selmode==SelectorMode.DRAGGINGLEFT)
+            {
+                selmode=SelectorMode.DRAGGINGLEFT;
+            }
+            else  if(selmode==SelectorMode.DRAGGINGRIGHT)
+            {
+                selmode=SelectorMode.DRAGGINGRIGHT;
+            }
         }
         else {
 
@@ -705,6 +702,18 @@ public abstract class PageView extends ViewGroup {
                 System.out.println("Clicked inside the RectF but not near edges RIGHT");
 
             }
+
+            if(selmode==SelectorMode.IDLEMODE)
+            {
+                selmode=SelectorMode.DRAGGINGNEWAREA;
+            }else   if(selmode==SelectorMode.DRAGGINGLEFT)
+            {
+                selmode=SelectorMode.DRAGGINGSELCTIONLTR;
+            }
+            else  if(selmode==SelectorMode.DRAGGINGRIGHT)
+            {
+                selmode=SelectorMode.DRAGGINGSELCTIONRTL;
+            }
         }
     }
 
@@ -713,11 +722,79 @@ public abstract class PageView extends ViewGroup {
         RectF myRect = new RectF(229.5f, 611.2064f, 686.6694f, 769.499f);
         checkClickPosition(clickX, clickY, myRect);
     }
+public void selectEvent(MotionEvent e)
+{
+    Log.d("Clikmode","EVENy"+e.getAction());
+    if(e.getAction()==MotionEvent.ACTION_UP)
+    {
+        selmode=SelectorMode.IDLEMODE;
+    }
 
-    public void selectText(final float x0, final float y0, final float x1, final float y1) {
-        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
-        final float docRelX0 = (x0 - this.getLeft()) / scale;
-        final float docRelY0 = (y0 - this.getTop()) / scale;
+}
+
+    public void selectText(float x0, float y0, float x1, float y1) {
+        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
+        float docRelX0 = (x0 - getLeft())/scale;
+        float docRelY0 = (y0 - getTop())/scale;
+        float docRelX1 = (x1 - getLeft())/scale;
+        float docRelY1 = (y1 - getTop())/scale;
+
+        // Order on Y but maintain the point grouping
+        if (docRelY0 <= docRelY1)
+            mSelectBox = new RectF(docRelX0, docRelY0, docRelX1, docRelY1);
+        else
+            mSelectBox = new RectF(docRelX1, docRelY1, docRelX0, docRelY0);
+
+        //Adjust the min/max x values between which text is selected
+        if(Math.max(docRelX0,docRelX1)>docRelXmax) docRelXmax = Math.max(docRelX0,docRelX1);
+        if(Math.min(docRelX0,docRelX1)<docRelXmin) docRelXmin = Math.min(docRelX0,docRelX1);
+
+        mSearchView.invalidate();
+
+        loadText(); //We should do this earlier in the background ...
+    }
+    private       AsyncTask<Void,Void,TextWord[][]> mLoadTextTask;
+
+    private void loadText() {
+        if (mLoadTextTask == null) {
+            mLoadTextTask = new AsyncTask<Void,Void,TextWord[][]>() {
+                @Override
+                protected TextWord[][] doInBackground(Void... params) {
+                    return getText();
+                }
+                @Override
+                protected void onPostExecute(TextWord[][] result) {
+                    mText = result;
+                    mSearchView.invalidate();
+                }
+            };
+            mLoadTextTask.execute();
+        }
+    }
+
+    public void selectdText(final float x0, final float y0, final float x1, final float y1) {
+
+
+        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
+        float docRelX0 = (x0 - getLeft())/scale;
+        float docRelY0 = (y0 - getTop())/scale;
+        float docRelX1 = (x1 - getLeft())/scale;
+        float docRelY1 = (y1 - getTop())/scale;
+
+        // Order on Y but maintain the point grouping
+        if (docRelY0 <= docRelY1)
+            mSelectBox = new RectF(docRelX0, docRelY0, docRelX1, docRelY1);
+        else
+            mSelectBox = new RectF(docRelX1, docRelY1, docRelX0, docRelY0);
+
+        //Adjust the min/max x values between which text is selected
+        if(Math.max(docRelX0,docRelX1)>docRelXmax) docRelXmax = Math.max(docRelX0,docRelX1);
+        if(Math.min(docRelX0,docRelX1)<docRelXmin) docRelXmin = Math.min(docRelX0,docRelX1);
+
+
+//        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
+//        final float docRelX0 = (x0 - this.getLeft()) / scale;
+//        final float docRelY0 = (y0 - this.getTop()) / scale;
         final float docRelX2 = (x1 - this.getLeft()) / scale;
         final float docRelY2 = (y1 - this.getTop()) / scale;
         RectF newSelectBox;
@@ -728,12 +805,17 @@ public abstract class PageView extends ViewGroup {
         }
 
 
+
+
         // If mSelectBox is already defined, merge it with the new select box
         if (this.mSelectBox != null) {
 
-            checkClickPosition(docRelX2, docRelY2, this.mSelectBox);
-            this.mSelectBox.union(newSelectBox);  // Union combines the new selection with the previous one
-            Log.d("mSelectBoxvalue",""+mSelectBox);
+            this.mSelectBox=expandOriginalRect(mSelectBox,newSelectBox);
+
+//            checkTouchInRect(mSelectBox,docRelX2,docRelY2);
+
+//                this.mSelectBox.union(newSelectBox);
+
 
         } else {
 
@@ -764,7 +846,43 @@ public abstract class PageView extends ViewGroup {
             }).execute(new Void[0]);
         }
     }
+    public  RectF expandOriginalRect(RectF originalRect, RectF newRect)  {
+        // Check if newRect is within originalRect
+        boolean isLeftTopInside = originalRect.contains(newRect.left, newRect.top);
+        boolean isLeftBottomInside = originalRect.contains(newRect.left, newRect.bottom);
 
+        // If left-top and left-bottom of newRect are inside originalRect
+        // but newRect's left side is outside
+        if (isLeftTopInside && isLeftBottomInside && newRect.left > originalRect.left) {
+            // Expand the right side of originalRect to cover newRect
+            originalRect.right = Math.max(originalRect.right, newRect.right);
+            return originalRect;
+        }
+        RectF unionRect = new RectF(originalRect);
+        unionRect.union(newRect);
+        return newRect;
+    }
+    final float sideMargin = 100f;  // Adjust as necessary for sensitivity
+
+    public void checkTouchInRect(RectF rect, float touchX, float touchY) {
+        // First, check if the touch is inside the rectangle
+        if (rect.contains(touchX, touchY)) {
+            // Now determine which part of the rect was touched
+            if (touchX >= rect.left && touchX <= rect.left + sideMargin) {
+                // Touched near the left side
+                Log.d("TouchEvent", "Touch near the left side of the rectangle");
+            } else if (touchX <= rect.right && touchX >= rect.right - sideMargin) {
+                // Touched near the right side
+                Log.d("TouchEvent", "Touch near the right side of the rectangle");
+            } else {
+                // Touched inside, but not near the sides
+                Log.d("TouchEvent", "Touch inside the rectangle but not near the sides");
+            }
+        } else {
+            // Touch is outside the rectangle
+            Log.d("TouchEvent", "Touch outside the rectangle");
+        }
+    }
     public void startDraw(final float x, final float y) {
         final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
         final float docRelX = (x - this.getLeft()) / scale;
@@ -865,11 +983,19 @@ public abstract class PageView extends ViewGroup {
 
         return colors;
     }
-
-
     protected void processSelectedText(TextProcessor tp) {
-        (new TextSelector(mText, mSelectBox)).select(tp);
+        if (useSmartTextSelection)
+            (new TextSelector(mText, mSelectBox,docRelXmin,docRelXmax)).select(tp);
+        else
+            (new TextSelector(mText, mSelectBox)).select(tp);
     }
+
+   /* protected void processSelectedText(TextProcessor tp) {
+        (new TextSelector(mText, mSelectBox)).select(tp);
+        TextSelectionDrawer textSelectionDrawer = new TextSelectionDrawer();
+        textSelectionDrawer.reset(canvas, scale); // Make sure to pass the correct canvas and scale
+        new TextSelector(mText, mSelectBox).select(textSelectionDrawer);
+    }*/
 
     public void setItemSelectBox(final RectF rect) {
         this.mItemSelectBox = rect;
@@ -1041,4 +1167,153 @@ public abstract class PageView extends ViewGroup {
     public boolean isOpaque() {
         return true;
     }
+    private final Paint searchResultPaint = new Paint();
+    private final Paint highlightedSearchResultPaint = new Paint();
+    private final Paint linksPaint = new Paint();
+    private final Paint selectBoxPaint = new Paint();
+    private final Paint selectMarkerPaint = new Paint();
+    private final Paint selectOverlayPaint = new Paint();
+    private final Paint itemSelectBoxPaint = new Paint();
+    private final Paint drawingPaint = new Paint();
+    private final Paint eraserInnerPaint = new Paint();
+    private final Paint eraserOuterPaint = new Paint();
+    class TextSelectionDrawer implements TextProcessor {
+        RectF rect;
+        RectF firstLineRect = new RectF();
+        RectF lastLineRect = new RectF();
+        Path leftMarker = new Path();
+        Path rightMarker = new Path();
+        float height;
+        float oldHeight = 0f;
+        float docRelXmaxSelection = Float.NEGATIVE_INFINITY;
+        float docRelXminSelection = Float.POSITIVE_INFINITY;
+        float scale;
+        Canvas canvas;
+
+        public void reset(Canvas canvas, float scale) {
+            this.canvas = canvas;
+            this.scale = scale;
+            firstLineRect.setEmpty();
+            lastLineRect.setEmpty();
+            docRelXmaxSelection = Float.NEGATIVE_INFINITY;
+            docRelXminSelection = Float.POSITIVE_INFINITY;
+        }
+
+        public void onStartLine() {
+            rect = new RectF();
+        }
+
+        public void onWord(TextWord word) {
+            rect.union(word);
+        }
+
+        public void onEndLine() {
+            if (!rect.isEmpty()) {
+                if (firstLineRect.isEmpty() || firstLineRect.top > rect.top) {
+                    firstLineRect.set(rect);
+                }
+                if (lastLineRect.isEmpty() || lastLineRect.bottom < rect.bottom) {
+                    lastLineRect.set(rect);
+                }
+
+                canvas.drawRect(rect.left * scale, rect.top * scale,
+                        rect.right * scale, rect.bottom * scale, selectBoxPaint);
+
+                docRelXmaxSelection = Math.max(docRelXmaxSelection, Math.max(rect.right, docRelXmax));
+                docRelXminSelection = Math.min(docRelXminSelection, Math.min(rect.left, docRelXmin));
+            }
+        }
+
+        public void onEndText() {
+            if (!firstLineRect.isEmpty() && !lastLineRect.isEmpty()) {
+                height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top,
+                                        lastLineRect.bottom - lastLineRect.top),
+                                getResources().getDisplayMetrics().xdpi * 0.07f / scale),
+                        4 * getResources().getDisplayMetrics().xdpi * 0.07f / scale);
+                leftMarkerRect.set(firstLineRect.left-0.9f*height,firstLineRect.top,firstLineRect.left,firstLineRect.top+1.9f*height);
+                rightMarkerRect.set(lastLineRect.right,lastLineRect.top,lastLineRect.right+0.9f*height,lastLineRect.top+1.9f*height);
+
+                leftMarker.reset();
+                leftMarker.moveTo(0f, 0f);
+                leftMarker.lineTo(0f, 1.9f * height * scale);
+                leftMarker.lineTo(-0.9f * height * scale, 1.9f * height * scale);
+                leftMarker.close();
+
+                rightMarker.reset();
+                rightMarker.moveTo(0f, 0f);
+                rightMarker.lineTo(0f, 1.9f * height * scale);
+                rightMarker.lineTo(0.9f * height * scale, 1.9f * height * scale);
+                rightMarker.close();
+
+                leftMarker.offset(firstLineRect.left * scale, firstLineRect.top * scale);
+                rightMarker.offset(lastLineRect.right * scale, lastLineRect.top * scale);
+                canvas.drawPath(leftMarker, selectMarkerPaint);
+                canvas.drawPath(rightMarker, selectMarkerPaint);
+            }
+
+            if (useSmartTextSelection) {
+                canvas.drawRect(0, 0, docRelXminSelection * scale, PageView.this.getHeight(), selectOverlayPaint);
+                canvas.drawRect(docRelXmaxSelection * scale, 0, PageView.this.getWidth(), PageView.this.getHeight(), selectOverlayPaint);
+            }
+        }
+    }
+    private static boolean useSmartTextSelection = false;
+    private       float     docRelXmax = Float.NEGATIVE_INFINITY;
+    private       float     docRelXmin = Float.POSITIVE_INFINITY;
+
+    //Update in following TextSelectionDrawer (coordinates are relative to document)
+    private RectF leftMarkerRect = new RectF();
+    private RectF rightMarkerRect= new RectF();
+
+    public boolean hitsLeftMarker(float x, float y)
+    {
+        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
+        float docRelX = (x - getLeft())/scale;
+        float docRelY = (y - getTop())/scale;
+        Log.d("LADALALA","MMleftMarkerRect"+leftMarkerRect);
+        return leftMarkerRect != null && leftMarkerRect.contains(docRelX,docRelY);
+    }
+    public boolean hitsRightMarker(float x, float y)
+    {
+        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
+        float docRelX = (x - getLeft())/scale;
+        float docRelY = (y - getTop())/scale;
+        Log.d("LADALALA","MMrightMarkerRect"+rightMarkerRect);
+
+        return rightMarkerRect != null && rightMarkerRect.contains(docRelX,docRelY);
+    }
+    public void moveLeftMarker(MotionEvent e){
+        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
+        float docRelX = (e.getX() - getLeft())/scale;
+        float docRelY = (e.getY() - getTop())/scale;
+
+        mSelectBox.left=docRelX;
+        if(docRelY < mSelectBox.bottom)
+            mSelectBox.top=docRelY;
+        else {
+            mSelectBox.top=mSelectBox.bottom;
+            mSelectBox.bottom=docRelY;
+        }
+        if(docRelX>docRelXmax) docRelXmax = docRelX;
+        if(docRelX<docRelXmin) docRelXmin = docRelX;
+        mSearchView.invalidate();
+    }
+
+    public void moveRightMarker(MotionEvent e){
+        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
+        float docRelX = (e.getX() - getLeft())/scale;
+        float docRelY = (e.getY() - getTop())/scale;
+        mSelectBox.right=docRelX;
+        if(docRelY > mSelectBox.top)
+            mSelectBox.bottom=docRelY;
+        else {
+            mSelectBox.bottom=mSelectBox.top;
+            mSelectBox.top=docRelY;
+        }
+        if(docRelX>docRelXmax) docRelXmax = docRelX;
+        if(docRelX<docRelXmin) docRelXmin = docRelX;
+        mSearchView.invalidate();
+    }
+    private static final int ERASER_INNER_COLOR = 0xFFFFFFFF;
+    private static final int ERASER_OUTER_COLOR = 0xFF000000;
 }

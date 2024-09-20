@@ -6,6 +6,7 @@ package com.artifex.mupdfdemo;
 
 import android.graphics.RectF;
 import android.graphics.PointF;
+import android.view.MotionEvent;
 
 public interface MuPDFView
 {
@@ -18,10 +19,15 @@ public interface MuPDFView
     void blank(final int p0);
 
     Hit passClickEvent(final float p0, final float p1);
+    public void moveRightMarker(MotionEvent e);
+    public boolean hitsRightMarker(float x, float y);
+    public void moveLeftMarker(MotionEvent e);
+    public boolean hitsLeftMarker(float x, float y);
 
     LinkInfo hitLink(final float p0, final float p1);
 
     void selectText(final float p0, final float p1, final float p2, final float p3);
+    void selectEvent(MotionEvent e);
 
     void selectorFirstPoint(final float p0, final float p1);
 

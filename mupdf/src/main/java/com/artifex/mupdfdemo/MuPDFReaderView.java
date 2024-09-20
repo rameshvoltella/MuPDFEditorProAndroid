@@ -164,7 +164,8 @@ public class MuPDFReaderView extends ReaderView {
         }
         return super.onSingleTapUp(e);
     }
-
+    private boolean scrollStartedAtLeftMarker = false;
+    private boolean scrollStartedAtRightMarker = false;
     @Override
     public boolean onScroll(final MotionEvent e1, final MotionEvent e2, final float distanceX, final float distanceY) {
         final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
@@ -177,9 +178,23 @@ public class MuPDFReaderView extends ReaderView {
             }
             case Selecting: {
                 if (pageView != null) {
-                    Log.d("scroller","YONO");
                     //ambu
-                    pageView.selectText(e1.getX(), e1.getY(), e2.getX(), e2.getY());
+                    if(pageView.hitsLeftMarker(e1.getX(),e1.getY()) || scrollStartedAtLeftMarker) {
+                        Log.d("newCheck","LEFTMARKER");
+                        scrollStartedAtLeftMarker = true;
+                        pageView.moveLeftMarker(e2);
+                    }
+                    else if(pageView.hitsRightMarker(e1.getX(),e1.getY()) || scrollStartedAtRightMarker) {
+                        scrollStartedAtRightMarker = true;
+                        Log.d("newCheck","RightMARKER");
+                        pageView.moveRightMarker(e2);
+                    }
+                    else {
+                        pageView.selectText(e1.getX(), e1.getY(), e2.getX(), e2.getY());
+                        Log.d("newCheck","NORMAL");
+
+
+                    }
                 }
                 return true;
             }
@@ -253,11 +268,14 @@ public class MuPDFReaderView extends ReaderView {
                 }
 
                 case MotionEvent.ACTION_UP:
+                    scrollStartedAtLeftMarker = false;
+                    scrollStartedAtRightMarker = false;
                     if (this.mMode == Mode.Selecting) {
                         final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
                         pageView.isTextSelected();
-                        touch_up(x, y);
+                        pageView.selectEvent(event);
 
+                        touch_up(x, y);
                     }
                     break;
             }
