@@ -1269,6 +1269,7 @@ public void selectEvent(MotionEvent e)
                 canvas.drawPath(leftMarker, selectMarkerPaint);
                 canvas.drawPath(rightMarker, selectMarkerPaint);
             }*/
+           /*
             if(firstLineRect != null && lastLineRect != null)
             {
                 height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top, lastLineRect.bottom - lastLineRect.top), getResources().getDisplayMetrics().xdpi*0.07f/scale), 4*getResources().getDisplayMetrics().xdpi*0.07f/scale);
@@ -1298,6 +1299,10 @@ Log.d("ckckckc","firstLineRect"+firstLineRect);
 
                 leftMarker.offset(firstLineRect.left*scale, firstLineRect.top*scale);
                 rightMarker.offset(lastLineRect.right*scale, lastLineRect.top*scale);
+
+//                textSelectionHelper.drawStartHandle(canvas,firstLineRect.left,firstLineRect.top,scale);
+//                textSelectionHelper.drawEndHandle(canvas,lastLineRect.right,lastLineRect.top,scale);
+
                 canvas.drawPath(leftMarker, selectMarkerPaint);
                 canvas.drawPath(rightMarker, selectMarkerPaint);
                 //Undo the offset so that we can reuse the path
@@ -1309,6 +1314,58 @@ Log.d("ckckckc","firstLineRect"+firstLineRect);
                 canvas.drawRect(0, 0, docRelXminSelection * scale, PageView.this.getHeight(), selectOverlayPaint);
                 canvas.drawRect(docRelXmaxSelection * scale, 0, PageView.this.getWidth(), PageView.this.getHeight(), selectOverlayPaint);
             }
+
+            */
+            if (firstLineRect != null && lastLineRect != null) {
+                height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top, lastLineRect.bottom - lastLineRect.top), getResources().getDisplayMetrics().xdpi * 0.07f / scale), 4 * getResources().getDisplayMetrics().xdpi * 0.07f / scale);
+
+                leftMarkerRect.set(firstLineRect.left - 0.9f * height, firstLineRect.top, firstLineRect.left, firstLineRect.top + 1.9f * height);
+                rightMarkerRect.set(lastLineRect.right, lastLineRect.top, lastLineRect.right + 0.9f * height, lastLineRect.top + 1.9f * height);
+
+                /*if (height != oldHeight || true) {
+                    float cornerRadius = 0.4f * height * scale; // Adjust this value for corner curvature
+
+                    // Left marker with rounded bottom
+                    leftMarker.rewind();
+                    leftMarker.moveTo(0f, 0f);
+                    leftMarker.rLineTo(0f, 1.5f * height * scale);  // Straight line down
+                    leftMarker.quadTo(-0.9f * height * scale / 2, 1.9f * height * scale, -0.9f * height * scale, 1.5f * height * scale);  // Rounded bottom
+                    leftMarker.rLineTo(0f, -1.5f * height * scale);  // Straight line up
+                    leftMarker.close();
+
+                    // Right marker with rounded bottom
+                    rightMarker.rewind();
+                    rightMarker.moveTo(0f, 0f);
+                    rightMarker.rLineTo(0f, 1.5f * height * scale);  // Straight line down
+                    rightMarker.quadTo(0.9f * height * scale / 2, 1.9f * height * scale, 0.9f * height * scale, 1.5f * height * scale);  // Rounded bottom
+                    rightMarker.rLineTo(0f, -1.5f * height * scale);  // Straight line up
+                    rightMarker.close();
+
+                    oldHeight = height;
+                }*/
+
+                Log.d("ckckckc", "firstLineRect" + firstLineRect);
+                Log.d("ckckckc", "last" + lastLineRect);
+
+//                leftMarker.offset(firstLineRect.left * scale, firstLineRect.top * scale);
+//                rightMarker.offset(lastLineRect.right * scale, lastLineRect.top * scale);
+
+                // Drawing the paths
+//                canvas.drawPath(leftMarker, selectMarkerPaint);
+//                canvas.drawPath(rightMarker, selectMarkerPaint);
+                textSelectionHelper.drawStartHandle(canvas,firstLineRect.left,firstLineRect.top,scale);
+                textSelectionHelper.drawEndHandle(canvas,lastLineRect.right,lastLineRect.top,scale);
+                // Undo the offset so that we can reuse the path
+//                leftMarker.offset(-firstLineRect.left * scale, -firstLineRect.top * scale);
+//                rightMarker.offset(-lastLineRect.right * scale, -lastLineRect.top * scale);
+            }
+
+            if (useSmartTextSelection) {
+                canvas.drawRect(0, 0, docRelXminSelection * scale, PageView.this.getHeight(), selectOverlayPaint);
+                canvas.drawRect(docRelXmaxSelection * scale, 0, PageView.this.getWidth(), PageView.this.getHeight(), selectOverlayPaint);
+            }
+
+
         }
     }
     private static boolean useSmartTextSelection = false;
