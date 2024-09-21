@@ -106,6 +106,7 @@ public abstract class PageView extends ViewGroup {
     protected abstract void addMarkup(final PointF[] p0, final Annotation.Type p1 , int color);
 
     private void reinit() {
+        reset();
         if (this.mDrawEntire != null) {
             this.mDrawEntire.cancelAndWait();
             this.mDrawEntire = null;
@@ -190,9 +191,16 @@ public abstract class PageView extends ViewGroup {
 
     public void releaseResources() {
         this.reinit();
+
         if (this.mBusyIndicator != null) {
             this.removeView((View) this.mBusyIndicator);
             this.mBusyIndicator = null;
+        }
+    }
+    private void reset() {
+        if (mLoadTextTask != null) {
+            mLoadTextTask.cancel(true);
+            mLoadTextTask = null;
         }
     }
 
@@ -584,6 +592,7 @@ public abstract class PageView extends ViewGroup {
 */
             });
         }
+        loadText();
         this.requestLayout();
     }
 
@@ -984,6 +993,8 @@ public void selectEvent(MotionEvent e)
         return colors;
     }
     protected void processSelectedText(TextProcessor tp) {
+        Log.d("dddddd","CheckprocessSelectedText"+mText+"<><><"+mSelectBox);
+
         if (useSmartTextSelection)
             (new TextSelector(mText, mSelectBox,docRelXmin,docRelXmax)).select(tp);
         else
@@ -1429,7 +1440,7 @@ Log.d("ckckckc","firstLineRect"+firstLineRect);
     private static final int ERASER_OUTER_COLOR = 0xFF000000;
 
     public boolean hasTextSelected() {
-
+Log.d("dddddd","Check");
         class Boolean {
             public boolean value;
         }
