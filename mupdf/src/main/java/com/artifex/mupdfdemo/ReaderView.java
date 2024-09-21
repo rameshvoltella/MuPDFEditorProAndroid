@@ -377,6 +377,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vl = (View)this.mChildViews.get(this.mCurrent + 1);
                     if (vl != null) {
+                        Log.d("smapp","Yaaa1111111");
                         this.slideViewOntoScreen(vl);
                         return true;
                     }
@@ -388,6 +389,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vl = (View)this.mChildViews.get(this.mCurrent + 1);
                     if (vl != null) {
+                        Log.d("smapp","Yaaa22222");
                         this.slideViewOntoScreen(vl);
                         return true;
                     }
@@ -399,6 +401,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vr = (View)this.mChildViews.get(this.mCurrent - 1);
                     if (vr != null) {
+                        Log.d("smapp","Yaaa33333");
                         this.slideViewOntoScreen(vr);
                         return true;
                     }
@@ -410,6 +413,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vr = (View)this.mChildViews.get(this.mCurrent - 1);
                     if (vr != null) {
+                        Log.d("smapp","Yaaa55555");
                         this.slideViewOntoScreen(vr);
                         return true;
                     }
@@ -518,6 +522,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
             final View v = (View)this.mChildViews.get(this.mCurrent);
             if (v != null) {
                 if (this.mScroller.isFinished()) {
+                    Log.d("smapp","Yaaa66666666");
                     this.slideViewOntoScreen(v);
                 }
                 if (this.mScroller.isFinished()) {
@@ -648,13 +653,23 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 final Point corr = this.getCorrection(this.getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
                 cvRight += corr.x;
                 cvLeft += corr.x;
-                cvTop += corr.y;
+                if(mCurrent==0)
+                {
+                    cvTop=0;
+                }else {
+                    cvTop += corr.y;
+                }
                 cvBottom += corr.y;
             }
             else if (cv.getMeasuredHeight() <= this.getHeight()) {
                 final Point corr = this.getCorrection(this.getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
                 if (this.HORIZONTAL_SCROLLING) {
-                    cvTop += corr.y;
+                    if(mCurrent==0)
+                    {
+                        cvTop=0;
+                    }else {
+                        cvTop += corr.y;
+                    }
                     cvBottom += corr.y;
                 }
                 else {
@@ -771,6 +786,11 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     private Point getCorrection(final Rect bounds) {
+        Log.d("TOP VALUE",">>>>>chl"+mCurrent);
+//        if(mCurrent==0)
+//        {
+//        bounds.top=0;
+//        }
 //        return new Point(0,0);
         return new Point(Math.min(Math.max(0, bounds.left), bounds.right), Math.min(Math.max(0, bounds.top), bounds.bottom));
     }
@@ -794,6 +814,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     private void slideViewOntoScreen(final View v) {
+        Log.d("smapp","Yaaa");
         final Point corr = this.getCorrection(this.getScrollBounds(v));
         if (corr.x != 0 || corr.y != 0) {
             final int n = 0;
