@@ -655,7 +655,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 cvLeft += corr.x;
                 if(mCurrent==0)
                 {
-                    cvTop=0;
+                    cvTop=corr.y;
                 }else {
                     cvTop += corr.y;
                 }
@@ -666,7 +666,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 if (this.HORIZONTAL_SCROLLING) {
                     if(mCurrent==0)
                     {
-                        cvTop=0;
+                        cvTop=corr.y;
                     }else {
                         cvTop += corr.y;
                     }
@@ -787,10 +787,10 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
 
     private Point getCorrection(final Rect bounds) {
         Log.d("TOP VALUE",">>>>>chl"+mCurrent);
-//        if(mCurrent==0)
-//        {
-//        bounds.top=0;
-//        }
+        if(mCurrent==0)
+        {
+        bounds.top=0;
+        }
 //        return new Point(0,0);
         return new Point(Math.min(Math.max(0, bounds.left), bounds.right), Math.min(Math.max(0, bounds.top), bounds.bottom));
     }
