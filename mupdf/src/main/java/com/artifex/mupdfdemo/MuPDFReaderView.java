@@ -133,6 +133,9 @@ public class MuPDFReaderView extends ReaderView {
 
     @Override
     public boolean onSingleTapUp(final MotionEvent e) {
+        //Stop the long tap handler
+        longInputHandler.removeCallbacks(longPressed);
+        longPressStartEvent = null;
         if (this.mMode == Mode.Viewing && !this.tapDisabled) {
             final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
             final Hit item = pageView.passClickEvent(e.getX(), e.getY());
@@ -266,7 +269,9 @@ public class MuPDFReaderView extends ReaderView {
 
     @Override
     public boolean onFling(final MotionEvent e1, final MotionEvent e2, final float velocityX, final float velocityY) {
-        switch (this.mMode) {
+
+        longInputHandler.removeCallbacks(longPressed);
+        longPressStartEvent = null;  switch (this.mMode) {
             case Viewing: {
                 return super.onFling(e1, e2, velocityX, velocityY);
             }
@@ -278,6 +283,8 @@ public class MuPDFReaderView extends ReaderView {
 
     @Override
     public boolean onScaleBegin(final ScaleGestureDetector d) {
+        longInputHandler.removeCallbacks(longPressed);
+        longPressStartEvent = null;
         this.tapDisabled = true;
         return super.onScaleBegin(d);
     }
@@ -285,6 +292,7 @@ public class MuPDFReaderView extends ReaderView {
     @Override
     public void onLongPress(MotionEvent e) {
         super.onLongPress(e);
+
         //  MuPDFView pageView = (MuPDFView) getDisplayedView();
       /*  switch (mMode) {
             case Viewing:
@@ -330,6 +338,9 @@ public class MuPDFReaderView extends ReaderView {
                 case MotionEvent.ACTION_UP:
                     scrollStartedAtLeftMarker = false;
                     scrollStartedAtRightMarker = false;
+
+                    longInputHandler.removeCallbacks(longPressed);
+                    longPressStartEvent = null;
                     if (this.mMode == Mode.Selecting) {
                         final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
                         pageView.isTextSelected();

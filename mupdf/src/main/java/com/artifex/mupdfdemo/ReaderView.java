@@ -771,6 +771,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     private Point getCorrection(final Rect bounds) {
+//        return new Point(0,0);
         return new Point(Math.min(Math.max(0, bounds.left), bounds.right), Math.min(Math.max(0, bounds.top), bounds.bottom));
     }
 
@@ -804,7 +805,8 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     private Point subScreenSizeOffset(final View v) {
-        return new Point(Math.max((this.getWidth() - v.getMeasuredWidth()) / 2, 0), Math.max((this.getHeight() - v.getMeasuredHeight()) / 2, 0));
+        return new Point(0,0);
+//        return new Point(Math.max((this.getWidth() - v.getMeasuredWidth()) / 2, 0), Math.max((this.getHeight() - v.getMeasuredHeight()) / 2, 0));
     }
 
     private static int directionOfTravel(final float vx, final float vy) {
