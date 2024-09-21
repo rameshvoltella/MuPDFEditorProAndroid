@@ -655,8 +655,10 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 cvLeft += corr.x;
                 if(mCurrent==0)
                 {
+
                     cvTop=corr.y;
                 }else {
+
                     cvTop += corr.y;
                 }
                 cvBottom += corr.y;
@@ -666,7 +668,10 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 if (this.HORIZONTAL_SCROLLING) {
                     if(mCurrent==0)
                     {
+                        Log.d("checking the top","<>222<>"+corr);
+
                         cvTop=corr.y;
+
                     }else {
                         cvTop += corr.y;
                     }
@@ -677,7 +682,20 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     cvLeft += corr.x;
                 }
             }
+            Log.d("chakkappa","cvLeft>"+cvLeft+"cvTop>"+cvTop+"cvRight>"+cvRight+"cvBottom>"+cvBottom);
+//            if(mCurrent==0&&!this.mUserInteracting) {
+//                cvLeft=0;
+//                cvTop=0;
+//                cvRight=1080;
+//                cvBottom=1527;
+////                1527
+//
+//
+//            }else{
+//
+//            }
             cv.layout(cvLeft, cvTop, cvRight, cvBottom);
+
             if (this.mCurrent > 0) {
                 final View lv = this.getOrCreateChild(this.mCurrent - 1);
                 final Point leftOffset = this.subScreenSizeOffset(lv);
@@ -703,7 +721,6 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 }
             }
             this.invalidate();
-            Log.d("INVALIDATEunda","77777");
 
         }
     }
