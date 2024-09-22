@@ -352,6 +352,18 @@ public abstract class PageView extends ViewGroup {
                         paint.setStyle(Paint.Style.STROKE);
                         canvas.drawPath(path, paint);
                     }
+                    if (!PageView.this.mIsBlank && PageView.this.mLinks != null && PageView.this.mHighlightLinks) {
+                        paint.setColor(PageView.this.LINK_COLOR);
+                        for (final LinkInfo link : PageView.this.mLinks) {
+                            canvas.drawRect(link.rect.left * scale, link.rect.top * scale, link.rect.right * scale, link.rect.bottom * scale, paint);
+                        }
+                    }
+                    if (PageView.this.mItemSelectBox != null) {
+                        paint.setStyle(Paint.Style.STROKE);
+                        paint.setStrokeWidth(4.0f);
+                        paint.setColor(BOX_COLOR);
+                        canvas.drawRect(PageView.this.mItemSelectBox.left * scale, PageView.this.mItemSelectBox.top * scale, PageView.this.mItemSelectBox.right * scale, PageView.this.mItemSelectBox.bottom * scale, paint);
+                    }
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
                         paint.setColor(HIGHLIGHT_COLOR);
                         for (final RectF rect : PageView.this.mSearchBoxes) {

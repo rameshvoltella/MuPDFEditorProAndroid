@@ -41,6 +41,9 @@ public interface MuPDFView
 
     boolean markupSelection(final Annotation.Type p0);
 
+    boolean markupHardcodeSelection(final Annotation.Type p0);
+
+
     void deleteSelectedAnnotation();
 
     void setSearchBoxes(final RectF[] p0);

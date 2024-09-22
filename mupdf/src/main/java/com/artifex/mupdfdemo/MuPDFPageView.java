@@ -375,7 +375,42 @@ public class MuPDFPageView extends PageView implements MuPDFView
         cm.setPrimaryClip(ClipData.newPlainText("MuPDF", text));
         return true;
     }
+    @Override
+    public boolean markupHardcodeSelection(final Annotation.Type type) {
+        ArrayList<PointF> quadPoints = new ArrayList<>();
 
+        // Adding the points from your log
+        quadPoints.add(new PointF(334.56006f, 370.91287f));
+        quadPoints.add(new PointF(1127.1147f, 370.91287f));
+        quadPoints.add(new PointF(1127.1147f, 346.41177f));
+        quadPoints.add(new PointF(334.56006f, 346.41177f));
+        quadPoints.add(new PointF(68.448f, 395.39285f));
+        quadPoints.add(new PointF(1099.8542f, 395.39285f));
+        quadPoints.add(new PointF(1099.8542f, 370.89175f));
+        quadPoints.add(new PointF(68.448f, 370.89175f));
+        quadPoints.add(new PointF(68.448f, 419.15286f));
+        quadPoints.add(new PointF(1081.1471f, 419.15286f));
+        quadPoints.add(new PointF(1081.1471f, 394.65176f));
+        quadPoints.add(new PointF(68.448f, 394.65176f));
+        quadPoints.add(new PointF(68.448f, 443.63284f));
+        quadPoints.add(new PointF(152.016f, 443.63284f));
+        quadPoints.add(new PointF(152.016f, 419.13174f));
+        quadPoints.add(new PointF(68.448f, 419.13174f));
+
+        (this.mAddStrikeOut = new AsyncTask<Object, Void, Void>() {
+            protected Void doInBackground(final Object... params) {
+                MuPDFPageView.this.addMarkup(((PointF[][]) params[0])[0], type, (int)params[1]);
+                return null;
+            }
+
+            protected void onPostExecute(final Void result) {
+                MuPDFPageView.this.loadAnnotations();
+                MuPDFPageView.this.update();
+            }
+        }).execute(new PointF[][] { quadPoints.toArray(new PointF[quadPoints.size()]) }, getInkColor());
+        this.deselectText();
+        return true;
+    }
     @Override
     public boolean markupSelection(final Annotation.Type type) {
         final ArrayList<PointF> quadPoints = new ArrayList<PointF>();
@@ -399,6 +434,8 @@ public class MuPDFPageView extends PageView implements MuPDFView
                     quadPoints.add(new PointF(this.rect.right, this.rect.bottom));
                     quadPoints.add(new PointF(this.rect.right, this.rect.top));
                     quadPoints.add(new PointF(this.rect.left, this.rect.top));
+
+                    Log.d("poinsyoyo",""+quadPoints);
                 }
             }
 
@@ -518,7 +555,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
 
     @Override
     protected void addMarkup(final PointF[] quadPoints, final Annotation.Type type , int color) {
-        Log.d("points",quadPoints.length+"");
+        Log.d("addingpoints",quadPoints+"");
 
 
         this.mCore.addMarkupAnnotation(this.mPageNumber, quadPoints, type , color);

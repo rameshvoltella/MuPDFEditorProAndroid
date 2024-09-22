@@ -55,7 +55,7 @@
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:paddingHorizontal="20dp"
         android:src="@drawable/baseline_close_24"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@id/tittle_bar"
         app:layout_constraintEnd_toStartOf="@id/text_search_btn"
         app:layout_constraintStart_toEndOf="@id/title_tv"
