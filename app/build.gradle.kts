@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myapplication"
+    namespace = "com.rameshvoltella.pdfeditorpro"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.rameshvoltella.pdfeditorpro"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

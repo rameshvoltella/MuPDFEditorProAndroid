@@ -1,22 +1,26 @@
-package com.example.myapplication
+package com.rameshvoltella.pdfeditorpro
 
+import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.myapplication.databinding.SearchDismissDialogBinding
+import com.rameshvoltella.pdfeditorpro.Constants.DOC_BOOKMARK
+import com.rameshvoltella.pdfeditorpro.Constants.DOC_TABLE_CONTENT
+import com.rameshvoltella.pdfeditorpro.databinding.ContentOpenFileOptionDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class SearchDismissDialog : BottomSheetDialogFragment() {
+class OpenFileOptionsDialog: BottomSheetDialogFragment() {
     private var openedOptionListener: ((selectedOption: String) -> Unit)? = null
 
     companion object {
         private const val KEY_TITLE = "KEY_TITLE"
-        fun newInstance(title: String, listener: (selectedOption: String) -> Unit): SearchDismissDialog {
+        fun newInstance(title: String, listener: (selectedOption: String) -> Unit): OpenFileOptionsDialog {
             val args = Bundle()
             args.putString(KEY_TITLE, title)
-            val fragment = SearchDismissDialog()
+            val fragment = OpenFileOptionsDialog()
             fragment.arguments = args
             fragment.openedOptionListener = listener
             return fragment
@@ -24,7 +28,7 @@ class SearchDismissDialog : BottomSheetDialogFragment() {
 
     }
 
-    private var _binding: SearchDismissDialogBinding? = null
+    private var _binding: ContentOpenFileOptionDialogBinding? = null
     private val binding get() = _binding!!
     private var documentName: String? = null
 
@@ -34,6 +38,8 @@ class SearchDismissDialog : BottomSheetDialogFragment() {
         setStyle(STYLE_NORMAL, R.style.StyleBottomSheetDialog)
         documentName = arguments?.getString(KEY_TITLE)
         Log.i("FILEOP", "onCreate:--IF$documentName")
+
+
     }
 
     override fun onCreateView(
@@ -42,14 +48,17 @@ class SearchDismissDialog : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         if (_binding == null) {
-            _binding = SearchDismissDialogBinding.inflate(inflater, container, false)
+            _binding = ContentOpenFileOptionDialogBinding.inflate(inflater, container, false)
+
         }
-        documentName?.let {
-            binding.titleTv.text = it
-        }
+       documentName?.let {
+           binding.titleTv.text = it
+       }
         binding.setListenersToButtons()
         return binding.root
     }
+
+
 
 
     override fun onPause() {
@@ -62,13 +71,31 @@ class SearchDismissDialog : BottomSheetDialogFragment() {
         }
     }
 
-    private fun SearchDismissDialogBinding.setListenersToButtons() {
-        closeDialogBtn.setOnSingleClickListener({
+    private fun ContentOpenFileOptionDialogBinding.setListenersToButtons() {
+
+        tableContentBtn.setOnSingleClickListener ({
+            openedOptionListener?.invoke(DOC_TABLE_CONTENT)
             runDismiss()
+
         })
+        addBookmarkBtn.setOnSingleClickListener ({
+            openedOptionListener?.invoke(DOC_BOOKMARK)
+            runDismiss()
+
+        })
+
+
     }
 
     private fun runDismiss() {
         dialog?.dismiss()
+    }
+
+
+}
+
+fun Context.dismissDialogIfVisible(dialog: Dialog?) {
+    dialog?.apply {
+        if (isShowing) dismiss()
     }
 }

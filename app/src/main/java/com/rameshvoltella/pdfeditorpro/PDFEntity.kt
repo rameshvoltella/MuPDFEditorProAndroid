@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.rameshvoltella.pdfeditorpro
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.rameshvoltella.pdfeditorpro
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -6,7 +6,7 @@ import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myapplication.databinding.ContentColorRecyclerBinding
+import com.rameshvoltella.pdfeditorpro.databinding.ContentColorRecyclerBinding
 
 
 class ColorAdapter(

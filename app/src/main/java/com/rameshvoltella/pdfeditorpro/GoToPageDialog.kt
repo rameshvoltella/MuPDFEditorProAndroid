@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.rameshvoltella.pdfeditorpro
 
 import android.os.Bundle
 import android.text.InputType
@@ -9,7 +9,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.fragment.app.DialogFragment
-import com.example.myapplication.databinding.ContentPageNavigationDialogBinding
+import com.rameshvoltella.pdfeditorpro.databinding.ContentPageNavigationDialogBinding
 
 class GoToPageDialog : DialogFragment() {
 //    var pageNavigationListener: GoToPageDialogListener? = null

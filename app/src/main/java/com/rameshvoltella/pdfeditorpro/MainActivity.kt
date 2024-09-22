@@ -1,11 +1,11 @@
-package com.example.myapplication
+package com.rameshvoltella.pdfeditorpro
 
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import com.example.myapplication.Constants.DATA_CLASS_BUNDLE
+import com.rameshvoltella.pdfeditorpro.Constants.DATA_CLASS_BUNDLE
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -18,12 +18,12 @@ class MainActivity : ComponentActivity() {
         setContentView(R.layout.activity_main)
 
 //        copyFileFromAssetsToInternal(this, "example.pdf")
-        copyFileFromAssetsToInternal(this, "harrypotter.pdf")
+        copyFileFromAssetsToInternal(this, "testfile.pdf")
         startActivity(Intent(this@MainActivity, ViewEditPdfActivity::class.java).apply {
-            putExtra(Constants.PDF_FILE_PATH, "${filesDir.path}/harrypotter.pdf")
+            putExtra(Constants.PDF_FILE_PATH, "${filesDir.path}/testfile.pdf")
             putExtra(Constants.DOC_ID, -1L)
             putExtra(Constants.DIRECT_DOC_EDIT_OPEN, false)
-            putExtra(Constants.DOC_NAME, "harrypotter.pdf")
+            putExtra(Constants.DOC_NAME, "testfile.pdf")
         })
     }
 

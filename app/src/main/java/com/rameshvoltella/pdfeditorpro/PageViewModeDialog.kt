@@ -1,4 +1,4 @@
-package  com.example.myapplication
+package  com.rameshvoltella.pdfeditorpro
 
 import android.content.res.Resources
 import android.os.Bundle
@@ -8,14 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.appcompat.widget.AppCompatTextView
-import com.example.myapplication.Constants.CONTINUE_MODE
-import com.example.myapplication.Constants.DARK
-import com.example.myapplication.Constants.EYES
-import com.example.myapplication.Constants.HORIZONTAL
-import com.example.myapplication.Constants.LIGHT
-import com.example.myapplication.Constants.PAGE_MODE
-import com.example.myapplication.Constants.VERTICAL
-import com.example.myapplication.databinding.ContentPageModeDialogBinding
+import com.rameshvoltella.pdfeditorpro.Constants.CONTINUE_MODE
+import com.rameshvoltella.pdfeditorpro.Constants.DARK
+import com.rameshvoltella.pdfeditorpro.Constants.EYES
+import com.rameshvoltella.pdfeditorpro.Constants.HORIZONTAL
+import com.rameshvoltella.pdfeditorpro.Constants.LIGHT
+import com.rameshvoltella.pdfeditorpro.Constants.PAGE_MODE
+import com.rameshvoltella.pdfeditorpro.Constants.VERTICAL
+import com.rameshvoltella.pdfeditorpro.databinding.ContentPageModeDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 

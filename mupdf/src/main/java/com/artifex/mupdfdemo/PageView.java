@@ -318,8 +318,14 @@ public abstract class PageView extends ViewGroup {
                     paint.setColor(Color.RED);
                     circlePaint.setColor(Color.BLUE);  // Circle color
                     circlePaint.setStyle(Paint.Style.FILL);
-                    final RectF[] firstRect = {null};
+                    if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
+                        paint.setColor(HIGHLIGHT_COLOR);
+                        for (final RectF rect : PageView.this.mSearchBoxes) {
+                            Log.d("chakka","yaaaa1111");
 
+                            canvas.drawRect(rect.left * scale, rect.top * scale, rect.right * scale, rect.bottom * scale, paint);
+                        }
+                    }
                     // Draw the selection rectangle
                     if (PageView.this.mSelectBox != null && PageView.this.mText != null) {
           /*              int color = getInkColor();
