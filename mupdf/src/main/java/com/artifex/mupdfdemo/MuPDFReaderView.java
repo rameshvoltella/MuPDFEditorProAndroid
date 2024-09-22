@@ -207,7 +207,8 @@ public class MuPDFReaderView extends ReaderView {
                     }
                     else {
 //                        pageView.selectText(e1.getX(), e1.getY(), e2.getX(), e2.getY());
-                        return super.onScroll(e1, e2, distanceX, distanceY);
+//                        return super.onScroll(e1, e2, distanceX, distanceY);
+                        return false;
 
 //                        Log.d("newCheck","NORMAL");
 
@@ -250,6 +251,7 @@ public class MuPDFReaderView extends ReaderView {
                         cv.selectText(longPressStartEvent.getX(),longPressStartEvent.getRawY()-locationOnScreen[1],longPressStartEvent.getX()+1,longPressStartEvent.getRawY()+1-locationOnScreen[1]);
                         if(cv.hasTextSelected()) {
                             setMode(MuPDFReaderView.Mode.Selecting);
+                            listener.onLongPress();
                         }
                         else {
                             cv.deselectText();
@@ -317,19 +319,22 @@ public class MuPDFReaderView extends ReaderView {
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
 //        if (this.mMode == Mode.Drawing || this.mMode == Mode.Selecting) {
-        if (this.mMode == Mode.Selecting) {
+        if (this.mMode == Mode.Selecting||mMode == Mode.Drawing) {
 
             final float x = event.getX();
             final float y = event.getY();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
                     if (this.mMode == Mode.Drawing) {
+                        Log.d("losap","drawing....");
                         this.touch_start(x, y);
                     }
                     break;
                 }
                 case MotionEvent.ACTION_MOVE: {
                     if (this.mMode == Mode.Drawing) {
+                        Log.d("losap","drawing....move");
+
                         this.touch_move(x, y);
                     }
                     break;

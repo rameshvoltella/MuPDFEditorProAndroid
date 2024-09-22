@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 interface TextProcessor {
@@ -318,6 +319,39 @@ public abstract class PageView extends ViewGroup {
                     paint.setColor(Color.RED);
                     circlePaint.setColor(Color.BLUE);  // Circle color
                     circlePaint.setStyle(Paint.Style.FILL);
+                    if (PageView.this.mDrawing != null) {
+                        final Path path = new Path();
+                        paint.setAntiAlias(true);
+                        paint.setDither(true);
+                        paint.setStrokeJoin(Paint.Join.ROUND);
+                        paint.setStrokeCap(Paint.Cap.ROUND);
+                        paint.setStyle(Paint.Style.FILL);
+                        paint.setStrokeWidth(PageView.this.INK_THICKNESS * scale);
+                        paint.setColor(PageView.this.INK_COLOR);
+                        for (final ArrayList<PointF> arc : PageView.this.mDrawing) {
+                            if (arc.size() >= 2) {
+                                final Iterator<PointF> iit = arc.iterator();
+                                PointF p = iit.next();
+                                float mX = p.x * scale;
+                                float mY = p.y * scale;
+                                path.moveTo(mX, mY);
+                                while (iit.hasNext()) {
+                                    p = iit.next();
+                                    final float x = p.x * scale;
+                                    final float y = p.y * scale;
+                                    path.quadTo(mX, mY, (x + mX) / 2.0f, (y + mY) / 2.0f);
+                                    mX = x;
+                                    mY = y;
+                                }
+                                path.lineTo(mX, mY);
+                            } else {
+                                final PointF p = arc.get(0);
+                                canvas.drawCircle(p.x * scale, p.y * scale, PageView.this.INK_THICKNESS * scale / 2.0f, paint);
+                            }
+                        }
+                        paint.setStyle(Paint.Style.STROKE);
+                        canvas.drawPath(path, paint);
+                    }
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
                         paint.setColor(HIGHLIGHT_COLOR);
                         for (final RectF rect : PageView.this.mSearchBoxes) {
@@ -899,6 +933,8 @@ public void selectEvent(MotionEvent e)
         }
     }
     public void startDraw(final float x, final float y) {
+        Log.d("losap","drawing....statdraw");
+
         final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
         final float docRelX = (x - this.getLeft()) / scale;
         final float docRelY = (y - this.getTop()) / scale;
