@@ -49,9 +49,10 @@ class PdfTextSelectionHelper {
     enum class TouchState { StartHandlePressed, EndHandlePressed, IDLE }
 
     public fun drawStartHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
+        val verticalOffset = 10f  // Adjust this value to move the drawing down as needed
         val mR = handleRoundRadius * zoom
         val mX = x * zoom
-        val mY = y * zoom
+        val mY = (y + mR) * zoom  // Add verticalOffset to move it down
         canvas.drawCircle(mX - mR, mY + mR, mR, selectionHandleColor)
         val path = Path()
         path.moveTo(mX, mY)
@@ -63,7 +64,7 @@ class PdfTextSelectionHelper {
     public fun drawEndHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
         val mR = handleRoundRadius * zoom
         val mX = x * zoom
-        val mY = y * zoom
+        val mY = (y+mR) * zoom
         canvas.drawCircle(mX + mR, mY + mR, mR, selectionHandleColor)
         val path = Path()
         path.moveTo(mX, mY)
