@@ -8,6 +8,8 @@ import android.graphics.RectF;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
+import java.util.ArrayList;
+
 public interface MuPDFView
 {
     void setPage(final int p0, final PointF p1);
@@ -39,7 +41,7 @@ public interface MuPDFView
     boolean copySelection();
     boolean isTextSelected();
 
-    boolean markupSelection(final Annotation.Type p0);
+    ArrayList<PointF> markupSelection(final Annotation.Type p0);
 
     boolean markupHardcodeSelection(final Annotation.Type p0);
 

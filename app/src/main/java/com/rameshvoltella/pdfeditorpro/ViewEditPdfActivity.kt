@@ -1170,7 +1170,7 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                 }
 
                 AcceptMode.Highlight -> {
-                    success = pageView.markupSelection(Annotation.Type.HIGHLIGHT)
+//                    success = pageView.markupSelection(Annotation.Type.HIGHLIGHT)
                     //    mTopBarMode = TopBarMode.Accept
                     hideEditingViews()
                     if (success) {
@@ -1183,13 +1183,13 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                 }
 
                 AcceptMode.Underline -> {
-                    success = pageView.markupSelection(Annotation.Type.UNDERLINE)
+//                    success = pageView.markupSelection(Annotation.Type.UNDERLINE)
                     hideEditingViews()
                     if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.no_text_selected))
                 }
 
                 AcceptMode.StrikeOut -> {
-                    success = pageView.markupSelection(Annotation.Type.STRIKEOUT)
+//                    success = pageView.markupSelection(Annotation.Type.STRIKEOUT)
                     //   mTopBarMode = TopBarMode.Accept
                     hideEditingViews()
                     if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.no_text_selected))

@@ -378,24 +378,40 @@ public class MuPDFPageView extends PageView implements MuPDFView
     @Override
     public boolean markupHardcodeSelection(final Annotation.Type type) {
         ArrayList<PointF> quadPoints = new ArrayList<>();
-
+        quadPoints.add(new PointF(68.448f, 852.0528f));
+        quadPoints.add(new PointF(1128.5419f, 852.0528f));
+        quadPoints.add(new PointF(1128.5419f, 827.5517f));
+        quadPoints.add(new PointF(68.448f, 827.5517f));
+        quadPoints.add(new PointF(68.448f, 876.5928f));
+        quadPoints.add(new PointF(1107.5895f, 876.5928f));
+        quadPoints.add(new PointF(1107.5895f, 852.0917f));
+        quadPoints.add(new PointF(68.448f, 852.0917f));
+        quadPoints.add(new PointF(68.448f, 900.3528f));
+        quadPoints.add(new PointF(1077.5247f, 900.3528f));
+        quadPoints.add(new PointF(1077.5247f, 875.8517f));
+        quadPoints.add(new PointF(68.448f, 875.8517f));
+        quadPoints.add(new PointF(68.448f, 924.83276f));
+        quadPoints.add(new PointF(1058.3f, 924.83276f));
+        quadPoints.add(new PointF(1058.3f, 900.33167f));
+        quadPoints.add(new PointF(68.448f, 900.33167f));
         // Adding the points from your log
-        quadPoints.add(new PointF(334.56006f, 370.91287f));
-        quadPoints.add(new PointF(1127.1147f, 370.91287f));
-        quadPoints.add(new PointF(1127.1147f, 346.41177f));
-        quadPoints.add(new PointF(334.56006f, 346.41177f));
-        quadPoints.add(new PointF(68.448f, 395.39285f));
-        quadPoints.add(new PointF(1099.8542f, 395.39285f));
-        quadPoints.add(new PointF(1099.8542f, 370.89175f));
-        quadPoints.add(new PointF(68.448f, 370.89175f));
-        quadPoints.add(new PointF(68.448f, 419.15286f));
-        quadPoints.add(new PointF(1081.1471f, 419.15286f));
-        quadPoints.add(new PointF(1081.1471f, 394.65176f));
-        quadPoints.add(new PointF(68.448f, 394.65176f));
-        quadPoints.add(new PointF(68.448f, 443.63284f));
-        quadPoints.add(new PointF(152.016f, 443.63284f));
-        quadPoints.add(new PointF(152.016f, 419.13174f));
-        quadPoints.add(new PointF(68.448f, 419.13174f));
+     /*   quadPoints.add(new PointF(327.30228f, 1349.8127f));
+        quadPoints.add(new PointF(392.0764f, 1349.8127f));
+        quadPoints.add(new PointF(392.0764f, 1325.3116f));
+        quadPoints.add(new PointF(327.30228f, 1325.3116f));*/
+//        quadPoints.add(new PointF(68.448f, 395.39285f));
+//        quadPoints.add(new PointF(1099.8542f, 395.39285f));
+//        quadPoints.add(new PointF(1099.8542f, 370.89175f));
+//        quadPoints.add(new PointF(68.448f, 370.89175f));
+//        quadPoints.add(new PointF(68.448f, 419.15286f));
+//        quadPoints.add(new PointF(1081.1471f, 419.15286f));
+//        quadPoints.add(new PointF(1081.1471f, 394.65176f));
+//        quadPoints.add(new PointF(68.448f, 394.65176f));
+//        quadPoints.add(new PointF(68.448f, 443.63284f));
+//        quadPoints.add(new PointF(152.016f, 443.63284f));
+//        quadPoints.add(new PointF(152.016f, 419.13174f));
+//        quadPoints.add(new PointF(68.448f, 419.13174f));
+//        2024-09-23 16:13:29.712 27245-27245 poinsyoyo               com.rameshvoltella.pdfeditorpro      D  [PointF(327.30228, 1349.8127), PointF(392.0764, 1349.8127), PointF(392.0764, 1325.3116), PointF(327.30228, 1325.3116)]
 
         (this.mAddStrikeOut = new AsyncTask<Object, Void, Void>() {
             protected Void doInBackground(final Object... params) {
@@ -412,7 +428,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
         return true;
     }
     @Override
-    public boolean markupSelection(final Annotation.Type type) {
+    public ArrayList<PointF> markupSelection(final Annotation.Type type) {
         final ArrayList<PointF> quadPoints = new ArrayList<PointF>();
         this.processSelectedText(new TextProcessor() {
             RectF rect;
@@ -445,7 +461,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
             }
         });
         if (quadPoints.size() == 0) {
-            return false;
+            return quadPoints;
         }
         (this.mAddStrikeOut = new AsyncTask<Object, Void, Void>() {
             protected Void doInBackground(final Object... params) {
@@ -459,7 +475,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
             }
         }).execute(new PointF[][] { quadPoints.toArray(new PointF[quadPoints.size()]) }, getInkColor());
         this.deselectText();
-        return true;
+        return quadPoints;
     }
 
     @Override

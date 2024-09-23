@@ -90,4 +90,14 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    // Room components
+    implementation (libs.androidx.room.runtime)
+    implementation (libs.androidx.room.ktx)
+    kapt (libs.androidx.room.compiler)
+
+    implementation ("com.google.code.gson:gson:2.11.0")
+}
+kapt {
+    correctErrorTypes = true
 }

@@ -265,7 +265,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     private fun selectAnnotationMode() {
-        viewModel.addAnnotation(getPageViewMupdf(),mAcceptMode)
+        viewModel.addAnnotation(getPageViewMupdf(),mAcceptMode,"test.pdf")
 
     }
 
