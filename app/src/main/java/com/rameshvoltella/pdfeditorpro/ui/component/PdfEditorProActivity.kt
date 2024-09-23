@@ -18,8 +18,10 @@ import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.ViewEditPdfActivity
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
+import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
+import com.rameshvoltella.pdfeditorpro.utils.observe
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -41,6 +43,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     override fun getViewBinding() = PdfViewProEditorLayoutBinding.inflate(layoutInflater)
 
     override fun observeViewModel() {
+        observe(viewModel.annotationResponse, ::handleAddCommentResponse)
+
     }
 
     override fun observeActivity() {
@@ -126,7 +130,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             Log.d("PROGRESSSEEK", "sliderInitial:$mPageSliderRes")
             // Update page number text and slider
             binding.pdfReaderRenderView?.let { readerView ->
-                if (ViewEditPdfActivity.currentMode == Constants.HORIZONTAL) {
+                if (currentMode == Constants.HORIZONTAL) {
                     readerView.setHorizontalScrolling(true)
                 } else {
                     readerView.setHorizontalScrolling(false)
@@ -141,7 +145,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             //last commented code will be here
             binding.pdfReaderRenderView?.adapter = MuPDFPageAdapter(this, muPDFCore, this)
             //Set the background color of the view
-            binding.pdfReaderRenderView?.setBackgroundColor(ViewEditPdfActivity.currentBgColor)
+            binding.pdfReaderRenderView?.setBackgroundColor(currentBgColor)
 //                ContextCompat.getColor(this, R.color.muPDFReaderView_bg)
 //            )
         }?.run {
@@ -261,8 +265,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     private fun selectAnnotationMode() {
+        viewModel.addAnnotation(getPageViewMupdf()!!,mAcceptMode!!)
         //val pageView = muPDFReaderViewN?.displayedView as MuPDFView
-        getPageViewMupdf()?.let { pageView ->
+       /* getPageViewMupdf()?.let { pageView ->
             var success = false
             when (mAcceptMode) {
                 AcceptMode.CopyText -> {
@@ -312,7 +317,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             }
         }
 
-        binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
+        binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)*/
     }
 
     private fun getPageViewMupdf(): MuPDFView? {
@@ -350,4 +355,19 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
         toggleOptionState(true)
     }
+
+    fun handleAddCommentResponse(annotationOperationResult: AnnotationOperationResult) {
+
+        if(annotationOperationResult.status)
+        {
+            Log.d("TAG", "handleAddCommentResponse:")
+        }
+        if(annotationOperationResult.acceptMode==AcceptMode.Ink) {
+            mAcceptMode = AcceptMode.None;
+            toggleOptionState(true)
+        }
+        binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
+    }
 }
+
+
