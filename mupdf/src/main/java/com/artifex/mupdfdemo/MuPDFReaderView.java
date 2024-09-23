@@ -29,6 +29,8 @@ public class MuPDFReaderView extends ReaderView {
     private boolean mLinksEnabled;
     private boolean isLinkHighlightColor;
     private Mode mMode;
+
+    private boolean userSelectedText=false;
     private boolean tapDisabled;
     private int tapPageMargin;
     private int mLinkHighlightColor;
@@ -91,6 +93,17 @@ public class MuPDFReaderView extends ReaderView {
 
     public void setMode(final Mode m) {
         this.mMode = m;
+    }
+
+    public boolean getUserSelectedText()
+    {
+        final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+        if(pageView!=null) {
+            return pageView.isTextSelected();
+        }else {
+            return false;
+        }
+
     }
 
     public Mode getMode() {

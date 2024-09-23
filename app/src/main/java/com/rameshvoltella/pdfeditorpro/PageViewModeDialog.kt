@@ -8,15 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.appcompat.widget.AppCompatTextView
-import com.rameshvoltella.pdfeditorpro.Constants.CONTINUE_MODE
-import com.rameshvoltella.pdfeditorpro.Constants.DARK
-import com.rameshvoltella.pdfeditorpro.Constants.EYES
-import com.rameshvoltella.pdfeditorpro.Constants.HORIZONTAL
-import com.rameshvoltella.pdfeditorpro.Constants.LIGHT
-import com.rameshvoltella.pdfeditorpro.Constants.PAGE_MODE
-import com.rameshvoltella.pdfeditorpro.Constants.VERTICAL
+import com.rameshvoltella.pdfeditorpro.constants.Constants.CONTINUE_MODE
+import com.rameshvoltella.pdfeditorpro.constants.Constants.DARK
+import com.rameshvoltella.pdfeditorpro.constants.Constants.EYES
+import com.rameshvoltella.pdfeditorpro.constants.Constants.HORIZONTAL
+import com.rameshvoltella.pdfeditorpro.constants.Constants.LIGHT
+import com.rameshvoltella.pdfeditorpro.constants.Constants.PAGE_MODE
+import com.rameshvoltella.pdfeditorpro.constants.Constants.VERTICAL
 import com.rameshvoltella.pdfeditorpro.databinding.ContentPageModeDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.rameshvoltella.pdfeditorpro.constants.Constants
 
 
 class PageViewModeDialog : BottomSheetDialogFragment() {

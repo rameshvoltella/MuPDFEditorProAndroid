@@ -2,10 +2,10 @@ package com.rameshvoltella.pdfeditorpro
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import com.rameshvoltella.pdfeditorpro.Constants.DATA_CLASS_BUNDLE
+import com.rameshvoltella.pdfeditorpro.constants.Constants
+import com.rameshvoltella.pdfeditorpro.ui.component.PdfEditorProActivity
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
 
 //        copyFileFromAssetsToInternal(this, "example.pdf")
         copyFileFromAssetsToInternal(this, "testfile.pdf")
-        startActivity(Intent(this@MainActivity, ViewEditPdfActivity::class.java).apply {
+        startActivity(Intent(this@MainActivity, PdfEditorProActivity::class.java).apply {
             putExtra(Constants.PDF_FILE_PATH, "${filesDir.path}/testfile.pdf")
             putExtra(Constants.DOC_ID, -1L)
             putExtra(Constants.DIRECT_DOC_EDIT_OPEN, false)

@@ -2,6 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-parcelize")
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
+    kotlin("kapt")
+
+
 }
 
 android {
@@ -82,4 +87,7 @@ dependencies {
     implementation("com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:1.0.0")
 
     implementation(project(":mupdf"))
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 }

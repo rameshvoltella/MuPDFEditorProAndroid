@@ -7,8 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.rameshvoltella.pdfeditorpro.Constants.DOC_BOOKMARK
-import com.rameshvoltella.pdfeditorpro.Constants.DOC_TABLE_CONTENT
+import com.rameshvoltella.pdfeditorpro.constants.Constants.DOC_BOOKMARK
+import com.rameshvoltella.pdfeditorpro.constants.Constants.DOC_TABLE_CONTENT
 import com.rameshvoltella.pdfeditorpro.databinding.ContentOpenFileOptionDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 

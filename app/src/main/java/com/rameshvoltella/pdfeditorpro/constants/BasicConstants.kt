@@ -1,4 +1,4 @@
-package com.rameshvoltella.pdfeditorpro
+package com.rameshvoltella.pdfeditorpro.constants
 
 object Constants {
     const val FILES = "FILES"

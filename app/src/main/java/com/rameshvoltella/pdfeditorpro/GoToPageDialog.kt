@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.fragment.app.DialogFragment
+import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.databinding.ContentPageNavigationDialogBinding
 
 class GoToPageDialog : DialogFragment() {
