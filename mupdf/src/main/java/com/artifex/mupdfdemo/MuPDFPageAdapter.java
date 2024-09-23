@@ -84,6 +84,7 @@ public class MuPDFPageAdapter extends BaseAdapter {
         }
 
         PointF pageSize = mPageSizes.get(position);
+        PageDown(position);
         if (pageSize != null) {
             // We already know the page size. Set it up
             // immediately

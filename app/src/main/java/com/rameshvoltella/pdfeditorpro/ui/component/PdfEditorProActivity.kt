@@ -19,6 +19,7 @@ import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.ViewEditPdfActivity
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
+import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
 import com.rameshvoltella.pdfeditorpro.utils.observe
@@ -38,14 +39,18 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
     private var mAcceptMode: AcceptMode? = null
 
+    private var addedAnnotationPages = ArrayList<Int>()
+
     override fun getViewModelClass() = PdfViewModel::class.java
 
     override fun getViewBinding() = PdfViewProEditorLayoutBinding.inflate(layoutInflater)
 
     override fun observeViewModel() {
         observe(viewModel.annotationResponse, ::handleAddCommentResponse)
+        observe(viewModel.annotationPerPage, ::handleAnnotationPerPage)
 
     }
+
 
     override fun observeActivity() {
 
@@ -98,18 +103,17 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
             binding.basicLl.visibility = View.GONE;
             binding.acceptModeLl.visibility = View.VISIBLE
-            binding.bottomOptions.visibility=View.GONE
+            binding.bottomOptions.visibility = View.GONE
             drawTextOnPage()
 
         }
 
         binding.activityBackBtn.setOnClickListener {
 
-            if(binding.basicLl.visibility==View.VISIBLE){
+            if (binding.basicLl.visibility == View.VISIBLE) {
                 finish()
 
-            }else
-            {
+            } else {
                 cancellAllEdit()
             }
         }
@@ -221,6 +225,15 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     override fun onPageChanged(page: Int) {
+//        onPageChanged
+        Log.e("PageIs", "CurrentPageIS:${getPageViewMupdf()?.page}"+addedAnnotationPages)
+
+        if (getPageViewMupdf() != null) {
+            if (!addedAnnotationPages.contains(getPageViewMupdf()?.page)) {
+                Log.d("Pageis","CurrentPageIS goint :${getPageViewMupdf()?.page}")
+                viewModel.getAnnotations("test.pdf", getPageViewMupdf()?.page!!)
+            }
+        }
 
     }
 
@@ -265,7 +278,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     private fun selectAnnotationMode() {
-        viewModel.addAnnotation(getPageViewMupdf(),mAcceptMode,"test.pdf")
+        viewModel.addAnnotation(getPageViewMupdf(), mAcceptMode, "test.pdf")
 
     }
 
@@ -305,13 +318,25 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         toggleOptionState(true)
     }
 
+    private fun handleAnnotationPerPage(quadPointsAndTypes: List<QuadPointsAndType>) {
+
+        Log.d("Pageis","CurrentPageIS goint :${getPageViewMupdf()?.page}"+"<>"+quadPointsAndTypes.size)
+
+        for (index in quadPointsAndTypes) {
+            Log.d("dbdata", "" + index.type + "<>" + index.quadPoints);
+        }
+        if (getPageViewMupdf() != null) {
+            addedAnnotationPages.add(getPageViewMupdf()?.page!!)
+        }
+
+    }
+
     fun handleAddCommentResponse(annotationOperationResult: AnnotationOperationResult) {
 
-        if(annotationOperationResult.status)
-        {
+        if (annotationOperationResult.status) {
             Log.d("TAG", "handleAddCommentResponse:")
         }
-        if(annotationOperationResult.acceptMode==AcceptMode.Ink) {
+        if (annotationOperationResult.acceptMode == AcceptMode.Ink) {
             mAcceptMode = AcceptMode.None;
             toggleOptionState(true)
         }

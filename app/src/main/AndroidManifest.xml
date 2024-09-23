@@ -27,6 +27,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.component.PdfEditorProActivity" />
+        <activity android:name=".ViewEditPdfActivity"/>
 
     </application>
 

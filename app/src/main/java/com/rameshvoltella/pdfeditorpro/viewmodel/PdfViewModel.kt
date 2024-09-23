@@ -15,6 +15,7 @@ import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
 import com.rameshvoltella.pdfeditorpro.data.database.DatabaseData
 import com.rameshvoltella.pdfeditorpro.data.database.DatabaseRepository
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
+import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -30,7 +31,23 @@ constructor(
     val annotationResponse: LiveData<AnnotationOperationResult> get() = annotationResponsePrivate
 
     private val annotationInsertPrivate = MutableLiveData<Boolean>()
+    private val annotationPerPagePrivate = MutableLiveData<List<QuadPointsAndType>>()
+    val annotationPerPage: LiveData<List<QuadPointsAndType>> get() = annotationPerPagePrivate
+
     val annotationInsert: LiveData<Boolean> get() = annotationInsertPrivate
+
+    fun getAnnotations(pdfName:String,page:Int)
+    {
+//        pdfDatabaseRepository.getQuadPointsAndTypeByPage(pdfName,1)
+
+        viewModelScope.launch {
+
+            pdfDatabaseRepository.getQuadPointsAndTypeByPage(pdfName,page).collect {
+                annotationPerPagePrivate.value = it
+
+            }
+        }
+    }
 
     fun addAnnotation(muPDFView: MuPDFView?,mAcceptMode: AcceptMode?,pdfName:String)
     {
@@ -50,7 +67,7 @@ constructor(
 
                 AcceptMode.Highlight -> {
                     annotationPointList = pageView.markupSelection(Annotation.Type.HIGHLIGHT)
-//                    annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
 //                    success = pageView.markupHardcodeSelection(Annotation.Type.HIGHLIGHT)
                     if(annotationPointList.size>0)
                     {
