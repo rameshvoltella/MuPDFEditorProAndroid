@@ -265,59 +265,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     private fun selectAnnotationMode() {
-        viewModel.addAnnotation(getPageViewMupdf()!!,mAcceptMode!!)
-        //val pageView = muPDFReaderViewN?.displayedView as MuPDFView
-       /* getPageViewMupdf()?.let { pageView ->
-            var success = false
-            when (mAcceptMode) {
-                AcceptMode.CopyText -> {
-                    success = pageView.copySelection()
-                    // mTopBarMode = TopBarMode.Accept
-//                    showInfo(
-//                        if (success) getString(com.artifex.mupdfdemo.R.string.copied_to_clipboard) else getString(
-//                            com.artifex.mupdfdemo.R.string.no_text_selected
-//                        )
-//                    )
-                }
+        viewModel.addAnnotation(getPageViewMupdf(),mAcceptMode)
 
-                AcceptMode.Highlight -> {
-                    success = pageView.markupSelection(Annotation.Type.HIGHLIGHT)
-                    //    mTopBarMode = TopBarMode.Accept
-                    if (success) {
-
-
-                    }
-                }
-
-                AcceptMode.Underline -> {
-                    success = pageView.markupSelection(Annotation.Type.UNDERLINE)
-//                    hideEditingViews()
-//                    if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.no_text_selected))
-                }
-
-                AcceptMode.StrikeOut -> {
-                    success = pageView.markupSelection(Annotation.Type.STRIKEOUT)
-                    //   mTopBarMode = TopBarMode.Accept
-//                    hideEditingViews()
-//                    if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.no_text_selected))
-                }
-
-                AcceptMode.Ink -> {
-                    success = pageView.saveDraw()
-                    mAcceptMode=AcceptMode.None;
-                    toggleOptionState(true)
-//                    hideEditingViews()
-//                    // mTopBarMode = TopBarMode.Accept
-//                    if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.nothing_to_save))
-                }
-
-                else -> {
-
-                }
-            }
-        }
-
-        binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)*/
     }
 
     private fun getPageViewMupdf(): MuPDFView? {

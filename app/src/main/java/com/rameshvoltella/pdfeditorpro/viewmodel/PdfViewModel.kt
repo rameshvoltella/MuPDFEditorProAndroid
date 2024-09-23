@@ -21,7 +21,7 @@ constructor(
     private val annotationResponsePrivate = MutableLiveData<AnnotationOperationResult>()
     val annotationResponse: LiveData<AnnotationOperationResult> get() = annotationResponsePrivate
 
-    fun addAnnotation(muPDFView: MuPDFView,mAcceptMode: AcceptMode)
+    fun addAnnotation(muPDFView: MuPDFView?,mAcceptMode: AcceptMode?)
     {
 
 
@@ -30,26 +30,36 @@ constructor(
             when (mAcceptMode) {
                 AcceptMode.CopyText -> {
                     success = pageView.copySelection()
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
+
 
                 }
 
                 AcceptMode.Highlight -> {
                     success = pageView.markupSelection(Annotation.Type.HIGHLIGHT)
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
+
 
                 }
 
                 AcceptMode.Underline -> {
                     success = pageView.markupSelection(Annotation.Type.UNDERLINE)
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
+
 
                 }
 
                 AcceptMode.StrikeOut -> {
                     success = pageView.markupSelection(Annotation.Type.STRIKEOUT)
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
+
 
                 }
 
                 AcceptMode.Ink -> {
                     success = pageView.saveDraw()
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
+
                 }
 
                 else -> {
@@ -57,7 +67,6 @@ constructor(
                 }
 
             }
-            annotationResponsePrivate.value=AnnotationOperationResult(success,mAcceptMode)
 
         }
 
