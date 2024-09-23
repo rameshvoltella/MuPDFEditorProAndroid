@@ -6,5 +6,5 @@ enum class TopBarMode {
 }
 
 enum class AcceptMode {
-    Highlight, Underline, StrikeOut, Ink, CopyText
+    Highlight, Underline, StrikeOut, Ink, CopyText,None
 }

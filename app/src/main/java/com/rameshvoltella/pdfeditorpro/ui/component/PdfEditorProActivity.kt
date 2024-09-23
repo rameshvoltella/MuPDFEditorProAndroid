@@ -16,17 +16,16 @@ import com.artifex.mupdfdemo.OnPageChangeListener
 import com.artifex.mupdfdemo.OutlineActivityData
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.Constants
-import com.rameshvoltella.pdfeditorpro.TopBarMode
 import com.rameshvoltella.pdfeditorpro.ViewEditPdfActivity
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
-import com.rameshvoltella.pdfeditorpro.databinding.PdfvieweditorlayoutBinding
+import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
 @AndroidEntryPoint
-class PdfEditorProActivity:BaseActivity<PdfvieweditorlayoutBinding,PdfViewModel> (),
+class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfViewModel>(),
     OnPageChangeListener {
     private var muPDFCore: MuPDFCore? = null
     private var currentDocId: Long? = null
@@ -35,60 +34,79 @@ class PdfEditorProActivity:BaseActivity<PdfvieweditorlayoutBinding,PdfViewModel>
     var currentPageMode: String = PdfConstants.PAGE_MODE
     var currentBgColor = Color.WHITE
 
-    private var mTopBarMode: TopBarMode = TopBarMode.Main
     private var mAcceptMode: AcceptMode? = null
 
     override fun getViewModelClass() = PdfViewModel::class.java
 
-    override fun getViewBinding() = PdfvieweditorlayoutBinding.inflate(layoutInflater)
+    override fun getViewBinding() = PdfViewProEditorLayoutBinding.inflate(layoutInflater)
 
     override fun observeViewModel() {
     }
 
     override fun observeActivity() {
 
-        if(intent.extras!!.containsKey(Constants.PDF_FILE_PATH)) {
+        if (intent.extras!!.containsKey(Constants.PDF_FILE_PATH)) {
             openPdfFile(intent.getStringExtra(Constants.PDF_FILE_PATH))
             initPdfCore()
-        }else
-        {
+        } else {
             finish()
         }
 
         binding.highlighterIv.setOnClickListener {
 
-            if(binding.pdfReaderRenderView.userSelectedText)
-            {
+            if (binding.pdfReaderRenderView.userSelectedText) {
                 mAcceptMode = AcceptMode.Highlight
                 selectAnnotationMode()
 
-            }else
-            {
-                Toast.makeText(applicationContext,"No text Selected",1).show()
+            } else {
+                Toast.makeText(applicationContext, "No text Selected", 1).show()
             }
         }
         binding.strikethroughIv.setOnClickListener {
 
-            if(binding.pdfReaderRenderView.userSelectedText)
-            {
+            if (binding.pdfReaderRenderView.userSelectedText) {
                 mAcceptMode = AcceptMode.StrikeOut
                 selectAnnotationMode()
 
-            }else
-            {
-                Toast.makeText(applicationContext,"No text Selected",1).show()
+            } else {
+                Toast.makeText(applicationContext, "No text Selected", 1).show()
             }
         }
         binding.underlineIv.setOnClickListener {
 
-            if(binding.pdfReaderRenderView.userSelectedText)
-            {
+            if (binding.pdfReaderRenderView.userSelectedText) {
                 mAcceptMode = AcceptMode.Underline
                 selectAnnotationMode()
 
+            } else {
+                Toast.makeText(applicationContext, "No text Selected", 1).show()
+            }
+        }
+
+        binding.acceptBtn.setOnClickListener {
+            mAcceptMode = AcceptMode.Ink
+            selectAnnotationMode()
+
+        }
+
+
+        binding.drawerIv.setOnClickListener {
+
+            binding.basicLl.visibility = View.GONE;
+            binding.acceptModeLl.visibility = View.VISIBLE
+            binding.bottomOptions.visibility=View.GONE
+            drawTextOnPage()
+
+        }
+
+        binding.activityBackBtn.setOnClickListener {
+
+            if(binding.basicLl.visibility==View.VISIBLE){
+                finish()
+
             }else
             {
-                Toast.makeText(applicationContext,"No text Selected",1).show()
+                cancellAllEdit()
             }
         }
 
@@ -145,8 +163,9 @@ class PdfEditorProActivity:BaseActivity<PdfvieweditorlayoutBinding,PdfViewModel>
 
             override fun onTapMainDocArea() {
                 Log.d("DELETEANNOT", "onHit:  ")
-
-                toggleOptionState()
+                if (mAcceptMode != AcceptMode.Ink) {
+                    toggleOptionState()
+                }
 
 
             }
@@ -171,13 +190,18 @@ class PdfEditorProActivity:BaseActivity<PdfvieweditorlayoutBinding,PdfViewModel>
 
     }
 
-    private fun toggleOptionState(forceShow:Boolean=false) {
+    private fun toggleOptionState(forceShow: Boolean = false) {
+        if (binding.basicLl.visibility == View.GONE) {
 
-        if(forceShow) {
+            binding.basicLl.visibility = View.VISIBLE;
+            binding.acceptModeLl.visibility = View.GONE
+        }
+
+        if (forceShow) {
             binding.titleBar.visibility = View.VISIBLE
             binding.border.visibility = View.VISIBLE
             binding.bottomOptions.visibility = View.VISIBLE
-        }else {
+        } else {
             if (binding.titleBar.visibility == View.VISIBLE) {
                 binding.titleBar.visibility = View.GONE
                 binding.border.visibility = View.GONE
@@ -206,6 +230,7 @@ class PdfEditorProActivity:BaseActivity<PdfvieweditorlayoutBinding,PdfViewModel>
 
         }
     }
+
     private fun displayPdf(path: String) {
         val file = File(path)
         if (file.exists()) {
@@ -274,6 +299,8 @@ class PdfEditorProActivity:BaseActivity<PdfvieweditorlayoutBinding,PdfViewModel>
 
                 AcceptMode.Ink -> {
                     success = pageView.saveDraw()
+                    mAcceptMode=AcceptMode.None;
+                    toggleOptionState(true)
 //                    hideEditingViews()
 //                    // mTopBarMode = TopBarMode.Accept
 //                    if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.nothing_to_save))
@@ -303,5 +330,24 @@ class PdfEditorProActivity:BaseActivity<PdfvieweditorlayoutBinding,PdfViewModel>
             null
         }
 
+    }
+
+    private fun drawTextOnPage() {
+        mAcceptMode = AcceptMode.Ink
+        binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Drawing)
+
+
+    }
+
+    private fun cancellAllEdit() {
+        // val pageView = muPDFReaderViewN?.displayedView as MuPDFView
+        getPageViewMupdf()?.let { pageView ->
+            if (pageView != null) {
+                pageView.deselectText()
+                pageView.cancelDraw()
+            }
+        }
+        binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
+        toggleOptionState(true)
     }
 }

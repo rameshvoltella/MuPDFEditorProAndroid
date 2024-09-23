@@ -35,6 +35,26 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:layout_toEndOf="@id/activity_back_btn"
+            android:id="@+id/accept_mode_ll"
+            android:visibility="gone"
+            android:gravity="right">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/accept_btn"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:paddingHorizontal="10dp"
+                app:srcCompat="@drawable/accept_mode_tick"
+                android:visibility="visible"
+                android:layout_gravity="end"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_toEndOf="@id/activity_back_btn"
+            android:id="@+id/basic_ll"
             android:gravity="right">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -114,7 +134,7 @@
             android:id="@+id/highlighter_iv"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:padding="12dp"
+            android:padding="15dp"
             app:srcCompat="@drawable/highlighter_page_img"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/strikethrough_iv"
@@ -126,7 +146,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/strikethrough_iv"
             android:layout_width="0dp"
-            android:padding="12dp"
+            android:padding="15dp"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/strikethrough_page_img"
             app:layout_constraintStart_toEndOf="@id/highlighter_iv"
@@ -139,7 +159,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/underline_iv"
             android:layout_width="0dp"
-            android:padding="12dp"
+            android:padding="15dp"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/underline_ic"
             app:layout_constraintStart_toEndOf="@id/strikethrough_iv"
@@ -152,7 +172,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/drawer_iv"
             android:layout_width="0dp"
-            android:padding="12dp"
+            android:padding="15dp"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/draw_page_img"
             app:layout_constraintStart_toEndOf="@id/underline_iv"
@@ -167,7 +187,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/listen_audio"
-            android:padding="12dp"
+            android:padding="15dp"
             app:layout_constraintStart_toEndOf="@id/drawer_iv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

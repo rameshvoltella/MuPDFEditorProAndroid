@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
             putExtra(Constants.DIRECT_DOC_EDIT_OPEN, false)
             putExtra(Constants.DOC_NAME, "testfile.pdf")
         })
+        finish()
     }
 
     private fun copyFileFromAssetsToInternal(context: Context, assetFileName: String): String? {
