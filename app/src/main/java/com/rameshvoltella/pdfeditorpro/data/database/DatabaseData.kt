@@ -2,10 +2,13 @@ package com.rameshvoltella.pdfeditorpro.data.database
 
 import android.graphics.PointF
 import android.graphics.RectF
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
 import com.rameshvoltella.pdfeditorpro.database.PdfDrawAnnotation
 import com.rameshvoltella.pdfeditorpro.database.dao.PdfAnnotationDao
 import com.rameshvoltella.pdfeditorpro.database.dao.PdfDrawerAnnotationDao
+import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,6 +33,16 @@ class DatabaseData @Inject constructor(
 
     override suspend fun getQuadPointsAndTypeByPage(pdfname: String, pagenumber: Int): List<QuadPointsAndType> {
         return withContext(Dispatchers.IO){ pdfAnnotationDao.getQuadPointsAndTypeByPage(pdfname, pagenumber)}
+    }
+
+    override suspend fun getDrawQuadPointsAndTypeByPage(
+        pdfname: String,
+        pagenumber: Int
+    ): List<QuadDrawPointsAndType> {
+        return withContext(Dispatchers.IO){
+            pdfDrawerAnnotationDao.getQuadDrawPointsAndTypeByPage(pdfname, pagenumber)
+
+        }
     }
 
     override suspend fun deleteAnnotationById(id: Int): Boolean {
@@ -66,13 +79,12 @@ class DatabaseData @Inject constructor(
 
             }
 
-
-            val result = pdfDrawerAnnotationDao.getQuadPointsAndTypeByPage(pdfname, pagenumber)
+            val result = pdfDrawerAnnotationDao.getDrawAnnotationsByPage(pdfname, pagenumber)
 
 
             // Check each annotation's quadPoints
             for (annotation in result) {
-                val quadPoints = annotation.getQuadPoints() // Get the PointF[][]
+                val quadPoints = getQuadPoints(annotation.quadPoints) // Get the PointF[][]
                 println("konacheckiop---------------------------------"+quadPoints)
 
                 // Check each PointF in the quadPoints
@@ -85,7 +97,7 @@ class DatabaseData @Inject constructor(
                         if (selectedRect.contains(point.x, point.y)) {
                             println("konacheckiop---------------Contains------------------"+point)
 
-                            pdfAnnotationDao.deleteAnnotationById(annotation.id)
+                            pdfDrawerAnnotationDao.deleteAnnotationById(annotation.id)
                             break
 
                         }
@@ -98,5 +110,10 @@ class DatabaseData @Inject constructor(
             true
 
         }
+    }
+    fun getQuadPoints(quadPoints:String): Array<Array<PointF>> {
+        val gson = Gson()
+        val type = object : TypeToken<Array<Array<PointF>>>() {}.type
+        return gson.fromJson(quadPoints, type)
     }
 }

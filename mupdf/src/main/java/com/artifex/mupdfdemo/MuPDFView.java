@@ -65,7 +65,10 @@ public interface MuPDFView
 
     void cancelDraw();
 
-    boolean saveDraw();
+    PointF[][] saveDraw();
+
+
+    boolean saveDrawFromDb(PointF[][] points);
 
     void setChangeReporter(final Runnable p0);
 

@@ -3,6 +3,7 @@ package com.rameshvoltella.pdfeditorpro.data.database
 import android.graphics.RectF
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
 import com.rameshvoltella.pdfeditorpro.database.PdfDrawAnnotation
+import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -41,6 +42,13 @@ class DatabaseRepository @Inject constructor(
     ): Flow<Boolean> {
         return flow {emit(databaseData.getQuadPointsAndTypeByPageToDelete(pdfname,pagenumber,selectedRect))  }
 
+    }
+
+    override suspend fun getDrawQuadPointsAndTypeByPage(
+        pdfname: String,
+        pagenumber: Int
+    ): Flow<List<QuadDrawPointsAndType>> {
+        return flow {emit(databaseData.getDrawQuadPointsAndTypeByPage(pdfname,pagenumber))  }
     }
 
 }

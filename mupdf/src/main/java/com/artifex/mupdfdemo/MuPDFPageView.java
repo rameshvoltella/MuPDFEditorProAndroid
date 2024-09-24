@@ -518,10 +518,31 @@ public class MuPDFPageView extends PageView implements MuPDFView
     }
 
     @Override
-    public boolean saveDraw() {
+    public boolean saveDrawFromDb(PointF[][] points) {
+        if (this.mAddInk != null) {
+            this.mAddInk.cancel(true);
+            this.mAddInk = null;
+        }
+        (this.mAddInk = new AsyncTask<Object, Void, Void>() {
+            protected Void doInBackground(final Object... params) {
+                MuPDFPageView.this.mCore.addInkAnnotation(MuPDFPageView.this.mPageNumber, (PointF[][])params[0], (int)params[1], (float)params[2]);
+                return null;
+            }
+
+            protected void onPostExecute(final Void result) {
+                MuPDFPageView.this.update();
+                MuPDFPageView.this.loadAnnotations();
+            }
+        }).execute(new Object[] { points, this.getInkColor(), this.getInkThickness() });
+        this.cancelDraw();
+        return true;
+    }
+
+    @Override
+    public PointF[][] saveDraw() {
         final PointF[][] path = this.getDraw();
         if (path == null) {
-            return false;
+            return null;
         }
         if (this.mAddInk != null) {
             this.mAddInk.cancel(true);
@@ -539,7 +560,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
             }
         }).execute(new Object[] { this.getDraw(), this.getInkColor(), this.getInkThickness() });
         this.cancelDraw();
-        return true;
+        return path;
     }
 
     @Override

@@ -1196,10 +1196,10 @@ class ViewEditPdfActivity : AppCompatActivity(),
                 }
 
                 AcceptMode.Ink -> {
-                    success = pageView.saveDraw()
+                    val success = pageView.saveDraw()
                     hideEditingViews()
                     // mTopBarMode = TopBarMode.Accept
-                    if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.nothing_to_save))
+//                    if (!success) showInfo(getString(com.artifex.mupdfdemo.R.string.nothing_to_save))
                 }
 
                 else -> {

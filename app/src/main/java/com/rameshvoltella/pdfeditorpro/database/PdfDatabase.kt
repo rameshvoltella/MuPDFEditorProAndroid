@@ -19,6 +19,6 @@ abstract class PdfDatabase : RoomDatabase() {
 )
 @TypeConverters(PointFConverter::class) // If you have any specific type converters
 abstract class PdfDatabase : RoomDatabase() {
-    abstract fun pdfAnnotationDao(): PdfAnnotationDao // Existing DAO for PdfAnnotation
     abstract fun pdfAnnotationDrawDao(): PdfDrawerAnnotationDao // New DAO for PdfAnnotationNew
+    abstract fun pdfAnnotationDao(): PdfAnnotationDao // Existing DAO for PdfAnnotation
 }
