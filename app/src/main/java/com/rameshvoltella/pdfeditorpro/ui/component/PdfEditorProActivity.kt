@@ -1,7 +1,6 @@
 package com.rameshvoltella.pdfeditorpro.ui.component
 
 import android.graphics.Color
-import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -13,15 +12,13 @@ import com.artifex.mupdfdemo.MuPDFReaderViewListener
 import com.artifex.mupdfdemo.MuPDFView
 import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
-import com.rameshvoltella.pdfeditorpro.database.PdfDrawAnnotation
 import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
+import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
 import com.rameshvoltella.pdfeditorpro.utils.observe
@@ -51,6 +48,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         observe(viewModel.annotationResponse, ::handleAddCommentResponse)
         observe(viewModel.annotationPerPage, ::handleAnnotationPerPage)
         observe(viewModel.annotationDrawPerPage,::handleDrawAnnotationPerPage)
+        observe(viewModel.annotationInsertDelete,::handleOnInsertionDeletion)
 
     }
 
@@ -102,6 +100,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         }
 
         binding.acceptBtn.setOnClickListener {
+
             mAcceptMode = AcceptMode.Ink
             selectAnnotationMode()
 
@@ -337,11 +336,21 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
         toggleOptionState(true)
     }
+
+    private fun handleOnInsertionDeletion(status: Boolean) {
+
+
+    }
     private fun handleDrawAnnotationPerPage(pdfDrawAnnotations: List<QuadDrawPointsAndType>) {
         for (annotation in pdfDrawAnnotations) {
             val quadPoints = getQuadPoints(annotation.quadPoints)
+
             viewModel.addDrawAnnotationFromDatabase(getPageViewMupdf(),quadPoints)
+//            viewModel.setDrawingAnnotation(pdfDrawAnnotations)
         }
+//        lifecycleScope.launch {
+//            viewModel.setDrawingAnnotation(getPageViewMupdf(), pdfDrawAnnotations)
+//        }
 
     }
     private fun handleAnnotationPerPage(quadPointsAndTypes: List<QuadPointsAndType>) {
@@ -374,11 +383,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
     }
 
-    fun getQuadPoints(quadPoints:String): Array<Array<PointF>> {
-        val gson = Gson()
-        val type = object : TypeToken<Array<Array<PointF>>>() {}.type
-        return gson.fromJson(quadPoints, type)
-    }
+
 }
 
 

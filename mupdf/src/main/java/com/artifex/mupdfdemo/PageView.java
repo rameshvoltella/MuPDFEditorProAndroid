@@ -283,12 +283,12 @@ public abstract class PageView extends ViewGroup {
                     PageView.this.mBusyIndicator = new ProgressBar(PageView.this.mContext);
                     PageView.this.mBusyIndicator.setIndeterminate(true);
                     PageView.this.addView((View) PageView.this.mBusyIndicator);
-                    PageView.this.mBusyIndicator.setVisibility(4);
+                    PageView.this.mBusyIndicator.setVisibility(View.VISIBLE);
                     PageView.this.mHandler.postDelayed((Runnable) new Runnable() {
                         @Override
                         public void run() {
                             if (PageView.this.mBusyIndicator != null) {
-                                PageView.this.mBusyIndicator.setVisibility(0);
+                                PageView.this.mBusyIndicator.setVisibility(View.GONE);
                             }
                         }
                     }, 200L);
@@ -368,7 +368,7 @@ public abstract class PageView extends ViewGroup {
                     if (PageView.this.mItemSelectBox != null) {
                         paint.setStyle(Paint.Style.STROKE);
                         paint.setStrokeWidth(4.0f);
-                        paint.setColor(BOX_TRANSPARENT_COLOR);
+                        paint.setColor(BOX_COLOR);
                         canvas.drawRect(PageView.this.mItemSelectBox.left * scale, PageView.this.mItemSelectBox.top * scale, PageView.this.mItemSelectBox.right * scale, PageView.this.mItemSelectBox.bottom * scale, paint);
                     }
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {

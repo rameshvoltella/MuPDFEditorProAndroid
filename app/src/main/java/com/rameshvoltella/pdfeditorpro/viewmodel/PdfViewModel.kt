@@ -17,9 +17,12 @@ import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
 import com.rameshvoltella.pdfeditorpro.database.PdfDrawAnnotation
 import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
+import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 @HiltViewModel
 class PdfViewModel@Inject
@@ -156,8 +159,11 @@ constructor(
 
                 AcceptMode.Ink -> {
                    val savedPointF:Array<Array<PointF>> = pageView.saveDraw()
+                    annotationResponsePrivate.value=AnnotationOperationResult(true,mAcceptMode)
+
                     if(savedPointF!=null)
                     {
+
                         viewModelScope.launch {
                             val pdfAnnotationNew = PdfDrawAnnotation(
                                 pdfname = pdfName,
@@ -267,5 +273,21 @@ constructor(
 
         }
 
+    }
+
+    suspend fun setDrawingAnnotation(
+        muPDFView: MuPDFView?,
+        pdfDrawAnnotations: List<QuadDrawPointsAndType>
+    ) {
+        withContext(Dispatchers.IO)
+        {
+            muPDFView?.let {
+                for (annotation in pdfDrawAnnotations) {
+                    val quadPoints = getQuadPoints(annotation.quadPoints)
+
+                    addDrawAnnotationFromDatabase(muPDFView, quadPoints)
+                }
+            }
+        }
     }
 }
