@@ -8,7 +8,7 @@ public class SearchTaskResult {
     public final RectF searchBoxes[];
     static private SearchTaskResult singleton;
 
-    SearchTaskResult(String _txt, int _pageNumber, RectF _searchBoxes[]) {
+    public SearchTaskResult(String _txt, int _pageNumber, RectF _searchBoxes[]) {
         txt = _txt;
         pageNumber = _pageNumber;
         searchBoxes = _searchBoxes;

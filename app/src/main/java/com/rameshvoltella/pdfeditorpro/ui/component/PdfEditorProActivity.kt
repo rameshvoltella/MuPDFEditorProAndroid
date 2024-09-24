@@ -12,7 +12,11 @@ import com.artifex.mupdfdemo.MuPDFReaderViewListener
 import com.artifex.mupdfdemo.MuPDFView
 import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
+import com.artifex.mupdfdemo.SearchTaskResult
+import com.artifex.mupdfdemo.util.SearchTask
+import com.google.android.material.internal.ViewUtils.hideKeyboard
 import com.rameshvoltella.pdfeditorpro.AcceptMode
+import com.rameshvoltella.pdfeditorpro.SearchDismissDialog
 import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
@@ -35,6 +39,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     var currentTheme: String = PdfConstants.LIGHT
     var currentPageMode: String = PdfConstants.PAGE_MODE
     var currentBgColor = Color.WHITE
+    private var mSearchTask: SearchTask? = null // Coroutine-based search task
+    var resultt: SearchTaskResult?= null
 
     private var mAcceptMode: AcceptMode? = null
 
@@ -383,6 +389,72 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
     }
 
+
+    private fun searchTaskClicks() {
+        // Create a coroutine-based SearchTask
+        mSearchTask = object : SearchTask(this, muPDFCore) {
+            override fun onTextFound(result: SearchTaskResult) {
+                // Handle the search result when text is found
+                resultt = result
+                SearchTaskResult.set(result)
+
+                Log.i("TAG", "TotalWordCount: ${result.txt.count()}")
+                // Move to the resulting page
+                binding.pdfReaderRenderView?.displayedViewIndex = result.pageNumber
+                Log.e("TAG", "onTextFound: ${result.pageNumber}")
+                // Reset the ReaderView to reflect changes in SearchTaskResult
+                binding.pdfReaderRenderView?.resetupChildren()
+            }
+
+            override fun onTextNotFound(result: String) {
+                // Handle the case where text is not found
+                try {
+                    val searchDismissDialog = SearchDismissDialog.newInstance(result) { selectedOption ->
+//                        cbSearchDialog(selectedOption)
+                    }
+//                    searchDismissDialog.show(getsupo, "SEARCH_DISMISS")
+                } catch (e: Exception) {
+                    Log.e("TAG", "Error showing search dismiss dialog", e)
+                }
+            }
+        }
+
+        // Start the search task with the search term and direction
+
+
+        // Disable search buttons while search is in progress
+
+    }
+    private fun search(direction: Int) {
+//        hideKeyboard()
+
+//        val searchText = "Your search query"
+//        val currentDisplayPage = binding.pdfReaderRenderView?.displayedViewIndex ?: 0
+
+   /*     mSearchTask?.go(
+            text = searchText,
+            direction = 1,  // Forward direction, can be -1 for backward
+            displayPage = currentDisplayPage,
+            searchPage = -1 // You can customize this if needed
+        )*/
+        val displayPage = binding.pdfReaderRenderView?.displayedViewIndex
+        val r = SearchTaskResult.get()
+        val searchPage = r?.pageNumber ?: -1
+        displayPage?.let { page ->
+            mSearchTask?.go(
+                "binding.searchActionLy.searchText.text.toString()", direction, page, searchPage
+            )
+            Log.i("TAG", "search: $page")
+
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (mSearchTask != null) {
+            mSearchTask?.stop()
+        }
+    }
 
 }
 
