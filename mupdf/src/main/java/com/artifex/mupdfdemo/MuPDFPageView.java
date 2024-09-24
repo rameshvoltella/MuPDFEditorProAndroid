@@ -237,6 +237,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
                     case STRIKEOUT:
                     case INK: {
                         this.mSelectedAnnotationIndex = i;
+                        this.setItemDeleteBox(this.mAnnotations[i]);
                         this.setItemSelectBox(this.mAnnotations[i]);
                         return Hit.Annotation;
                     }

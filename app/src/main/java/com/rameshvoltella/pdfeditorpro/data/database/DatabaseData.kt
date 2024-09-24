@@ -1,5 +1,6 @@
 package com.rameshvoltella.pdfeditorpro.data.database
 
+import android.graphics.RectF
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
 import com.rameshvoltella.pdfeditorpro.database.dao.PdfAnnotationDao
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
@@ -25,5 +26,38 @@ class DatabaseData @Inject constructor(
     override suspend fun deleteAnnotationById(id: Int): Boolean {
         return withContext(Dispatchers.IO){ pdfAnnotationDao.deleteAnnotationById(id)
         true}
+    }
+
+    override suspend fun getQuadPointsAndTypeByPageToDelete(
+        pdfname: String,
+        pagenumber: Int,selectedRect: RectF
+    ): Boolean {
+        return withContext(Dispatchers.IO){
+
+
+            val annotationInList=pdfAnnotationDao.getAnnotationsByPage(pdfname, pagenumber)
+            for(annotation in annotationInList){
+                println("konacheck---------------------------------"+selectedRect)
+
+                println("konacheckfirstList"+annotation.quadPoints)
+
+                for(point in annotation.quadPoints){
+                    println("konacheckPoints---pointx>"+point.x+"-pointy>"+point.y)
+
+                    if(selectedRect.contains(point.x,point.y)){
+                        println("konacheckGOTPoints---pointx>"+point.x+"-pointy>"+point.y)
+
+                        pdfAnnotationDao.deleteAnnotationById(annotation.id)
+                        break
+                    }
+                }
+                println("----------------OVER-----------------")
+
+
+            }
+
+            true
+
+        }
     }
 }

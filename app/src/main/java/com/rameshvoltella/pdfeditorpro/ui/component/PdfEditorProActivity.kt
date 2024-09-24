@@ -1,11 +1,9 @@
 package com.rameshvoltella.pdfeditorpro.ui.component
 
-import android.content.ClipboardManager
 import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.artifex.mupdfdemo.Annotation
 import com.artifex.mupdfdemo.Hit
 import com.artifex.mupdfdemo.MuPDFCore
 import com.artifex.mupdfdemo.MuPDFPageAdapter
@@ -16,7 +14,6 @@ import com.artifex.mupdfdemo.OnPageChangeListener
 import com.artifex.mupdfdemo.OutlineActivityData
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.Constants
-import com.rameshvoltella.pdfeditorpro.ViewEditPdfActivity
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
@@ -59,6 +56,10 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             initPdfCore()
         } else {
             finish()
+        }
+
+        binding.bookmarkBtn.setOnClickListener {
+            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
         }
 
         binding.highlighterIv.setOnClickListener {

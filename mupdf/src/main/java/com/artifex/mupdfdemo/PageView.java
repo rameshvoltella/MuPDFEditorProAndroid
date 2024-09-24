@@ -72,13 +72,15 @@ public abstract class PageView extends ViewGroup {
     public RectF selectedText;
     private TextWord[][] mText;
     private RectF mItemSelectBox;
+
+    private RectF mDeleteSelectBox;
     protected ArrayList<ArrayList<PointF>> mDrawing;
     private View mSearchView;
     private boolean mIsBlank;
     private boolean mHighlightLinks;
     private ProgressBar mBusyIndicator;
     private final Handler mHandler;
-    int once=-1;
+    int once = -1;
     private final TextSelectionDrawer textSelectionDrawer = new TextSelectionDrawer();
     private PdfTextSelectionHelper textSelectionHelper = new PdfTextSelectionHelper();
 
@@ -104,7 +106,7 @@ public abstract class PageView extends ViewGroup {
 
     protected abstract TextWord[][] getText();
 
-    protected abstract void addMarkup(final PointF[] p0, final Annotation.Type p1 , int color);
+    protected abstract void addMarkup(final PointF[] p0, final Annotation.Type p1, int color);
 
     private void reinit() {
         reset();
@@ -132,12 +134,12 @@ public abstract class PageView extends ViewGroup {
         if (this.mEntire != null) {
             this.mEntire.setImageBitmap((Bitmap) null);
             this.mEntire.invalidate();
-            Log.d("INVALIDATEunda","1111");
+            Log.d("INVALIDATEunda", "1111");
         }
         if (this.mPatch != null) {
             this.mPatch.setImageBitmap((Bitmap) null);
             this.mPatch.invalidate();
-            Log.d("INVALIDATEunda","22222");
+            Log.d("INVALIDATEunda", "22222");
 
         }
         this.mPatchViewSize = null;
@@ -148,7 +150,7 @@ public abstract class PageView extends ViewGroup {
         this.mText = null;
         this.mItemSelectBox = null;
 
-        Log.d("nullified","yes1");
+        Log.d("nullified", "yes1");
 
         highlightedSearchResultPaint.setColor(HIGHLIGHTED_SEARCHRESULT_COLOR);
         highlightedSearchResultPaint.setStyle(Paint.Style.STROKE);
@@ -198,6 +200,7 @@ public abstract class PageView extends ViewGroup {
             this.mBusyIndicator = null;
         }
     }
+
     private void reset() {
         if (mLoadTextTask != null) {
             mLoadTextTask.cancel(true);
@@ -236,7 +239,7 @@ public abstract class PageView extends ViewGroup {
         this.mIsBlank = false;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
-            Log.d("INVALIDATEunda","4444");
+            Log.d("INVALIDATEunda", "4444");
 
         }
         this.mPageNumber = page;
@@ -248,7 +251,7 @@ public abstract class PageView extends ViewGroup {
         this.mSize = new Point((int) (size.x * this.mSourceScale), (int) (size.y * this.mSourceScale));
         this.mEntire.setImageBitmap((Bitmap) null);
         this.mEntire.invalidate();
-        Log.d("INVALIDATEunda","5555");
+        Log.d("INVALIDATEunda", "5555");
 
         (this.mGetLinkInfo = new AsyncTask<Void, Void, LinkInfo[]>() {
             protected LinkInfo[] doInBackground(final Void... v) {
@@ -259,7 +262,7 @@ public abstract class PageView extends ViewGroup {
                 PageView.this.mLinks = v;
                 if (PageView.this.mSearchView != null) {
                     PageView.this.mSearchView.invalidate();
-                    Log.d("INVALIDATEunda","31");
+                    Log.d("INVALIDATEunda", "31");
 
                 }
             }
@@ -270,7 +273,7 @@ public abstract class PageView extends ViewGroup {
                 PageView.this.setBackgroundColor(-1);
                 PageView.this.mEntire.setImageBitmap((Bitmap) null);
                 PageView.this.mEntire.invalidate();
-                Log.d("INVALIDATEunda","30");
+                Log.d("INVALIDATEunda", "30");
 
                 if (PageView.this.mBusyIndicator == null) {
                     PageView.this.mBusyIndicator = new ProgressBar(PageView.this.mContext);
@@ -294,19 +297,19 @@ public abstract class PageView extends ViewGroup {
                 PageView.this.mBusyIndicator = null;
                 PageView.this.mEntire.setImageBitmap(PageView.this.mEntireBm);
                 PageView.this.mEntire.invalidate();
-                Log.d("INVALIDATEunda","29");
+                Log.d("INVALIDATEunda", "29");
 
                 PageView.this.setBackgroundColor(0);
             }
         }).execute(new Void[0]);
         if (this.mSearchView == null) {
             this.addView(this.mSearchView = new View(this.mContext) {
-//                private Float left = null;
+                //                private Float left = null;
 //                private Float top = null;
 //                private Float right = null;
 //                private Float bottom = null;
 //                private RectF rectF = null;
-                RectF rectMain,rectMain2;
+                RectF rectMain, rectMain2;
                 private RectF lastCircleRect = null; // Track the last circle's position
                 float initialHandleY2 = -1;  // Initialize it to an invalid value
 
@@ -367,7 +370,7 @@ public abstract class PageView extends ViewGroup {
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
                         paint.setColor(HIGHLIGHT_COLOR);
                         for (final RectF rect : PageView.this.mSearchBoxes) {
-                            Log.d("chakka","yaaaa1111");
+                            Log.d("chakka", "yaaaa1111");
 
                             canvas.drawRect(rect.left * scale, rect.top * scale, rect.right * scale, rect.bottom * scale, paint);
                         }
@@ -652,7 +655,7 @@ public abstract class PageView extends ViewGroup {
         this.mSearchBoxes = searchBoxes;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
-            Log.d("INVALIDATEunda","27");
+            Log.d("INVALIDATEunda", "27");
 
         }
     }
@@ -661,7 +664,7 @@ public abstract class PageView extends ViewGroup {
         this.mHighlightLinks = f;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
-            Log.d("INVALIDATEunda","26");
+            Log.d("INVALIDATEunda", "26");
 
         }
     }
@@ -670,45 +673,46 @@ public abstract class PageView extends ViewGroup {
         this.LINK_COLOR = color;
         if (this.mHighlightLinks && this.mSearchView != null) {
             this.mSearchView.invalidate();
-            Log.d("INVALIDATEunda","25");
+            Log.d("INVALIDATEunda", "25");
 
         }
     }
 
     public void deselectText() {
         this.mSelectBox = null;
-        Log.d("nullified","yes2");
+        Log.d("nullified", "yes2");
 
         this.mSearchView.invalidate();
-        Log.d("INVALIDATEunda","24");
+        Log.d("INVALIDATEunda", "24");
 
     }
+
     private float rectSize = 50f; // Size of the RectF
     private RectF startPoint;
-    public void  selectorFirstPoint(final float x, final float y)
-    {
+
+    public void selectorFirstPoint(final float x, final float y) {
         startPoint = new RectF(
                 x - rectSize / 2, // left
                 y - rectSize / 2, // top
                 x + rectSize / 2, // right
                 y + rectSize / 2  // bottom
         );
-        once=0;
+        once = 0;
     }
 
-    public void resetSelection()
-    {
-        once=-1;
+    public void resetSelection() {
+        once = -1;
     }
 
 
-    int k=0;
+    int k = 0;
     // Define a tolerance for detecting clicks near edges or corners
     private static final float EDGE_TOLERANCE = 100.0f; // Adjust this value as needed
 
     // Method to check click position relative to the RectF
-    boolean isLeft=false;
-    SelectorMode selmode=SelectorMode.IDLEMODE;
+    boolean isLeft = false;
+    SelectorMode selmode = SelectorMode.IDLEMODE;
+
     private void checkClickPosition(float clickX, float clickY, RectF rect) {
         // Calculate the corners of the RectF
         float left = rect.left;
@@ -719,61 +723,50 @@ public abstract class PageView extends ViewGroup {
         // Check if the click is near the right bottom corner
         if (Math.abs(clickX - right) <= EDGE_TOLERANCE && Math.abs(clickY - bottom) <= EDGE_TOLERANCE) {
             System.out.println("Clicked near the right bottom corner");
-            isLeft=false;
-            selmode=SelectorMode.DRAGGINGRIGHT;
+            isLeft = false;
+            selmode = SelectorMode.DRAGGINGRIGHT;
         }
         // Check if the click is near the left top corner
         else if (Math.abs(clickX - left) <= EDGE_TOLERANCE && Math.abs(clickY - top) <= EDGE_TOLERANCE) {
             System.out.println("Clicked near the left top corner");
-            isLeft=true;
-            selmode=SelectorMode.DRAGGINGLEFT;
+            isLeft = true;
+            selmode = SelectorMode.DRAGGINGLEFT;
 
         }
         // Check if the click is near any other edge (optional)
         else if (Math.abs(clickX - left) <= EDGE_TOLERANCE || Math.abs(clickX - right) <= EDGE_TOLERANCE ||
                 Math.abs(clickY - top) <= EDGE_TOLERANCE || Math.abs(clickY - bottom) <= EDGE_TOLERANCE) {
-            if(isLeft)
-            {
+            if (isLeft) {
                 System.out.println("Clicked near an edge after LeftClick");
 
-            }else {
+            } else {
                 System.out.println("Clicked near an edge after Right");
 
             }
 
-            if(selmode==SelectorMode.IDLEMODE)
-            {
-                selmode=SelectorMode.DRAGGINGNEWAREA;
-            }else   if(selmode==SelectorMode.DRAGGINGLEFT)
-            {
-                selmode=SelectorMode.DRAGGINGLEFT;
+            if (selmode == SelectorMode.IDLEMODE) {
+                selmode = SelectorMode.DRAGGINGNEWAREA;
+            } else if (selmode == SelectorMode.DRAGGINGLEFT) {
+                selmode = SelectorMode.DRAGGINGLEFT;
+            } else if (selmode == SelectorMode.DRAGGINGRIGHT) {
+                selmode = SelectorMode.DRAGGINGRIGHT;
             }
-            else  if(selmode==SelectorMode.DRAGGINGRIGHT)
-            {
-                selmode=SelectorMode.DRAGGINGRIGHT;
-            }
-        }
-        else {
+        } else {
 
-            if(isLeft)
-            {
+            if (isLeft) {
                 System.out.println("Clicked inside the RectF but not near edges LEFT");
 
-            }else {
+            } else {
                 System.out.println("Clicked inside the RectF but not near edges RIGHT");
 
             }
 
-            if(selmode==SelectorMode.IDLEMODE)
-            {
-                selmode=SelectorMode.DRAGGINGNEWAREA;
-            }else   if(selmode==SelectorMode.DRAGGINGLEFT)
-            {
-                selmode=SelectorMode.DRAGGINGSELCTIONLTR;
-            }
-            else  if(selmode==SelectorMode.DRAGGINGRIGHT)
-            {
-                selmode=SelectorMode.DRAGGINGSELCTIONRTL;
+            if (selmode == SelectorMode.IDLEMODE) {
+                selmode = SelectorMode.DRAGGINGNEWAREA;
+            } else if (selmode == SelectorMode.DRAGGINGLEFT) {
+                selmode = SelectorMode.DRAGGINGSELCTIONLTR;
+            } else if (selmode == SelectorMode.DRAGGINGRIGHT) {
+                selmode = SelectorMode.DRAGGINGSELCTIONRTL;
             }
         }
     }
@@ -783,22 +776,21 @@ public abstract class PageView extends ViewGroup {
         RectF myRect = new RectF(229.5f, 611.2064f, 686.6694f, 769.499f);
         checkClickPosition(clickX, clickY, myRect);
     }
-public void selectEvent(MotionEvent e)
-{
-    Log.d("Clikmode","EVENy"+e.getAction());
-    if(e.getAction()==MotionEvent.ACTION_UP)
-    {
-        selmode=SelectorMode.IDLEMODE;
+
+    public void selectEvent(MotionEvent e) {
+        Log.d("Clikmode", "EVENy" + e.getAction());
+        if (e.getAction() == MotionEvent.ACTION_UP) {
+            selmode = SelectorMode.IDLEMODE;
+        }
+
     }
 
-}
-
     public void selectText(float x0, float y0, float x1, float y1) {
-        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
-        float docRelX0 = (x0 - getLeft())/scale;
-        float docRelY0 = (y0 - getTop())/scale;
-        float docRelX1 = (x1 - getLeft())/scale;
-        float docRelY1 = (y1 - getTop())/scale;
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX0 = (x0 - getLeft()) / scale;
+        float docRelY0 = (y0 - getTop()) / scale;
+        float docRelX1 = (x1 - getLeft()) / scale;
+        float docRelY1 = (y1 - getTop()) / scale;
 
         // Order on Y but maintain the point grouping
         if (docRelY0 <= docRelY1)
@@ -807,22 +799,24 @@ public void selectEvent(MotionEvent e)
             mSelectBox = new RectF(docRelX1, docRelY1, docRelX0, docRelY0);
 
         //Adjust the min/max x values between which text is selected
-        if(Math.max(docRelX0,docRelX1)>docRelXmax) docRelXmax = Math.max(docRelX0,docRelX1);
-        if(Math.min(docRelX0,docRelX1)<docRelXmin) docRelXmin = Math.min(docRelX0,docRelX1);
+        if (Math.max(docRelX0, docRelX1) > docRelXmax) docRelXmax = Math.max(docRelX0, docRelX1);
+        if (Math.min(docRelX0, docRelX1) < docRelXmin) docRelXmin = Math.min(docRelX0, docRelX1);
 
         mSearchView.invalidate();
 
         loadText(); //We should do this earlier in the background ...
     }
-    private       AsyncTask<Void,Void,TextWord[][]> mLoadTextTask;
+
+    private AsyncTask<Void, Void, TextWord[][]> mLoadTextTask;
 
     private void loadText() {
         if (mLoadTextTask == null) {
-            mLoadTextTask = new AsyncTask<Void,Void,TextWord[][]>() {
+            mLoadTextTask = new AsyncTask<Void, Void, TextWord[][]>() {
                 @Override
                 protected TextWord[][] doInBackground(Void... params) {
                     return getText();
                 }
+
                 @Override
                 protected void onPostExecute(TextWord[][] result) {
                     mText = result;
@@ -836,11 +830,11 @@ public void selectEvent(MotionEvent e)
     public void selectdText(final float x0, final float y0, final float x1, final float y1) {
 
 
-        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
-        float docRelX0 = (x0 - getLeft())/scale;
-        float docRelY0 = (y0 - getTop())/scale;
-        float docRelX1 = (x1 - getLeft())/scale;
-        float docRelY1 = (y1 - getTop())/scale;
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX0 = (x0 - getLeft()) / scale;
+        float docRelY0 = (y0 - getTop()) / scale;
+        float docRelX1 = (x1 - getLeft()) / scale;
+        float docRelY1 = (y1 - getTop()) / scale;
 
         // Order on Y but maintain the point grouping
         if (docRelY0 <= docRelY1)
@@ -849,8 +843,8 @@ public void selectEvent(MotionEvent e)
             mSelectBox = new RectF(docRelX1, docRelY1, docRelX0, docRelY0);
 
         //Adjust the min/max x values between which text is selected
-        if(Math.max(docRelX0,docRelX1)>docRelXmax) docRelXmax = Math.max(docRelX0,docRelX1);
-        if(Math.min(docRelX0,docRelX1)<docRelXmin) docRelXmin = Math.min(docRelX0,docRelX1);
+        if (Math.max(docRelX0, docRelX1) > docRelXmax) docRelXmax = Math.max(docRelX0, docRelX1);
+        if (Math.min(docRelX0, docRelX1) < docRelXmin) docRelXmin = Math.min(docRelX0, docRelX1);
 
 
 //        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
@@ -866,12 +860,10 @@ public void selectEvent(MotionEvent e)
         }
 
 
-
-
         // If mSelectBox is already defined, merge it with the new select box
         if (this.mSelectBox != null) {
 
-            this.mSelectBox=expandOriginalRect(mSelectBox,newSelectBox);
+            this.mSelectBox = expandOriginalRect(mSelectBox, newSelectBox);
 
 //            checkTouchInRect(mSelectBox,docRelX2,docRelY2);
 
@@ -889,7 +881,7 @@ public void selectEvent(MotionEvent e)
 //            this.mSelectBox = new RectF(docRelX2, docRelY2, docRelX0, docRelY0);
 //        }
         this.mSearchView.invalidate();
-        Log.d("INVALIDATEunda","23");
+        Log.d("INVALIDATEunda", "23");
 
         if (this.mGetText == null) {
             (this.mGetText = new AsyncTask<Void, Void, TextWord[][]>() {
@@ -900,14 +892,15 @@ public void selectEvent(MotionEvent e)
                 protected void onPostExecute(final TextWord[][] result) {
                     PageView.this.mText = result;
                     PageView.this.mSearchView.invalidate();
-                    Log.d("INVALIDATEunda","22");
+                    Log.d("INVALIDATEunda", "22");
 
 
                 }
             }).execute(new Void[0]);
         }
     }
-    public  RectF expandOriginalRect(RectF originalRect, RectF newRect)  {
+
+    public RectF expandOriginalRect(RectF originalRect, RectF newRect) {
         // Check if newRect is within originalRect
         boolean isLeftTopInside = originalRect.contains(newRect.left, newRect.top);
         boolean isLeftBottomInside = originalRect.contains(newRect.left, newRect.bottom);
@@ -923,6 +916,7 @@ public void selectEvent(MotionEvent e)
         unionRect.union(newRect);
         return newRect;
     }
+
     final float sideMargin = 100f;  // Adjust as necessary for sensitivity
 
     public void checkTouchInRect(RectF rect, float touchX, float touchY) {
@@ -944,8 +938,9 @@ public void selectEvent(MotionEvent e)
             Log.d("TouchEvent", "Touch outside the rectangle");
         }
     }
+
     public void startDraw(final float x, final float y) {
-        Log.d("losap","drawing....statdraw");
+        Log.d("losap", "drawing....statdraw");
 
         final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
         final float docRelX = (x - this.getLeft()) / scale;
@@ -957,7 +952,7 @@ public void selectEvent(MotionEvent e)
         arc.add(new PointF(docRelX, docRelY));
         this.mDrawing.add(arc);
         this.mSearchView.invalidate();
-        Log.d("INVALIDATEunda","21");
+        Log.d("INVALIDATEunda", "21");
 
     }
 
@@ -969,7 +964,7 @@ public void selectEvent(MotionEvent e)
             final ArrayList<PointF> arc = this.mDrawing.get(this.mDrawing.size() - 1);
             arc.add(new PointF(docRelX, docRelY));
             this.mSearchView.invalidate();
-            Log.d("INVALIDATEunda","20");
+            Log.d("INVALIDATEunda", "20");
 
         }
     }
@@ -977,7 +972,7 @@ public void selectEvent(MotionEvent e)
     public void cancelDraw() {
         this.mDrawing = null;
         this.mSearchView.invalidate();
-        Log.d("INVALIDATEunda","15");
+        Log.d("INVALIDATEunda", "15");
 
     }
 
@@ -1046,11 +1041,12 @@ public void selectEvent(MotionEvent e)
 
         return colors;
     }
+
     protected void processSelectedText(TextProcessor tp) {
-        Log.d("dddddd","CheckprocessSelectedText"+mText+"<><><"+mSelectBox);
+        Log.d("dddddd", "CheckprocessSelectedText" + mText + "<><><" + mSelectBox);
 
         if (useSmartTextSelection)
-            (new TextSelector(mText, mSelectBox,docRelXmin,docRelXmax)).select(tp);
+            (new TextSelector(mText, mSelectBox, docRelXmin, docRelXmax)).select(tp);
         else
             (new TextSelector(mText, mSelectBox)).select(tp);
     }
@@ -1066,227 +1062,245 @@ public void selectEvent(MotionEvent e)
         this.mItemSelectBox = rect;
         if (this.mSearchView != null) {
             this.mSearchView.invalidate();
-            Log.d("INVALIDATEunda","14");
+            Log.d("INVALIDATEunda", "14");
 
         }
     }
 
-    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        int x = 0;
-        switch (MeasureSpec.getMode(widthMeasureSpec)) {
-            case 0: {
-                x = this.mSize.x;
-                break;
-            }
-            default: {
-                x = MeasureSpec.getSize(widthMeasureSpec);
-                break;
-            }
-        }
-        int y = 0;
-        switch (MeasureSpec.getMode(heightMeasureSpec)) {
-            case 0: {
-                y = this.mSize.y;
-                break;
-            }
-            default: {
-                y = MeasureSpec.getSize(heightMeasureSpec);
-                break;
-            }
-        }
-        this.setMeasuredDimension(x, y);
-        if (this.mBusyIndicator != null) {
-            final int limit = Math.min(this.mParentSize.x, this.mParentSize.y) / 2;
-            this.mBusyIndicator.measure(Integer.MIN_VALUE | limit, Integer.MIN_VALUE | limit);
-        }
+    public void setItemDeleteBox(final RectF rect) {
+        this.mDeleteSelectBox = rect;
+
     }
 
-    protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
-        final int w = right - left;
-        final int h = bottom - top;
-        if (this.mEntire != null) {
-            if (this.mEntire.getWidth() != w || this.mEntire.getHeight() != h) {
-                this.mEntireMat.setScale(w / (float) this.mSize.x, h / (float) this.mSize.y);
-                this.mEntire.setImageMatrix(this.mEntireMat);
-                this.mEntire.invalidate();
-                Log.d("INVALIDATEunda","13");
 
-            }
-            this.mEntire.layout(0, 0, w, h);
-        }
-        if (this.mSearchView != null) {
-            this.mSearchView.layout(0, 0, w, h);
-        }
-        if (this.mPatchViewSize != null) {
-            if (this.mPatchViewSize.x != w || this.mPatchViewSize.y != h) {
-                this.mPatchViewSize = null;
-                this.mPatchArea = null;
-                if (this.mPatch != null) {
-                    this.mPatch.setImageBitmap((Bitmap) null);
-                    this.mPatch.invalidate();
-                    Log.d("INVALIDATEunda","12");
+public RectF getRectToDelete() {
+    return mDeleteSelectBox;
+}
 
-                }
-            } else {
-                this.mPatch.layout(this.mPatchArea.left, this.mPatchArea.top, this.mPatchArea.right, this.mPatchArea.bottom);
-            }
+public void clearDeleteRect()
+{
+    mDeleteSelectBox = null;
+}
+
+
+protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+    int x = 0;
+    switch (MeasureSpec.getMode(widthMeasureSpec)) {
+        case 0: {
+            x = this.mSize.x;
+            break;
         }
-        if (this.mBusyIndicator != null) {
-            final int bw = this.mBusyIndicator.getMeasuredWidth();
-            final int bh = this.mBusyIndicator.getMeasuredHeight();
-            this.mBusyIndicator.layout((w - bw) / 2, (h - bh) / 2, (w + bw) / 2, (h + bh) / 2);
+        default: {
+            x = MeasureSpec.getSize(widthMeasureSpec);
+            break;
         }
     }
+    int y = 0;
+    switch (MeasureSpec.getMode(heightMeasureSpec)) {
+        case 0: {
+            y = this.mSize.y;
+            break;
+        }
+        default: {
+            y = MeasureSpec.getSize(heightMeasureSpec);
+            break;
+        }
+    }
+    this.setMeasuredDimension(x, y);
+    if (this.mBusyIndicator != null) {
+        final int limit = Math.min(this.mParentSize.x, this.mParentSize.y) / 2;
+        this.mBusyIndicator.measure(Integer.MIN_VALUE | limit, Integer.MIN_VALUE | limit);
+    }
+}
 
-    public void updateHq(final boolean update) {
-        final Rect viewArea = new Rect(this.getLeft(), this.getTop(), this.getRight(), this.getBottom());
-        if (viewArea.width() == this.mSize.x || viewArea.height() == this.mSize.y) {
+protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
+    final int w = right - left;
+    final int h = bottom - top;
+    if (this.mEntire != null) {
+        if (this.mEntire.getWidth() != w || this.mEntire.getHeight() != h) {
+            this.mEntireMat.setScale(w / (float) this.mSize.x, h / (float) this.mSize.y);
+            this.mEntire.setImageMatrix(this.mEntireMat);
+            this.mEntire.invalidate();
+            Log.d("INVALIDATEunda", "13");
+
+        }
+        this.mEntire.layout(0, 0, w, h);
+    }
+    if (this.mSearchView != null) {
+        this.mSearchView.layout(0, 0, w, h);
+    }
+    if (this.mPatchViewSize != null) {
+        if (this.mPatchViewSize.x != w || this.mPatchViewSize.y != h) {
+            this.mPatchViewSize = null;
+            this.mPatchArea = null;
             if (this.mPatch != null) {
                 this.mPatch.setImageBitmap((Bitmap) null);
                 this.mPatch.invalidate();
-                Log.d("INVALIDATEunda","eleven");
+                Log.d("INVALIDATEunda", "12");
 
             }
         } else {
-            final Point patchViewSize = new Point(viewArea.width(), viewArea.height());
-            final Rect patchArea = new Rect(0, 0, this.mParentSize.x, this.mParentSize.y);
-            if (!patchArea.intersect(viewArea)) {
-                return;
-            }
-            patchArea.offset(-viewArea.left, -viewArea.top);
-            final boolean area_unchanged = patchArea.equals(this.mPatchArea) && patchViewSize.equals(this.mPatchViewSize);
-            if (area_unchanged && !update) {
-                return;
-            }
-            final boolean completeRedraw = !area_unchanged;
-            if (this.mDrawPatch != null) {
-                this.mDrawPatch.cancelAndWait();
-                this.mDrawPatch = null;
-            }
-            if (this.mPatch == null) {
-                (this.mPatch = (ImageView) new OpaqueImageView(this.mContext)).setScaleType(ImageView.ScaleType.MATRIX);
-                this.addView((View) this.mPatch);
-                this.mSearchView.bringToFront();
-            }
-            CancellableTaskDefinition<Void, Void> task;
-            if (completeRedraw) {
-                task = this.getDrawPageTask(this.mPatchBm, patchViewSize.x, patchViewSize.y, patchArea.left, patchArea.top, patchArea.width(), patchArea.height());
-            } else {
-                task = this.getUpdatePageTask(this.mPatchBm, patchViewSize.x, patchViewSize.y, patchArea.left, patchArea.top, patchArea.width(), patchArea.height());
-            }
-            (this.mDrawPatch = new CancellableAsyncTask<Void, Void>(task) {
-                @Override
-                public void onPostExecute(final Void result) {
-                    PageView.this.mPatchViewSize = patchViewSize;
-                    PageView.this.mPatchArea = patchArea;
-                    PageView.this.mPatch.setImageBitmap(PageView.this.mPatchBm);
-                    PageView.this.mPatch.invalidate();
-                    Log.d("INVALIDATEunda","ten");
-
-                    PageView.this.mPatch.layout(PageView.this.mPatchArea.left, PageView.this.mPatchArea.top, PageView.this.mPatchArea.right, PageView.this.mPatchArea.bottom);
-                }
-            }).execute(new Void[0]);
+            this.mPatch.layout(this.mPatchArea.left, this.mPatchArea.top, this.mPatchArea.right, this.mPatchArea.bottom);
         }
     }
-
-    public void update() {
-        if (this.mDrawEntire != null) {
-            this.mDrawEntire.cancelAndWait();
-            this.mDrawEntire = null;
-        }
-        if (this.mDrawPatch != null) {
-            this.mDrawPatch.cancelAndWait();
-            this.mDrawPatch = null;
-        }
-        (this.mDrawEntire = new CancellableAsyncTask<Void, Void>(this.getUpdatePageTask(this.mEntireBm, this.mSize.x, this.mSize.y, 0, 0, this.mSize.x, this.mSize.y)) {
-            @Override
-            public void onPostExecute(final Void result) {
-                PageView.this.mEntire.setImageBitmap(PageView.this.mEntireBm);
-                PageView.this.mEntire.invalidate();
-                Log.d("INVALIDATEunda","99999");
-
-            }
-        }).execute(new Void[0]);
-        this.updateHq(true);
+    if (this.mBusyIndicator != null) {
+        final int bw = this.mBusyIndicator.getMeasuredWidth();
+        final int bh = this.mBusyIndicator.getMeasuredHeight();
+        this.mBusyIndicator.layout((w - bw) / 2, (h - bh) / 2, (w + bw) / 2, (h + bh) / 2);
     }
+}
 
-    public void removeHq() {
-        if (this.mDrawPatch != null) {
-            this.mDrawPatch.cancelAndWait();
-            this.mDrawPatch = null;
-        }
-        this.mPatchViewSize = null;
-        this.mPatchArea = null;
+public void updateHq(final boolean update) {
+    final Rect viewArea = new Rect(this.getLeft(), this.getTop(), this.getRight(), this.getBottom());
+    if (viewArea.width() == this.mSize.x || viewArea.height() == this.mSize.y) {
         if (this.mPatch != null) {
             this.mPatch.setImageBitmap((Bitmap) null);
             this.mPatch.invalidate();
-            Log.d("INVALIDATEunda","88888");
+            Log.d("INVALIDATEunda", "eleven");
 
         }
-    }
-
-    public int getPage() {
-        return this.mPageNumber;
-    }
-
-    public boolean isOpaque() {
-        return true;
-    }
-    private final Paint searchResultPaint = new Paint();
-    private final Paint highlightedSearchResultPaint = new Paint();
-    private final Paint linksPaint = new Paint();
-    private final Paint selectBoxPaint = new Paint();
-    private final Paint selectMarkerPaint = new Paint();
-    private final Paint selectOverlayPaint = new Paint();
-    private final Paint itemSelectBoxPaint = new Paint();
-    private final Paint drawingPaint = new Paint();
-    private final Paint eraserInnerPaint = new Paint();
-    private final Paint eraserOuterPaint = new Paint();
-    class TextSelectionDrawer implements TextProcessor {
-        RectF rect;
-        RectF firstLineRect = new RectF();
-        RectF lastLineRect = new RectF();
-        Path leftMarker = new Path();
-        Path rightMarker = new Path();
-        float height;
-        float oldHeight = 0f;
-        float docRelXmaxSelection = Float.NEGATIVE_INFINITY;
-        float docRelXminSelection = Float.POSITIVE_INFINITY;
-        float scale;
-        Canvas canvas;
-
-        public void reset(Canvas canvas, float scale) {
-            this.canvas = canvas;
-            this.scale = scale;
-            firstLineRect.setEmpty();
-            lastLineRect.setEmpty();
-            docRelXmaxSelection = Float.NEGATIVE_INFINITY;
-            docRelXminSelection = Float.POSITIVE_INFINITY;
+    } else {
+        final Point patchViewSize = new Point(viewArea.width(), viewArea.height());
+        final Rect patchArea = new Rect(0, 0, this.mParentSize.x, this.mParentSize.y);
+        if (!patchArea.intersect(viewArea)) {
+            return;
         }
-
-        public void onStartLine() {
-            rect = new RectF();
+        patchArea.offset(-viewArea.left, -viewArea.top);
+        final boolean area_unchanged = patchArea.equals(this.mPatchArea) && patchViewSize.equals(this.mPatchViewSize);
+        if (area_unchanged && !update) {
+            return;
         }
-
-        public void onWord(TextWord word) {
-            rect.union(word);
+        final boolean completeRedraw = !area_unchanged;
+        if (this.mDrawPatch != null) {
+            this.mDrawPatch.cancelAndWait();
+            this.mDrawPatch = null;
         }
+        if (this.mPatch == null) {
+            (this.mPatch = (ImageView) new OpaqueImageView(this.mContext)).setScaleType(ImageView.ScaleType.MATRIX);
+            this.addView((View) this.mPatch);
+            this.mSearchView.bringToFront();
+        }
+        CancellableTaskDefinition<Void, Void> task;
+        if (completeRedraw) {
+            task = this.getDrawPageTask(this.mPatchBm, patchViewSize.x, patchViewSize.y, patchArea.left, patchArea.top, patchArea.width(), patchArea.height());
+        } else {
+            task = this.getUpdatePageTask(this.mPatchBm, patchViewSize.x, patchViewSize.y, patchArea.left, patchArea.top, patchArea.width(), patchArea.height());
+        }
+        (this.mDrawPatch = new CancellableAsyncTask<Void, Void>(task) {
+            @Override
+            public void onPostExecute(final Void result) {
+                PageView.this.mPatchViewSize = patchViewSize;
+                PageView.this.mPatchArea = patchArea;
+                PageView.this.mPatch.setImageBitmap(PageView.this.mPatchBm);
+                PageView.this.mPatch.invalidate();
+                Log.d("INVALIDATEunda", "ten");
 
-        public void onEndLine() {
-            if (!rect.isEmpty()) {
-                if (firstLineRect.isEmpty() || firstLineRect.top > rect.top) {
-                    firstLineRect.set(rect);
-                }
-                if (lastLineRect.isEmpty() || lastLineRect.bottom < rect.bottom) {
-                    lastLineRect.set(rect);
-                }
-
-                canvas.drawRect(rect.left * scale, rect.top * scale,
-                        rect.right * scale, rect.bottom * scale, selectBoxPaint);
-
-                docRelXmaxSelection = Math.max(docRelXmaxSelection, Math.max(rect.right, docRelXmax));
-                docRelXminSelection = Math.min(docRelXminSelection, Math.min(rect.left, docRelXmin));
+                PageView.this.mPatch.layout(PageView.this.mPatchArea.left, PageView.this.mPatchArea.top, PageView.this.mPatchArea.right, PageView.this.mPatchArea.bottom);
             }
+        }).execute(new Void[0]);
+    }
+}
+
+public void update() {
+    if (this.mDrawEntire != null) {
+        this.mDrawEntire.cancelAndWait();
+        this.mDrawEntire = null;
+    }
+    if (this.mDrawPatch != null) {
+        this.mDrawPatch.cancelAndWait();
+        this.mDrawPatch = null;
+    }
+    (this.mDrawEntire = new CancellableAsyncTask<Void, Void>(this.getUpdatePageTask(this.mEntireBm, this.mSize.x, this.mSize.y, 0, 0, this.mSize.x, this.mSize.y)) {
+        @Override
+        public void onPostExecute(final Void result) {
+            PageView.this.mEntire.setImageBitmap(PageView.this.mEntireBm);
+            PageView.this.mEntire.invalidate();
+            Log.d("INVALIDATEunda", "99999");
+
+        }
+    }).execute(new Void[0]);
+    this.updateHq(true);
+}
+
+public void removeHq() {
+    if (this.mDrawPatch != null) {
+        this.mDrawPatch.cancelAndWait();
+        this.mDrawPatch = null;
+    }
+    this.mPatchViewSize = null;
+    this.mPatchArea = null;
+    if (this.mPatch != null) {
+        this.mPatch.setImageBitmap((Bitmap) null);
+        this.mPatch.invalidate();
+        Log.d("INVALIDATEunda", "88888");
+
+    }
+}
+
+public int getPage() {
+    return this.mPageNumber;
+}
+
+public boolean isOpaque() {
+    return true;
+}
+
+private final Paint searchResultPaint = new Paint();
+private final Paint highlightedSearchResultPaint = new Paint();
+private final Paint linksPaint = new Paint();
+private final Paint selectBoxPaint = new Paint();
+private final Paint selectMarkerPaint = new Paint();
+private final Paint selectOverlayPaint = new Paint();
+private final Paint itemSelectBoxPaint = new Paint();
+private final Paint drawingPaint = new Paint();
+private final Paint eraserInnerPaint = new Paint();
+private final Paint eraserOuterPaint = new Paint();
+
+class TextSelectionDrawer implements TextProcessor {
+    RectF rect;
+    RectF firstLineRect = new RectF();
+    RectF lastLineRect = new RectF();
+    Path leftMarker = new Path();
+    Path rightMarker = new Path();
+    float height;
+    float oldHeight = 0f;
+    float docRelXmaxSelection = Float.NEGATIVE_INFINITY;
+    float docRelXminSelection = Float.POSITIVE_INFINITY;
+    float scale;
+    Canvas canvas;
+
+    public void reset(Canvas canvas, float scale) {
+        this.canvas = canvas;
+        this.scale = scale;
+        firstLineRect.setEmpty();
+        lastLineRect.setEmpty();
+        docRelXmaxSelection = Float.NEGATIVE_INFINITY;
+        docRelXminSelection = Float.POSITIVE_INFINITY;
+    }
+
+    public void onStartLine() {
+        rect = new RectF();
+    }
+
+    public void onWord(TextWord word) {
+        rect.union(word);
+    }
+
+    public void onEndLine() {
+        if (!rect.isEmpty()) {
+            if (firstLineRect.isEmpty() || firstLineRect.top > rect.top) {
+                firstLineRect.set(rect);
+            }
+            if (lastLineRect.isEmpty() || lastLineRect.bottom < rect.bottom) {
+                lastLineRect.set(rect);
+            }
+
+            canvas.drawRect(rect.left * scale, rect.top * scale,
+                    rect.right * scale, rect.bottom * scale, selectBoxPaint);
+
+            docRelXmaxSelection = Math.max(docRelXmaxSelection, Math.max(rect.right, docRelXmax));
+            docRelXminSelection = Math.min(docRelXminSelection, Math.min(rect.left, docRelXmin));
+        }
            /* if (!rect.isEmpty())
             {
                 if(firstLineRect == null || firstLineRect.top > rect.top)
@@ -1306,9 +1320,9 @@ public void selectEvent(MotionEvent e)
                 docRelXmaxSelection = Math.max(docRelXmaxSelection,Math.max(rect.right,docRelXmax));
                 docRelXminSelection = Math.min(docRelXminSelection,Math.min(rect.left,docRelXmin));
             }*/
-        }
+    }
 
-        public void onEndText() {
+    public void onEndText() {
            /* if (!firstLineRect.isEmpty() && !lastLineRect.isEmpty()) {
                 height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top,
                                         lastLineRect.bottom - lastLineRect.top),
@@ -1381,11 +1395,11 @@ Log.d("ckckckc","firstLineRect"+firstLineRect);
             }
 
             */
-            if (firstLineRect != null && lastLineRect != null) {
-                height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top, lastLineRect.bottom - lastLineRect.top), getResources().getDisplayMetrics().xdpi * 0.07f / scale), 4 * getResources().getDisplayMetrics().xdpi * 0.07f / scale);
+        if (firstLineRect != null && lastLineRect != null) {
+            height = Math.min(Math.max(Math.max(firstLineRect.bottom - firstLineRect.top, lastLineRect.bottom - lastLineRect.top), getResources().getDisplayMetrics().xdpi * 0.07f / scale), 4 * getResources().getDisplayMetrics().xdpi * 0.07f / scale);
 
-                leftMarkerRect.set(firstLineRect.left - 0.9f * height, firstLineRect.top, firstLineRect.left, firstLineRect.top + 1.9f * height);
-                rightMarkerRect.set(lastLineRect.right, lastLineRect.top, lastLineRect.right + 0.9f * height, lastLineRect.top + 1.9f * height);
+            leftMarkerRect.set(firstLineRect.left - 0.9f * height, firstLineRect.top, firstLineRect.left, firstLineRect.top + 1.9f * height);
+            rightMarkerRect.set(lastLineRect.right, lastLineRect.top, lastLineRect.right + 0.9f * height, lastLineRect.top + 1.9f * height);
 
                 /*if (height != oldHeight || true) {
                     float cornerRadius = 0.4f * height * scale; // Adjust this value for corner curvature
@@ -1409,108 +1423,116 @@ Log.d("ckckckc","firstLineRect"+firstLineRect);
                     oldHeight = height;
                 }*/
 
-                Log.d("ckckckc", "firstLineRect" + firstLineRect);
-                Log.d("ckckckc", "last" + lastLineRect);
+            Log.d("ckckckc", "firstLineRect" + firstLineRect);
+            Log.d("ckckckc", "last" + lastLineRect);
 
 //                leftMarker.offset(firstLineRect.left * scale, firstLineRect.top * scale);
 //                rightMarker.offset(lastLineRect.right * scale, lastLineRect.top * scale);
 
-                // Drawing the paths
+            // Drawing the paths
 //                canvas.drawPath(leftMarker, selectMarkerPaint);
 //                canvas.drawPath(rightMarker, selectMarkerPaint);
-                textSelectionHelper.drawStartHandle(canvas,firstLineRect.left,firstLineRect.top,scale);
-                textSelectionHelper.drawEndHandle(canvas,lastLineRect.right,lastLineRect.top,scale);
-                // Undo the offset so that we can reuse the path
+            textSelectionHelper.drawStartHandle(canvas, firstLineRect.left, firstLineRect.top, scale);
+            textSelectionHelper.drawEndHandle(canvas, lastLineRect.right, lastLineRect.top, scale);
+            // Undo the offset so that we can reuse the path
 //                leftMarker.offset(-firstLineRect.left * scale, -firstLineRect.top * scale);
 //                rightMarker.offset(-lastLineRect.right * scale, -lastLineRect.top * scale);
-            }
-
-            if (useSmartTextSelection) {
-                canvas.drawRect(0, 0, docRelXminSelection * scale, PageView.this.getHeight(), selectOverlayPaint);
-                canvas.drawRect(docRelXmaxSelection * scale, 0, PageView.this.getWidth(), PageView.this.getHeight(), selectOverlayPaint);
-            }
-
-
-        }
-    }
-    private static boolean useSmartTextSelection = false;
-    private       float     docRelXmax = Float.NEGATIVE_INFINITY;
-    private       float     docRelXmin = Float.POSITIVE_INFINITY;
-
-    //Update in following TextSelectionDrawer (coordinates are relative to document)
-    private RectF leftMarkerRect = new RectF();
-    private RectF rightMarkerRect= new RectF();
-
-    public boolean hitsLeftMarker(float x, float y)
-    {
-        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
-        float docRelX = (x - getLeft())/scale;
-        float docRelY = (y - getTop())/scale;
-        Log.d("LADALALA","MMleftMarkerRect"+leftMarkerRect);
-        return leftMarkerRect != null && leftMarkerRect.contains(docRelX,docRelY);
-    }
-    public boolean hitsRightMarker(float x, float y)
-    {
-        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
-        float docRelX = (x - getLeft())/scale;
-        float docRelY = (y - getTop())/scale;
-        Log.d("LADALALA","MMrightMarkerRect"+rightMarkerRect);
-
-        return rightMarkerRect != null && rightMarkerRect.contains(docRelX,docRelY);
-    }
-    public void moveLeftMarker(MotionEvent e){
-        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
-        float docRelX = (e.getX() - getLeft())/scale;
-        float docRelY = (e.getY() - getTop())/scale;
-
-        mSelectBox.left=docRelX;
-        if(docRelY < mSelectBox.bottom)
-            mSelectBox.top=docRelY;
-        else {
-            mSelectBox.top=mSelectBox.bottom;
-            mSelectBox.bottom=docRelY;
-        }
-        if(docRelX>docRelXmax) docRelXmax = docRelX;
-        if(docRelX<docRelXmin) docRelXmin = docRelX;
-        mSearchView.invalidate();
-    }
-
-    public void moveRightMarker(MotionEvent e){
-        float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
-        float docRelX = (e.getX() - getLeft())/scale;
-        float docRelY = (e.getY() - getTop())/scale;
-        mSelectBox.right=docRelX;
-        if(docRelY > mSelectBox.top)
-            mSelectBox.bottom=docRelY;
-        else {
-            mSelectBox.bottom=mSelectBox.top;
-            mSelectBox.top=docRelY;
-        }
-        if(docRelX>docRelXmax) docRelXmax = docRelX;
-        if(docRelX<docRelXmin) docRelXmin = docRelX;
-        mSearchView.invalidate();
-    }
-    private static final int ERASER_INNER_COLOR = 0xFFFFFFFF;
-    private static final int ERASER_OUTER_COLOR = 0xFF000000;
-
-    public boolean hasTextSelected() {
-Log.d("dddddd","Check");
-        class Boolean {
-            public boolean value;
         }
 
-        final Boolean b = new Boolean();
-        b.value = false;
+        if (useSmartTextSelection) {
+            canvas.drawRect(0, 0, docRelXminSelection * scale, PageView.this.getHeight(), selectOverlayPaint);
+            canvas.drawRect(docRelXmaxSelection * scale, 0, PageView.this.getWidth(), PageView.this.getHeight(), selectOverlayPaint);
+        }
 
-        processSelectedText(new TextProcessor() {
-            public void onStartLine() {}
-            public void onWord(TextWord word) {
-                b.value = true;
-            }
-            public void onEndLine() {}
-            public void onEndText() {}
-        });
-        return b.value;
+
     }
+}
+
+private static boolean useSmartTextSelection = false;
+private float docRelXmax = Float.NEGATIVE_INFINITY;
+private float docRelXmin = Float.POSITIVE_INFINITY;
+
+//Update in following TextSelectionDrawer (coordinates are relative to document)
+private RectF leftMarkerRect = new RectF();
+private RectF rightMarkerRect = new RectF();
+
+public boolean hitsLeftMarker(float x, float y) {
+    float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+    float docRelX = (x - getLeft()) / scale;
+    float docRelY = (y - getTop()) / scale;
+    Log.d("LADALALA", "MMleftMarkerRect" + leftMarkerRect);
+    return leftMarkerRect != null && leftMarkerRect.contains(docRelX, docRelY);
+}
+
+public boolean hitsRightMarker(float x, float y) {
+    float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+    float docRelX = (x - getLeft()) / scale;
+    float docRelY = (y - getTop()) / scale;
+    Log.d("LADALALA", "MMrightMarkerRect" + rightMarkerRect);
+
+    return rightMarkerRect != null && rightMarkerRect.contains(docRelX, docRelY);
+}
+
+public void moveLeftMarker(MotionEvent e) {
+    float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+    float docRelX = (e.getX() - getLeft()) / scale;
+    float docRelY = (e.getY() - getTop()) / scale;
+
+    mSelectBox.left = docRelX;
+    if (docRelY < mSelectBox.bottom)
+        mSelectBox.top = docRelY;
+    else {
+        mSelectBox.top = mSelectBox.bottom;
+        mSelectBox.bottom = docRelY;
+    }
+    if (docRelX > docRelXmax) docRelXmax = docRelX;
+    if (docRelX < docRelXmin) docRelXmin = docRelX;
+    mSearchView.invalidate();
+}
+
+public void moveRightMarker(MotionEvent e) {
+    float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+    float docRelX = (e.getX() - getLeft()) / scale;
+    float docRelY = (e.getY() - getTop()) / scale;
+    mSelectBox.right = docRelX;
+    if (docRelY > mSelectBox.top)
+        mSelectBox.bottom = docRelY;
+    else {
+        mSelectBox.bottom = mSelectBox.top;
+        mSelectBox.top = docRelY;
+    }
+    if (docRelX > docRelXmax) docRelXmax = docRelX;
+    if (docRelX < docRelXmin) docRelXmin = docRelX;
+    mSearchView.invalidate();
+}
+
+private static final int ERASER_INNER_COLOR = 0xFFFFFFFF;
+private static final int ERASER_OUTER_COLOR = 0xFF000000;
+
+public boolean hasTextSelected() {
+    Log.d("dddddd", "Check");
+    class Boolean {
+        public boolean value;
+    }
+
+    final Boolean b = new Boolean();
+    b.value = false;
+
+    processSelectedText(new TextProcessor() {
+        public void onStartLine() {
+        }
+
+        public void onWord(TextWord word) {
+            b.value = true;
+        }
+
+        public void onEndLine() {
+        }
+
+        public void onEndText() {
+        }
+    });
+    return b.value;
+}
 
 }

@@ -51,6 +51,10 @@ public interface MuPDFView
 
     void setSearchBoxes(final RectF[] p0);
 
+    RectF getRectToDelete();
+
+    void clearDeleteRect();
+
     void setLinkHighlighting(final boolean p0);
 
     void deselectAnnotation();

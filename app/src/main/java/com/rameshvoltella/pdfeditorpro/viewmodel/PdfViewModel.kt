@@ -30,11 +30,11 @@ constructor(
     private val annotationResponsePrivate = MutableLiveData<AnnotationOperationResult>()
     val annotationResponse: LiveData<AnnotationOperationResult> get() = annotationResponsePrivate
 
-    private val annotationInsertPrivate = MutableLiveData<Boolean>()
+    private val annotationInsertDeletePrivate = MutableLiveData<Boolean>()
     private val annotationPerPagePrivate = MutableLiveData<List<QuadPointsAndType>>()
     val annotationPerPage: LiveData<List<QuadPointsAndType>> get() = annotationPerPagePrivate
 
-    val annotationInsert: LiveData<Boolean> get() = annotationInsertPrivate
+    val annotationInsertDelete: LiveData<Boolean> get() = annotationInsertDeletePrivate
 
     fun getAnnotations(pdfName:String,page:Int)
     {
@@ -80,7 +80,7 @@ constructor(
                                 type = PdfConstants.HIGHLIGHT,
                                 color = 0
                             )).collect {
-                                annotationInsertPrivate.value = it
+                                annotationInsertDeletePrivate.value = it
 
                             }
                         }
@@ -104,7 +104,7 @@ constructor(
                                 type = PdfConstants.UNDERLINE,
                                 color = 0
                             )).collect {
-                                annotationInsertPrivate.value = it
+                                annotationInsertDeletePrivate.value = it
 
                             }
                         }
@@ -127,7 +127,7 @@ constructor(
                                 type = PdfConstants.STRIKEOUT,
                                 color = 0
                             )).collect {
-                                annotationInsertPrivate.value = it
+                                annotationInsertDeletePrivate.value = it
 
                             }
                         }
@@ -150,6 +150,29 @@ constructor(
 
         }
 
+    }
+
+    fun deleteAnnotation(muPDFView: MuPDFView?,pdfName:String)
+    {
+        muPDFView?.let { pageView ->
+            val deleteRect=pageView.getRectToDelete()
+            if(deleteRect!=null) {
+                viewModelScope.launch {
+
+                    pdfDatabaseRepository.getQuadPointsAndTypeByPageToDelete(
+                        pdfname = pdfName, pagenumber = muPDFView.page, selectedRect = deleteRect!!
+                    ).collect {
+                        if(it)
+                        {
+                            pageView.clearDeleteRect();
+                        }
+                        annotationInsertDeletePrivate.value = it
+
+                    }
+                }
+            }
+            pageView.deleteSelectedAnnotation()
+    }
     }
 
     fun addAnnotationFromDatabase(muPDFView: MuPDFView?,quadPoints:QuadPointsAndType )

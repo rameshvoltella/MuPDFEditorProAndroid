@@ -20,4 +20,10 @@ interface PdfAnnotationDao {
 
     @Query("DELETE FROM pdf_annotations WHERE id = :id")
     suspend fun deleteAnnotationById(id: Int)
+
+    @Query("SELECT * FROM pdf_annotations WHERE pdfname = :pdfname AND pagenumber = :pagenumber")
+    suspend fun getAnnotationsByPage(
+        pdfname: String,
+        pagenumber: Int
+    ): List<PdfAnnotation>
 }
