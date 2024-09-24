@@ -6,6 +6,8 @@ package com.artifex.mupdfdemo;
 
 import android.os.Build;
 import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -376,8 +378,8 @@ public class MuPDFPageView extends PageView implements MuPDFView
         return true;
     }
     @Override
-    public boolean markupHardcodeSelection(final Annotation.Type type) {
-        ArrayList<PointF> quadPoints = new ArrayList<>();
+    public boolean markupFromDbSelection(final Annotation.Type type, List<PointF> quadPoints) {
+        /*ArrayList<PointF> quadPoints = new ArrayList<>();
         quadPoints.add(new PointF(68.448f, 852.0528f));
         quadPoints.add(new PointF(1128.5419f, 852.0528f));
         quadPoints.add(new PointF(1128.5419f, 827.5517f));
@@ -393,7 +395,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
         quadPoints.add(new PointF(68.448f, 924.83276f));
         quadPoints.add(new PointF(1058.3f, 924.83276f));
         quadPoints.add(new PointF(1058.3f, 900.33167f));
-        quadPoints.add(new PointF(68.448f, 900.33167f));
+        quadPoints.add(new PointF(68.448f, 900.33167f));*/
         // Adding the points from your log
      /*   quadPoints.add(new PointF(327.30228f, 1349.8127f));
         quadPoints.add(new PointF(392.0764f, 1349.8127f));

@@ -151,4 +151,50 @@ constructor(
         }
 
     }
+
+    fun addAnnotationFromDatabase(muPDFView: MuPDFView?,quadPoints:QuadPointsAndType )
+    {
+
+        muPDFView?.let { pageView ->
+            Log.d("muPDFViewunda","<>current<>"+muPDFView?.page)
+
+            var success = false
+            when (quadPoints.type) {
+
+
+                PdfConstants.HIGHLIGHT -> {
+                    success = pageView.markupFromDbSelection(Annotation.Type.HIGHLIGHT,quadPoints?.quadPoints!!)
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,AcceptMode.Highlight,true)
+//                    success = pageView.markupHardcodeSelection(Annotation.Type.HIGHLIGHT)
+
+
+
+
+                }
+
+                PdfConstants.UNDERLINE -> {
+                    success = pageView.markupFromDbSelection(Annotation.Type.UNDERLINE,quadPoints?.quadPoints)
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,AcceptMode.Underline,true)
+
+
+                }
+
+                PdfConstants.STRIKEOUT -> {
+                    success = pageView.markupFromDbSelection(Annotation.Type.STRIKEOUT,quadPoints?.quadPoints)
+                    annotationResponsePrivate.value=AnnotationOperationResult(success,AcceptMode.StrikeOut,true)
+
+
+                }
+
+
+
+                else -> {
+
+                }
+
+            }
+
+        }
+
+    }
 }

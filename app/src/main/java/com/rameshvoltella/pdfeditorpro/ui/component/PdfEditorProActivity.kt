@@ -322,12 +322,15 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
         Log.d("Pageis","CurrentPageIS goint :${getPageViewMupdf()?.page}"+"<>"+quadPointsAndTypes.size)
 
-        for (index in quadPointsAndTypes) {
-            Log.d("dbdata", "" + index.type + "<>" + index.quadPoints);
+        for (pointsData in quadPointsAndTypes) {
+//            Log.d("dbdata", "" + index.type + "<>" + index.quadPoints);
+            viewModel.addAnnotationFromDatabase( getPageViewMupdf(),pointsData)
+
         }
         if (getPageViewMupdf() != null) {
             addedAnnotationPages.add(getPageViewMupdf()?.page!!)
         }
+
 
     }
 
@@ -336,9 +339,11 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         if (annotationOperationResult.status) {
             Log.d("TAG", "handleAddCommentResponse:")
         }
-        if (annotationOperationResult.acceptMode == AcceptMode.Ink) {
-            mAcceptMode = AcceptMode.None;
-            toggleOptionState(true)
+        if(!annotationOperationResult.isFromDb) {
+            if (annotationOperationResult.acceptMode == AcceptMode.Ink) {
+                mAcceptMode = AcceptMode.None;
+                toggleOptionState(true)
+            }
         }
         binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
     }

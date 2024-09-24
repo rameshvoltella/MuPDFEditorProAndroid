@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface MuPDFView
 {
@@ -43,7 +44,7 @@ public interface MuPDFView
 
     ArrayList<PointF> markupSelection(final Annotation.Type p0);
 
-    boolean markupHardcodeSelection(final Annotation.Type p0);
+    boolean markupFromDbSelection(final Annotation.Type p0, List<PointF> quadPoints);
 
 
     void deleteSelectedAnnotation();
