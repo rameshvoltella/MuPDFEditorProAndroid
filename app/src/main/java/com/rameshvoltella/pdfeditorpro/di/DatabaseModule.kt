@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.rameshvoltella.pdfeditorpro.database.PdfDatabase
 import com.rameshvoltella.pdfeditorpro.database.dao.PdfAnnotationDao
+import com.rameshvoltella.pdfeditorpro.database.dao.PdfDrawerAnnotationDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,5 +29,10 @@ object DatabaseModule {
     @Provides
     fun providePdfAnnotationDao(database: PdfDatabase): PdfAnnotationDao {
         return database.pdfAnnotationDao()
+    }
+
+    @Provides
+    fun providePdfAnnotationDrawDao(database: PdfDatabase): PdfDrawerAnnotationDao {
+        return database.pdfAnnotationDrawDao()
     }
 }

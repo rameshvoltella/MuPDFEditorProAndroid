@@ -2,6 +2,7 @@ package com.rameshvoltella.pdfeditorpro.data.database
 
 import android.graphics.RectF
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
+import com.rameshvoltella.pdfeditorpro.database.PdfDrawAnnotation
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,6 +15,11 @@ class DatabaseRepository @Inject constructor(
 ):DatabaseRepositorySource {
     override suspend fun insertAnnotation(annotation: PdfAnnotation): Flow<Boolean> {
         return flow {emit(databaseData.insertAnnotation(annotation))  }
+
+    }
+
+    override suspend fun insertDrawAnnotation(annotation: PdfDrawAnnotation): Flow<Boolean> {
+        return flow {emit(databaseData.insertDrawAnnotation(annotation))  }
 
     }
 
