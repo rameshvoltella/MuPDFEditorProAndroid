@@ -1,8 +1,12 @@
 package com.rameshvoltella.pdfeditorpro.ui.component
 
 import android.graphics.Color
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.artifex.mupdfdemo.Hit
 import com.artifex.mupdfdemo.MuPDFCore
@@ -24,6 +28,7 @@ import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
+import com.rameshvoltella.pdfeditorpro.setOnSingleClickListener
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
 import com.rameshvoltella.pdfeditorpro.utils.observe
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
@@ -66,6 +71,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         if (intent.extras!!.containsKey(Constants.PDF_FILE_PATH)) {
             openPdfFile(intent.getStringExtra(Constants.PDF_FILE_PATH))
             initPdfCore()
+            settingClicksToSearch()
         } else {
             finish()
         }
@@ -111,6 +117,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             selectAnnotationMode()
 
         }
+
+        binding.searchBtn.setOnClickListener { searchTaskClicks() }
 
 
         binding.drawerIv.setOnClickListener {
@@ -442,12 +450,77 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         val searchPage = r?.pageNumber ?: -1
         displayPage?.let { page ->
             mSearchTask?.go(
-                "binding.searchActionLy.searchText.text.toString()", direction, page, searchPage
+                binding.searchText.text.toString(), direction, page, searchPage
             )
             Log.i("TAG", "search: $page")
 
         }
     }
+
+    private fun settingClicksToSearch() {
+        var haveText = false
+        binding.searchText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                haveText = s.toString().isNotEmpty()
+
+                //Remove any previous search results
+                if (SearchTaskResult.get() != null && binding.searchText.text.toString() != SearchTaskResult.get().txt) {
+                    SearchTaskResult.set(null)
+                    binding.pdfReaderRenderView?.resetupChildren()
+                }
+            }
+
+            override fun beforeTextChanged(
+                s: CharSequence, start: Int, count: Int, after: Int
+            ) {
+            }
+
+            override fun onTextChanged(
+                s: CharSequence, start: Int, before: Int, count: Int
+            ) {
+            }
+        })
+        //React to Done button on keyboard
+        binding.searchText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE && haveText) search(1)
+
+            false
+        }
+//        binding.searchText.setOnEditorActionListener { textView, actionId, keyEvent ->
+//            if(actionId == EditorInfo.IME_ACTION_NEXT && haveText) search(1)
+//            false
+//        }
+        binding.searchText.setOnKeyListener { v, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) search(
+                1
+            )
+            false
+        }
+        // Activate search invoking buttons
+        binding.searchBack.setOnSingleClickListener({
+            try {
+                search(-1)
+            } catch (ex: Exception) {
+                // Log.e(TAG, "settingClickToSearch: $ex")
+            }
+        })
+        binding.searchForward.setOnSingleClickListener({
+            try {
+                search(1)
+            } catch (ex: Exception) {
+
+            }
+
+        })
+        binding.cancelSearch.setOnSingleClickListener({
+//            hideShowView()
+        })
+        binding.backSearchBtn.setOnSingleClickListener({
+//            hideShowView()
+        })
+
+    }
+
 
     override fun onPause() {
         super.onPause()
