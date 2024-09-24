@@ -10,7 +10,7 @@ import com.artifex.mupdfdemo.MuPDFPageAdapter
 import com.artifex.mupdfdemo.MuPDFReaderView
 import com.artifex.mupdfdemo.MuPDFReaderViewListener
 import com.artifex.mupdfdemo.MuPDFView
-import com.artifex.mupdfdemo.OnPageChangeListener
+import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.Constants
@@ -26,7 +26,7 @@ import java.io.File
 
 @AndroidEntryPoint
 class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfViewModel>(),
-    OnPageChangeListener {
+    PageActionListener {
     private var muPDFCore: MuPDFCore? = null
     private var currentDocId: Long? = null
     var currentMode: String = PdfConstants.VERTICAL
@@ -59,7 +59,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         }
 
         binding.bookmarkBtn.setOnClickListener {
-            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
+//            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
         }
 
         binding.highlighterIv.setOnClickListener {
@@ -185,6 +185,10 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             }
 
             override fun onHit(item: Hit) {
+                if(item==Hit.Annotation) {
+
+//                    Toast.makeText(applicationContext, "Clickedon Annotaion", 1).show()
+                }
 
             }
 
@@ -239,6 +243,11 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     override fun onPageChanged(page: Int, currentPageView: View?) {
+    }
+
+    override fun onDeleteSelectedAnnotation() {
+        viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
+
     }
 
     private fun openPdfFile(pathGet: String?) {

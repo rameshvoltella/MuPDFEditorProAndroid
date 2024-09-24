@@ -21,7 +21,7 @@ import android.view.View;
  * Implements this interface to receive events from PDFView
  * when a page has changed through swipe
  */
-public interface OnPageChangeListener {
+public interface PageActionListener {
 
     /**
      * Called when the user use swipe to change page
@@ -30,5 +30,7 @@ public interface OnPageChangeListener {
      */
     void onPageChanged(int page);
     void onPageChanged(int page, View currentPageView);
+
+    void onDeleteSelectedAnnotation();
 
 }

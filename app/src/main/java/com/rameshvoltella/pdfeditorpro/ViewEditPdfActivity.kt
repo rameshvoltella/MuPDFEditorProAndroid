@@ -32,7 +32,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.artifex.mupdfdemo.Annotation
 import com.artifex.mupdfdemo.Ext.Companion.onClick
 import com.artifex.mupdfdemo.Hit
 import com.artifex.mupdfdemo.MuPDFCore
@@ -40,7 +39,7 @@ import com.artifex.mupdfdemo.MuPDFPageAdapter
 import com.artifex.mupdfdemo.MuPDFReaderView
 import com.artifex.mupdfdemo.MuPDFReaderViewListener
 import com.artifex.mupdfdemo.MuPDFView
-import com.artifex.mupdfdemo.OnPageChangeListener
+import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
 import com.artifex.mupdfdemo.ReaderView
 import com.artifex.mupdfdemo.SearchTask
@@ -173,7 +172,8 @@ import java.util.Date
 
 
 
-class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
+class ViewEditPdfActivity : AppCompatActivity(),
+    PageActionListener {
     private val binding by lazy {
         ActivityViewPdfBinding.inflate(layoutInflater)
     }
@@ -1708,6 +1708,10 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
     }
 
     override fun onPageChanged(page: Int, currentPageView: View?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDeleteSelectedAnnotation() {
         TODO("Not yet implemented")
     }
 

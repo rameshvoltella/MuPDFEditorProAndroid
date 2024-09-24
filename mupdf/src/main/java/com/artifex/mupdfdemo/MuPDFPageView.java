@@ -4,6 +4,8 @@
 
 package com.artifex.mupdfdemo;
 
+import static com.artifex.mupdfdemo.AnnotationHandlerPopUpKt.showPopupAtCenterTopOfRect;
+
 import android.os.Build;
 import java.util.ArrayList;
 import java.util.List;
@@ -239,6 +241,12 @@ public class MuPDFPageView extends PageView implements MuPDFView
                         this.mSelectedAnnotationIndex = i;
                         this.setItemDeleteBox(this.mAnnotations[i]);
                         this.setItemSelectBox(this.mAnnotations[i]);
+                        float recalculatedX0 = (mAnnotations[i].left * scale) + getLeft();
+                        float recalculatedY0 = (mAnnotations[i].top * scale) + getTop();
+                        float recalculatedX1 = (mAnnotations[i].right * scale) + getLeft();
+                        float recalculatedY1 = (mAnnotations[i].bottom * scale) + getTop();
+                        showPopupAtCenterTopOfRect(getContext(), new RectF(recalculatedX0,recalculatedY0,recalculatedX1,recalculatedY1),getRootView(),selectedListner);
+
                         return Hit.Annotation;
                     }
                 }
@@ -671,4 +679,11 @@ public class MuPDFPageView extends PageView implements MuPDFView
             return false;
         }
     }
+    SelectionListener selectedListner=null;
+    public void setSelectionListener(SelectionListener selectedListner) {
+        this.selectedListner=selectedListner;
+
+    }
+
+
 }

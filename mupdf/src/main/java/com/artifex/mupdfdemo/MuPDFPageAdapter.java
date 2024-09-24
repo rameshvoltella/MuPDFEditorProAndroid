@@ -13,15 +13,15 @@ import android.widget.BaseAdapter;
 
 
 
-public class MuPDFPageAdapter extends BaseAdapter {
+public class MuPDFPageAdapter extends BaseAdapter implements SelectionListener {
 
     private final Context mContext;
     private final MuPDFCore mCore;
     private final SparseArray<PointF> mPageSizes = new SparseArray<PointF>();
     private Bitmap mSharedHqBm;
 
-    private OnPageChangeListener mOnPageChangeListener;
-    public MuPDFPageAdapter(Context c, MuPDFCore core,OnPageChangeListener onPageChangeListener) {
+    private PageActionListener mOnPageChangeListener;
+    public MuPDFPageAdapter(Context c, MuPDFCore core, PageActionListener onPageChangeListener) {
         mContext = c;
         mCore = core;
         mOnPageChangeListener=onPageChangeListener;
@@ -83,6 +83,8 @@ public class MuPDFPageAdapter extends BaseAdapter {
             pageView = (MuPDFPageView) convertView;
         }
 
+        pageView.setSelectionListener(this);
+
         PointF pageSize = mPageSizes.get(position);
         PageDown(position);
         if (pageSize != null) {
@@ -116,4 +118,12 @@ public class MuPDFPageAdapter extends BaseAdapter {
         return pageView;
     }
 
+    @Override
+    public void onDeleteClicked() {
+
+        Log.d("TADADA","i got it");
+        mOnPageChangeListener.onDeleteSelectedAnnotation();
+
+
+    }
 }

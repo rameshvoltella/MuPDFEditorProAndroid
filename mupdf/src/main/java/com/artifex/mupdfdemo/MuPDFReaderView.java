@@ -58,6 +58,11 @@ public class MuPDFReaderView extends ReaderView {
         this.listener.onHit(item);
     }
 
+    protected void onDeleteAnnotation(final Hit item) {
+        this.checkMuPDFReaderViewListener();
+        this.listener.onHit(item);
+    }
+
     protected void onLongPress() {
         checkMuPDFReaderViewListener();
         this.listener.onLongPress();

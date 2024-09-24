@@ -1,5 +1,7 @@
 package com.artifex.mupdfdemo;
 
+import static com.artifex.mupdfdemo.AnnotationHandlerPopUpKt.showPopupAtCenterTopOfRect;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -45,6 +47,8 @@ public abstract class PageView extends ViewGroup {
     private static final int HIGHLIGHTED_SEARCHRESULT_COLOR = 0xFF33B5E5;
     private int LINK_COLOR;
     private static final int BOX_COLOR = -9868951;
+
+    private static final int BOX_TRANSPARENT_COLOR = Color.TRANSPARENT;
     private int INK_COLOR;
     private float INK_THICKNESS;
     private float current_scale;
@@ -364,7 +368,7 @@ public abstract class PageView extends ViewGroup {
                     if (PageView.this.mItemSelectBox != null) {
                         paint.setStyle(Paint.Style.STROKE);
                         paint.setStrokeWidth(4.0f);
-                        paint.setColor(BOX_COLOR);
+                        paint.setColor(BOX_TRANSPARENT_COLOR);
                         canvas.drawRect(PageView.this.mItemSelectBox.left * scale, PageView.this.mItemSelectBox.top * scale, PageView.this.mItemSelectBox.right * scale, PageView.this.mItemSelectBox.bottom * scale, paint);
                     }
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
@@ -1068,7 +1072,9 @@ public abstract class PageView extends ViewGroup {
     }
 
     public void setItemDeleteBox(final RectF rect) {
+        final float scale = this.mSourceScale * this.getWidth() / this.mSize.x;
         this.mDeleteSelectBox = rect;
+
 
     }
 
