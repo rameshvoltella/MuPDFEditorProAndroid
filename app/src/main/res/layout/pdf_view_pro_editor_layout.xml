@@ -21,7 +21,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/activity_back_btn"
             android:layout_width="@dimen/_45sdp"
-            android:layout_height="@dimen/_45sdp"
+            android:layout_height="match_parent"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:elevation="@dimen/_5sdp"

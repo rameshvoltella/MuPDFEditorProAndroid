@@ -18,6 +18,7 @@ import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
 import com.artifex.mupdfdemo.SearchTaskResult
 import com.artifex.mupdfdemo.util.SearchTask
+import com.google.android.material.snackbar.Snackbar
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.SearchDismissDialog
 import com.rameshvoltella.pdfeditorpro.TopBarMode
@@ -130,7 +131,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             if(binding.searchAction.searchViewCl.visibility==View.GONE)
             {
                 binding.searchAction.searchViewCl.visibility=View.VISIBLE
-                binding.basicLl.visibility=View.VISIBLE
+                binding.basicLl.visibility=View.GONE
                 searchModeOn()
                 searchTaskClicks()
 
@@ -155,6 +156,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
             }
             else if (binding.searchAction.searchViewCl.visibility == View.VISIBLE) {
+                binding.searchAction.searchViewCl.visibility=View.GONE
                 searchModeOff()
                 toggleOptionState(true)
             }
@@ -439,14 +441,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
             override fun onTextNotFound(result: String) {
                 // Handle the case where text is not found
-                try {
-                    val searchDismissDialog = SearchDismissDialog.newInstance(result) { selectedOption ->
-//                        cbSearchDialog(selectedOption)
-                    }
-//                    searchDismissDialog.show(getsupo, "SEARCH_DISMISS")
-                } catch (e: Exception) {
-                    Log.e("TAG", "Error showing search dismiss dialog", e)
-                }
+                Snackbar.make(binding.border,"No text found", Snackbar.LENGTH_LONG).show()
             }
         }
 
