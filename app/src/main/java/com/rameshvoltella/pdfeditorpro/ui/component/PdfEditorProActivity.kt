@@ -130,8 +130,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
             if(binding.searchAction.searchViewCl.visibility==View.GONE)
             {
-                binding.searchAction.searchViewCl.visibility=View.VISIBLE
-                binding.basicLl.visibility=View.GONE
+
                 searchModeOn()
                 searchTaskClicks()
 
@@ -145,6 +144,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             binding.basicLl.visibility = View.GONE;
             binding.acceptModeLl.visibility = View.VISIBLE
             binding.bottomOptions.visibility = View.GONE
+            if(binding.searchAction.searchViewCl.visibility==View.VISIBLE) {
+                searchModeOff()
+            }
             drawTextOnPage()
 
         }
@@ -240,6 +242,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
             override fun onLongPress() {
                 Log.i("LONGPRESS", "onLongPress: hitting in Activity")
+                if(binding.searchAction.searchViewCl.visibility==View.VISIBLE) {
+                    searchModeOff()
+                }
                 toggleOptionState(true)
 
 
@@ -541,6 +546,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         binding.searchAction.searchText.text = null
         binding.searchAction.searchText.hint = "Enter Text"
         SearchTaskResult.set(null)
+        binding.searchAction.searchViewCl.visibility=View.GONE
         // Make the ReaderView act on the change to mSearchTaskResult
         // via overridden onChildSetup method.
         binding.pdfReaderRenderView?.resetupChildren()
@@ -549,6 +555,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     private fun searchModeOn() {
 
             //Focus on EditTextWidget
+        binding.searchAction.searchViewCl.visibility=View.VISIBLE
+        binding.basicLl.visibility=View.GONE
             binding.searchAction.searchText.requestFocus()
             showKeyboardFromView(applicationContext,binding.searchAction.searchText)
 
