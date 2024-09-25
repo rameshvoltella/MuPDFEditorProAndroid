@@ -18,9 +18,9 @@ import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
 import com.artifex.mupdfdemo.SearchTaskResult
 import com.artifex.mupdfdemo.util.SearchTask
-import com.google.android.material.internal.ViewUtils.hideKeyboard
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.SearchDismissDialog
+import com.rameshvoltella.pdfeditorpro.TopBarMode
 import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
@@ -30,7 +30,9 @@ import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
 import com.rameshvoltella.pdfeditorpro.setOnSingleClickListener
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
+import com.rameshvoltella.pdfeditorpro.utils.hideKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.utils.observe
+import com.rameshvoltella.pdfeditorpro.utils.showKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -118,7 +120,23 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
         }
 
-        binding.searchBtn.setOnClickListener { searchTaskClicks() }
+        binding.searchAction.searchClose.setOnClickListener {
+            toggleOptionState(true)
+            searchModeOff()
+        }
+
+        binding.searchBtn.setOnClickListener {
+
+            if(binding.searchAction.searchViewCl.visibility==View.GONE)
+            {
+                binding.searchAction.searchViewCl.visibility=View.VISIBLE
+                binding.basicLl.visibility=View.VISIBLE
+                searchModeOn()
+                searchTaskClicks()
+
+            }
+
+        }
 
 
         binding.drawerIv.setOnClickListener {
@@ -135,7 +153,12 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             if (binding.basicLl.visibility == View.VISIBLE) {
                 finish()
 
-            } else {
+            }
+            else if (binding.searchAction.searchViewCl.visibility == View.VISIBLE) {
+                searchModeOff()
+                toggleOptionState(true)
+            }
+            else {
                 cancellAllEdit()
             }
         }
@@ -434,6 +457,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
     }
     private fun search(direction: Int) {
+        hideKeyboardFromView(applicationContext,binding.searchAction.searchText)
+
 //        hideKeyboard()
 
 //        val searchText = "Your search query"
@@ -450,7 +475,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         val searchPage = r?.pageNumber ?: -1
         displayPage?.let { page ->
             mSearchTask?.go(
-                binding.searchText.text.toString(), direction, page, searchPage
+                binding.searchAction.searchText.text.toString(), direction, page, searchPage
             )
             Log.i("TAG", "search: $page")
 
@@ -459,12 +484,12 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
     private fun settingClicksToSearch() {
         var haveText = false
-        binding.searchText.addTextChangedListener(object : TextWatcher {
+        binding.searchAction.searchText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
                 haveText = s.toString().isNotEmpty()
 
                 //Remove any previous search results
-                if (SearchTaskResult.get() != null && binding.searchText.text.toString() != SearchTaskResult.get().txt) {
+                if (SearchTaskResult.get() != null && binding.searchAction.searchText.text.toString() != SearchTaskResult.get().txt) {
                     SearchTaskResult.set(null)
                     binding.pdfReaderRenderView?.resetupChildren()
                 }
@@ -481,7 +506,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             }
         })
         //React to Done button on keyboard
-        binding.searchText.setOnEditorActionListener { v, actionId, event ->
+        binding.searchAction.searchText.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_DONE && haveText) search(1)
 
             false
@@ -490,21 +515,21 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 //            if(actionId == EditorInfo.IME_ACTION_NEXT && haveText) search(1)
 //            false
 //        }
-        binding.searchText.setOnKeyListener { v, keyCode, event ->
+        binding.searchAction.searchText.setOnKeyListener { v, keyCode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) search(
                 1
             )
             false
         }
         // Activate search invoking buttons
-        binding.searchBack.setOnSingleClickListener({
+        binding.searchAction.searchBack.setOnSingleClickListener({
             try {
                 search(-1)
             } catch (ex: Exception) {
                 // Log.e(TAG, "settingClickToSearch: $ex")
             }
         })
-        binding.searchForward.setOnSingleClickListener({
+        binding.searchAction.searchForward.setOnSingleClickListener({
             try {
                 search(1)
             } catch (ex: Exception) {
@@ -512,15 +537,27 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             }
 
         })
-        binding.cancelSearch.setOnSingleClickListener({
-//            hideShowView()
-        })
-        binding.backSearchBtn.setOnSingleClickListener({
-//            hideShowView()
-        })
+
 
     }
 
+    private fun searchModeOff() {
+        hideKeyboardFromView(applicationContext,binding.searchAction.searchText)
+        binding.searchAction.searchText.text = null
+        binding.searchAction.searchText.hint = "Enter Text"
+        SearchTaskResult.set(null)
+        // Make the ReaderView act on the change to mSearchTaskResult
+        // via overridden onChildSetup method.
+        binding.pdfReaderRenderView?.resetupChildren()
+    }
+
+    private fun searchModeOn() {
+
+            //Focus on EditTextWidget
+            binding.searchAction.searchText.requestFocus()
+            showKeyboardFromView(applicationContext,binding.searchAction.searchText)
+
+    }
 
     override fun onPause() {
         super.onPause()
