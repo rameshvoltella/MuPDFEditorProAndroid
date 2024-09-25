@@ -37,17 +37,6 @@ class PdfTextSelectionHelper {
     // Handle
     val handleRoundRadius = 20f
 
-    var startHandlePosition = PointF()
-    var endHandlePosition = PointF()
-    var startCharHeight = 0f
-
-    var startSelectionPosition = PointF()
-    var endSelectionPosition = PointF()
-    var endCharHeight = 0f
-
-    var touchState: TouchState = TouchState.IDLE
-    enum class TouchState { StartHandlePressed, EndHandlePressed, IDLE }
-
     public fun drawStartHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
         val verticalOffset = 10f  // Adjust this value to move the drawing down as needed
         val mR = handleRoundRadius * zoom
@@ -73,65 +62,6 @@ class PdfTextSelectionHelper {
         path.close()
         canvas.drawPath(path, selectionHandleColor)
     }
-    public fun drawEndTHandle(canvas: Canvas, x: Float, y: Float, zoom: Float) {
-        // Make mR bigger by increasing the factor (e.g., by 1.5 times)
-        val mR = handleRoundRadius * zoom * 1.5f  // Adjust the scale for a bigger handle
-        val mX = x * zoom
-        val mY = y * zoom
 
-        // Draw a larger circle
-        canvas.drawCircle(mX + mR, mY + mR, mR, selectionHandleColor2)
 
-        // Adjust the path to match the bigger circle
-        val path = Path()
-        path.moveTo(mX, mY)
-        path.lineTo(mX + mR, mY)  // Increase mR here as well
-        path.lineTo(mX, mY + mR)  // Same here
-        path.close()
-
-        // Draw the larger path
-        canvas.drawPath(path, selectionHandleColor2)
-    }
-
-    fun drawSelection(startY: Float, canvas: Canvas, details: TextSelectionData, zoom: Float) {
-        val selectionDetail = details.getSelections()
-        canvas.translate(0f, startY * zoom)
-        selectionDetail.forEachIndexed { index, data ->
-            if (index == 0) {
-                data.startChar.relatedPosition.let {
-                    drawStartHandle(canvas, it.x, data.rect.bottom, zoom)
-                    startHandlePosition.set(it.x - handleRoundRadius / 2, it.y + data.startChar.relatedSize.height + handleRoundRadius / 2)
-                    startSelectionPosition.set(it.x, it.y + data.startChar.relatedSize.height / 2)
-                    startCharHeight = data.startChar.relatedSize.height
-                }
-            }
-            if (index == selectionDetail.lastIndex) {
-                data.endChar.let {
-                    drawEndHandle(canvas, it.relatedPosition.x + it.relatedSize.width, data.rect.bottom, zoom)
-                    endHandlePosition.set(it.relatedPosition.x + handleRoundRadius / 2, it.relatedPosition.y + it.relatedSize.height + handleRoundRadius / 2)
-                    endSelectionPosition.set(it.relatedPosition.x, it.relatedPosition.y + it.relatedSize.height / 2)
-                    startCharHeight = it.relatedSize.height
-                }
-            }
-            canvas.drawRect(data.rect.zoom(zoom), selectedTextPaint)
-        }
-        canvas.translate(0f, -startY * zoom)
-    }
-
-    private fun RectF.zoom(value: Float): RectF {
-        return RectF(left * value, top * value, right * value, bottom * value)
-    }
-
-    // testPoints
-//    var userPoint = PointF()
-//    var xAxisPaint = Paint().apply {
-//        color = Color.RED
-//        strokeWidth = 2f
-//        style = Paint.Style.STROKE
-//    }
-//    var yAxisPaint = Paint().apply {
-//        color = Color.GREEN
-//        strokeWidth = 2f
-//        style = Paint.Style.STROKE
-//    }
 }

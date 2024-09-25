@@ -40,6 +40,9 @@ interface TextProcessor {
 public abstract class PageView extends ViewGroup {
     private static final float ITEM_SELECT_BOX_WIDTH = 4.0f;
     private static final int HIGHLIGHT_COLOR = 0x80ade1f6;
+
+    private static final int HIGHLIGHT_COLOR2 = Color.parseColor("#80FFA500");
+
     private static final int SELECTION_COLOR = 0x8033B5E5;
     private static final int SELECTION_MARKER_COLOR = 0xFF33B5E5;
     private static final int GRAYEDOUT_COLOR = 0x30000000;
@@ -164,7 +167,8 @@ public abstract class PageView extends ViewGroup {
         linksPaint.setStyle(Paint.Style.STROKE);
         linksPaint.setStrokeWidth(0);
 
-        selectBoxPaint.setColor(SELECTION_COLOR);
+        //selectBoxPaint.setColor(SELECTION_COLOR);
+        selectBoxPaint.setColor(HIGHLIGHT_COLOR2);
         selectBoxPaint.setStyle(Paint.Style.FILL);
         selectBoxPaint.setStrokeWidth(0);
 
@@ -372,7 +376,7 @@ public abstract class PageView extends ViewGroup {
                         canvas.drawRect(PageView.this.mItemSelectBox.left * scale, PageView.this.mItemSelectBox.top * scale, PageView.this.mItemSelectBox.right * scale, PageView.this.mItemSelectBox.bottom * scale, paint);
                     }
                     if (!PageView.this.mIsBlank && PageView.this.mSearchBoxes != null) {
-                        paint.setColor(HIGHLIGHT_COLOR);
+                        paint.setColor(HIGHLIGHT_COLOR2);
                         for (final RectF rect : PageView.this.mSearchBoxes) {
                             Log.d("chakka", "yaaaa1111");
 
