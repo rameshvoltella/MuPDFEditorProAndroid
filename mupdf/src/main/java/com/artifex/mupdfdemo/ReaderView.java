@@ -741,6 +741,15 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         this.requestLayout();
     }
 
+    public int getAdaptorCount()
+    {
+        if (null != this.mAdapter)
+        {
+            return this.mAdapter.getCount();
+        }
+        return 0;
+    }
+
     public void setSelection(final int arg0) {
         throw new UnsupportedOperationException(this.getContext().getString(R.string.not_supported));
     }

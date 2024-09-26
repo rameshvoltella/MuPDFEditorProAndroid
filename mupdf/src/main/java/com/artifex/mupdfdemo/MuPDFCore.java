@@ -280,6 +280,21 @@ public class MuPDFCore {
         this.gotoPage(page);
         return this.textAsHtml();
     }
+    public String textPerPage(final int page) {
+
+        TextWord[][] textWords = textLines(page);
+        StringBuilder word = new StringBuilder();
+
+        for (int z = 0; z < textWords.length; z++) {
+            for (int j = 0; j < textWords[z].length; j++) {
+                word.append(textWords[z][j].w).append(" ");
+            }
+        }
+        Log.d("kaskd", word.toString());
+
+        return word.toString();
+    }
+
 
     public synchronized TextWord[][] textLines(final int page) {
         this.gotoPage(page);

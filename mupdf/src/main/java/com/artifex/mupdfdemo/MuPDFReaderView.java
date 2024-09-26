@@ -84,6 +84,8 @@ public class MuPDFReaderView extends ReaderView {
         this.resetupChildren();
     }
 
+
+
     public void setInkColor(final int color) {
         ((MuPDFView) this.getCurrentView()).setInkColor(color);
     }

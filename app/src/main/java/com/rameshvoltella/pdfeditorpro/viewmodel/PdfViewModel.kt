@@ -7,12 +7,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.artifex.mupdfdemo.Annotation
+import com.artifex.mupdfdemo.MuPDFCore
 import com.artifex.mupdfdemo.MuPDFView
 import com.google.gson.Gson
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
 import com.rameshvoltella.pdfeditorpro.data.database.DatabaseRepository
+import com.rameshvoltella.pdfeditorpro.data.local.LocalRepository
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
 import com.rameshvoltella.pdfeditorpro.database.PdfDrawAnnotation
 import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
@@ -27,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PdfViewModel@Inject
 constructor(
-   private val pdfDatabaseRepository: DatabaseRepository
+   private val pdfDatabaseRepository: DatabaseRepository,private val localRepository: LocalRepository
 ):BaseViewModel() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -287,6 +289,18 @@ constructor(
 
                     addDrawAnnotationFromDatabase(muPDFView, quadPoints)
                 }
+            }
+        }
+    }
+
+    fun getComfortModeData(lastPageNumber: Int,totalPages: Int,muPDFCore: MuPDFCore)
+    {
+        viewModelScope.launch {
+
+            localRepository.getPageText(lastPageNumber,totalPages,muPDFCore
+            ).collect {
+//                annotationInsertDeletePrivate.value = it
+
             }
         }
     }

@@ -8,6 +8,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.artifex.mupdfdemo.Hit
 import com.artifex.mupdfdemo.MuPDFCore
 import com.artifex.mupdfdemo.MuPDFPageAdapter
@@ -16,6 +17,7 @@ import com.artifex.mupdfdemo.MuPDFReaderViewListener
 import com.artifex.mupdfdemo.MuPDFView
 import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
+import com.artifex.mupdfdemo.PDFTextExtractor
 import com.artifex.mupdfdemo.SearchTaskResult
 import com.artifex.mupdfdemo.util.SearchTask
 import com.google.android.material.snackbar.Snackbar
@@ -36,6 +38,7 @@ import com.rameshvoltella.pdfeditorpro.utils.observe
 import com.rameshvoltella.pdfeditorpro.utils.showKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.File
 
 @AndroidEntryPoint
@@ -81,6 +84,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
         binding.bookmarkBtn.setOnClickListener {
 //            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
+            viewModel.getComfortModeData(0,binding.pdfReaderRenderView.adaptorCount,muPDFCore!!)
         }
 
         binding.highlighterIv.setOnClickListener {
@@ -120,6 +124,15 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             selectAnnotationMode()
 
         }
+
+     /*   binding.bookmarkBtn.setOnClickListener {
+
+            // Inside a CoroutineScope, like in a ViewModel or Activity/Fragment
+            lifecycleScope.launch {
+                val extractedText = PDFTextExtractor().extractText(muPDFCore,  pageNumber = 1)
+                Log.d("Extracted Text", extractedText ?: "No text extracted")
+            }
+        }*/
 
         binding.searchAction.searchClose.setOnClickListener {
             toggleOptionState(true)
@@ -568,6 +581,26 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             mSearchTask?.stop()
         }
     }
+    var word = ""
+
+    private fun extractText() {
+        binding.pdfReaderRenderView?.let { readerView ->
+            muPDFCore?.let {
+                val textWord = it.textLines(binding.pdfReaderRenderView.displayedViewIndex)
+                for (z in textWord.indices) {
+                    for (j in textWord[z].indices) {
+                        word += "${textWord[z][j].w} "
+
+                    }
+//                    Log.d("kaskd")
+                }
+                //  Log.i("CUURENTTEXT", "extractText:$word")
+            }
+        }
+
+
+    }
+
 
 }
 
