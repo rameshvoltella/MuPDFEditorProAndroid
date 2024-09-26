@@ -52,11 +52,10 @@ constructor(
     val annotationDrawPerPage: LiveData<List<QuadDrawPointsAndType>> get() = annotationDrawPerPagePrivate
 
 
-
+    private val comfortListPrivate = MutableLiveData<List<String>>()
+    val comfortList: LiveData<List<String>> get() = comfortListPrivate
 
     var canLoadMore by mutableStateOf(true)
-    private val _items = MutableStateFlow<List<String>>(emptyList())
-    val items: StateFlow<List<String>> get() = _items
 
     fun getAnnotations(pdfName:String,page:Int)
     {
@@ -312,7 +311,7 @@ constructor(
             localRepository.getPageText(lastPageNumber,totalPages,muPDFCore
             ).collect {
 //                annotationInsertDeletePrivate.value = it
-                _items.value = it
+                comfortListPrivate.value = it
 
             }
         }

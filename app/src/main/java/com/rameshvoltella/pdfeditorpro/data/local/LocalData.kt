@@ -35,11 +35,12 @@ class LocalData@Inject constructor():LocalDataSource {
         return withContext(Dispatchers.IO) {  // Switch context to IO
             val pageStringData = ArrayList<String>()
 Log.d("las","lalal"+totalPages+"<>"+lastPageNumber)
+//            Log.d("andi",""+String(muPDFCore.html(4), Charsets.UTF_8))
             if (lastPageNumber < totalPages) {
                 for (i in lastPageNumber until (lastPageNumber + 3)) {
                     Log.d("looping,","<><><>"+i)
                     if (i < totalPages) {
-                        val extractedText = PDFTextExtractor().extractText(muPDFCore, pageNumber = i)
+                        val extractedText = String(muPDFCore.html(i), Charsets.UTF_8)
                         if (extractedText != null) {
                             pageStringData.add(extractedText)
                         }else{

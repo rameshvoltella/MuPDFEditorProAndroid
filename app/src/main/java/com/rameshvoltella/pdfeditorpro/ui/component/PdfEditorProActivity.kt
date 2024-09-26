@@ -1,5 +1,6 @@
 package com.rameshvoltella.pdfeditorpro.ui.component
 
+import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
@@ -84,7 +85,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
         binding.bookmarkBtn.setOnClickListener {
 //            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
-            viewModel.getComfortModeData(0,binding.pdfReaderRenderView.adaptorCount,muPDFCore!!)
+//            viewModel.getComfortModeData(0,binding.pdfReaderRenderView.adaptorCount,muPDFCore!!)
+            startActivity(Intent(applicationContext,ComfortReadingModeActivity::class.java).putExtra(Constants.PDF_FILE_PATH,intent.getStringExtra(Constants.PDF_FILE_PATH)))
         }
 
         binding.highlighterIv.setOnClickListener {
