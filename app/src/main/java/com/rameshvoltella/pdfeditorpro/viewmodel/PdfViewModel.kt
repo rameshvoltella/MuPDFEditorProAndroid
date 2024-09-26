@@ -3,6 +3,10 @@ package com.rameshvoltella.pdfeditorpro.viewmodel
 import android.graphics.PointF
 import android.util.Log
 import androidx.annotation.VisibleForTesting
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -23,6 +27,8 @@ import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -45,6 +51,12 @@ constructor(
     private val annotationDrawPerPagePrivate = MutableLiveData<List<QuadDrawPointsAndType>>()
     val annotationDrawPerPage: LiveData<List<QuadDrawPointsAndType>> get() = annotationDrawPerPagePrivate
 
+
+
+
+    var canLoadMore by mutableStateOf(true)
+    private val _items = MutableStateFlow<List<String>>(emptyList())
+    val items: StateFlow<List<String>> get() = _items
 
     fun getAnnotations(pdfName:String,page:Int)
     {
@@ -300,6 +312,7 @@ constructor(
             localRepository.getPageText(lastPageNumber,totalPages,muPDFCore
             ).collect {
 //                annotationInsertDeletePrivate.value = it
+                _items.value = it
 
             }
         }

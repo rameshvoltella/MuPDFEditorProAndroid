@@ -95,8 +95,11 @@ dependencies {
     implementation (libs.androidx.room.runtime)
     implementation (libs.androidx.room.ktx)
     kapt (libs.androidx.room.compiler)
-
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+    implementation (libs.androidx.hilt.navigation.compose)
     implementation ("com.google.code.gson:gson:2.11.0")
+    implementation ("androidx.recyclerview:recyclerview:1.2.1")
 }
 kapt {
     correctErrorTypes = true
