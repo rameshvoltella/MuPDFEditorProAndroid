@@ -86,6 +86,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         binding.bookmarkBtn.setOnClickListener {
 //            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
 //            viewModel.getComfortModeData(0,binding.pdfReaderRenderView.adaptorCount,muPDFCore!!)
+        }
+
+        binding.comfortBtn.setOnClickListener {
             startActivity(Intent(applicationContext,ComfortReadingModeActivity::class.java).putExtra(Constants.PDF_FILE_PATH,intent.getStringExtra(Constants.PDF_FILE_PATH)))
         }
 

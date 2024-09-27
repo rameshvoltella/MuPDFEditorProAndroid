@@ -49,6 +49,10 @@ class ComfortReadingModeActivity: BaseActivity<PdfComfortViewActivityBinding, Pd
         adapter = ComfortModeAdaptor(comfortModeItemList)
         binding.recyclerView.adapter = adapter
 
+        binding.activityBackBtn.setOnClickListener {
+            finish()
+        }
+
 
         muPDFCore=openFile(intent.getStringExtra(Constants.PDF_FILE_PATH)!!)
         if(muPDFCore!=null) {
