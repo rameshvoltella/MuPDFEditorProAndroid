@@ -104,9 +104,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
                 }
                 binding.movableView.onBottomReached={
 //                    Toast.makeText(applicationContext,"TOP RECHED",1).show()
-                    if(muPDFCore!=null) {
-                        binding.pdfReaderRenderView.setDisplayedViewIndex(muPDFCore!!.countPages())
-                    }
+//                    if(muPDFCore!=null) {
+                        binding.pdfReaderRenderView.setDisplayedViewIndex(binding.pdfReaderRenderView.adaptorCount)
+//                    }
 //                    binding.movableView.setProgress(0)
 
                 }
