@@ -53,10 +53,12 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     var currentBgColor = Color.WHITE
     private var mSearchTask: SearchTask? = null // Coroutine-based search task
     var resultt: SearchTaskResult?= null
+    var oldScrollPosition=0;
 
     private var mAcceptMode: AcceptMode? = null
 
     private var addedAnnotationPages = ArrayList<Int>()
+
 
     override fun getViewModelClass() = PdfViewModel::class.java
 
@@ -79,6 +81,21 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             openPdfFile(intent.getStringExtra(Constants.PDF_FILE_PATH))
             initPdfCore()
             settingClicksToSearch()
+            if(muPDFCore!=null) {
+                binding.movableView.progressMax =
+                    muPDFCore!!.countPages() // Set maximum progress to 200
+
+                binding.movableView.onProgressChanged = { progress ->
+                    // Handle the progress change
+                    Log.d("Progress", "Progress: $progress%")
+                    if(oldScrollPosition!=progress)
+                    {
+                        oldScrollPosition=progress;
+                        binding.pdfReaderRenderView.setDisplayedViewSyncIndex(progress - 1)
+
+                    }
+                }
+            }
         } else {
             finish()
         }
@@ -301,8 +318,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     override fun onPageChanged(page: Int) {
 //        onPageChanged
         Log.e("PageIs", "CurrentPageIS:${getPageViewMupdf()?.page}"+addedAnnotationPages)
-
         if (getPageViewMupdf() != null) {
+            binding.movableView.setProgress(page)
+
             if (!addedAnnotationPages.contains(getPageViewMupdf()?.page)) {
                 Log.d("Pageis","CurrentPageIS goint :${getPageViewMupdf()?.page}")
                 viewModel.getAnnotations("test.pdf", getPageViewMupdf()?.page!!)

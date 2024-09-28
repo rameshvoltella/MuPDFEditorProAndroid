@@ -118,6 +118,10 @@ public class MuPDFPageView extends PageView implements MuPDFView
         this.mPasswordEntry = this.mPasswordEntryBuilder.create();
     }
 
+    public MuPDFCore getMuPdfCore() {
+        return mCore;
+    }
+
     private void signWithKeyFile(final Uri uri) {
         this.mPasswordEntry.getWindow().setSoftInputMode(5);
         this.mPasswordEntry.setButton(-1, (CharSequence)"Sign", (DialogInterface.OnClickListener)new DialogInterface.OnClickListener() {

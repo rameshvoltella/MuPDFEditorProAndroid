@@ -132,6 +132,22 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         }
     }
 
+    public synchronized void setDisplayedViewSyncIndex(final int i) {
+        if (0 <= i && i < this.mAdapter.getCount()) {
+            this.onMoveOffChild(this.mCurrent);
+            this.onMoveToChild(this.mCurrent = i);
+            this.mResetLayout = true;
+
+            // Request a layout update and force it to process immediately
+            this.requestLayout();   // Schedule a layout pass
+            this.invalidate();      // Redraw the view
+            this.forceLayout();     // Forces the view hierarchy to re-layout immediately
+
+            // Ensure the layout pass happens immediately
+            this.getViewTreeObserver().dispatchOnGlobalLayout();
+        }
+    }
+
     public void setHorizontalScrolling(final boolean HORIZONTAL_SCROLLING) {
         this.HORIZONTAL_SCROLLING = HORIZONTAL_SCROLLING;
     }

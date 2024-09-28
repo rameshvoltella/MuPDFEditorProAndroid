@@ -100,6 +100,7 @@ dependencies {
 //    implementation (libs.androidx.hilt.navigation.compose)
     implementation ("com.google.code.gson:gson:2.11.0")
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
+    implementation ("com.github.hearsilent:DiscreteSlider:1.2.1")
 }
 kapt {
     correctErrorTypes = true
