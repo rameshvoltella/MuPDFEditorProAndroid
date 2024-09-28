@@ -5,9 +5,11 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.setPadding
+import hearsilent.discreteslider.libs.Utils
 
 class CustomVerticalMovableView @JvmOverloads constructor(
     context: Context,
@@ -27,6 +29,8 @@ class CustomVerticalMovableView @JvmOverloads constructor(
 
     var onProgressChanged: ((Int) -> Unit)? = null // Lambda callback to listen for progress changes
     var onTopReached: (() -> Unit)? = null // Callback when the top is reached
+    var onBottomReached: (() -> Unit)? = null // Callback when the top is reached
+
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
         textSize = 48f
@@ -57,17 +61,30 @@ class CustomVerticalMovableView @JvmOverloads constructor(
 
                 // Restrict the Y movement within the parent view bounds
                 val parentView = parent as View
+                Log.d("CKIO","newY>"+newY+"<>newY + height"+(newY + height)+"<>parentView.height<>"+parentView.height)
                 if (newY >= 0 && newY + height <= parentView.height) {
                     y = newY
 
                     // Check if the layout has reached the topmost position
-                    if (y == 0f) {
-                        onTopReached?.invoke() // Notify that the top is reached
-                    }
+
 
                     // Call the method to update the progress percentage
                     updateProgress(parentView.height)
+                }else  if (newY <= 0f) {
+                    Log.d("onTopReached","onTopReachedyo")
+                    y=0f
+                    updateProgress(0)
+                    onTopReached?.invoke() // Notify that the top is reached
+                }else if (newY + height >= parentView.height) { // Check if the bottom is reached
+                    Log.d("onBottomReached", "onBottomReachedyo")
+                    y = (parentView.height - height).toFloat() // Set to bottom
+                    passProgressListener=false
+                    setProgress(progressMax)
+                    onBottomReached?.invoke() // Notify that the top is reached
+
+//                    onBottomReached?.invoke() // Notify that the bottom is reached
                 }
+//
             }
 
             else -> return false
@@ -79,26 +96,28 @@ class CustomVerticalMovableView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         // Draw the progress text in the center of the view
-        val text = "$currentProgress%"
+        val text = "$currentProgress"
         val textX = width / 2f
         val textY = height / 2f - (paint.descent() + paint.ascent()) / 2
         canvas.drawText(text, textX, textY, paint)
     }
 
     private fun updateProgress(parentHeight: Int) {
-        // Calculate the current position as a percentage of the parent height
-        val currentY = y
-        val progressPercentage = ((currentY / (parentHeight - height)) * progressMax).toInt()
+        synchronized(this) {
+            // Calculate the current position as a percentage of the parent height
+            val currentY = y
+            val progressPercentage = ((currentY / (parentHeight - height)) * progressMax).toInt()
 
-        // Ensure the percentage is between 0 and progressMax
-        currentProgress = progressPercentage.coerceIn(0, progressMax)
-        if (passProgressListener) {
-            // Trigger the callback with the updated progress value
-            onProgressChanged?.invoke(currentProgress)
+            // Ensure the percentage is between 0 and progressMax
+            currentProgress = progressPercentage.coerceIn(0, progressMax)
+            if (passProgressListener) {
+                // Trigger the callback with the updated progress value
+                onProgressChanged?.invoke(currentProgress)
+            }
+
+            // Redraw the view to update the progress text
+            invalidate()
         }
-
-        // Redraw the view to update the progress text
-        invalidate()
     }
 
     private fun updateProgressText(progress: Int) {

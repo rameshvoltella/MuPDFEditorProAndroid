@@ -123,7 +123,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         return this.mCurrent;
     }
 
-    public void setDisplayedViewIndex(final int i) {
+    public void setDisplayeddViewIndex(final int i) {
         if (0 <= i && i < this.mAdapter.getCount()) {
             this.onMoveOffChild(this.mCurrent);
             this.onMoveToChild(this.mCurrent = i);
@@ -132,7 +132,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         }
     }
 
-    public synchronized void setDisplayedViewSyncIndex(final int i) {
+    public synchronized void setDisplayedViewIndex(final int i) {
         if (0 <= i && i < this.mAdapter.getCount()) {
             this.onMoveOffChild(this.mCurrent);
             this.onMoveToChild(this.mCurrent = i);

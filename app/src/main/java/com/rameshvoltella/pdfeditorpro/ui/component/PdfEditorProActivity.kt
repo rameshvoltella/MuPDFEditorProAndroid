@@ -91,13 +91,24 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
                     if(oldScrollPosition!=progress)
                     {
                         oldScrollPosition=progress;
-                        binding.pdfReaderRenderView.setDisplayedViewSyncIndex(progress - 1)
+                        binding.pdfReaderRenderView.setDisplayedViewIndex(progress - 1)
 
                     }
                 }
 
                 binding.movableView.onTopReached={
-                    Toast.makeText(applicationContext,"TOP RECHED",1).show()
+//                    Toast.makeText(applicationContext,"TOP RECHED",1).show()
+                    binding.pdfReaderRenderView.setDisplayedViewIndex(0)
+//                    binding.movableView.setProgress(0)
+
+                }
+                binding.movableView.onBottomReached={
+//                    Toast.makeText(applicationContext,"TOP RECHED",1).show()
+                    if(muPDFCore!=null) {
+                        binding.pdfReaderRenderView.setDisplayedViewIndex(muPDFCore!!.countPages())
+                    }
+//                    binding.movableView.setProgress(0)
+
                 }
             }
         } else {
