@@ -95,6 +95,10 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
                     }
                 }
+
+                binding.movableView.onTopReached={
+                    Toast.makeText(applicationContext,"TOP RECHED",1).show()
+                }
             }
         } else {
             finish()

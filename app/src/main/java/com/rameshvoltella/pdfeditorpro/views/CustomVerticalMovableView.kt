@@ -26,7 +26,7 @@ class CustomVerticalMovableView @JvmOverloads constructor(
     private var currentProgress = 0
 
     var onProgressChanged: ((Int) -> Unit)? = null // Lambda callback to listen for progress changes
-
+    var onTopReached: (() -> Unit)? = null // Callback when the top is reached
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
         textSize = 48f
@@ -41,10 +41,17 @@ class CustomVerticalMovableView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+
                 dY = y - event.rawY
+                passProgressListener=true
+            }
+            MotionEvent.ACTION_UP->{
+                passProgressListener=true
             }
 
             MotionEvent.ACTION_MOVE -> {
+                passProgressListener = true
+
                 // Calculate the new Y position
                 val newY = event.rawY + dY
 
@@ -52,6 +59,11 @@ class CustomVerticalMovableView @JvmOverloads constructor(
                 val parentView = parent as View
                 if (newY >= 0 && newY + height <= parentView.height) {
                     y = newY
+
+                    // Check if the layout has reached the topmost position
+                    if (y == 0f) {
+                        onTopReached?.invoke() // Notify that the top is reached
+                    }
 
                     // Call the method to update the progress percentage
                     updateProgress(parentView.height)
@@ -87,7 +99,6 @@ class CustomVerticalMovableView @JvmOverloads constructor(
 
         // Redraw the view to update the progress text
         invalidate()
-        passProgressListener=true
     }
 
     private fun updateProgressText(progress: Int) {
@@ -100,8 +111,8 @@ class CustomVerticalMovableView @JvmOverloads constructor(
      * @param progress The desired progress percentage (0 to progressMax)
      */
     fun setProgress(progress: Int) {
+        passProgressListener=false
         // Ensure progress is within the valid range
-        passProgressListener = false;
         val clampedProgress = progress.coerceIn(0, progressMax)
 
         // Calculate the corresponding Y position for the given progress percentage
