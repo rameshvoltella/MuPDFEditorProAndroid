@@ -2,8 +2,6 @@ package com.rameshvoltella.pdfeditorpro.viewmodel
 
 import android.content.Context
 import android.graphics.PointF
-import android.os.Build
-import android.text.Html
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.getValue
@@ -28,7 +26,6 @@ import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseViewModel
-import com.rameshvoltella.pdfeditorpro.utils.TextToSpeechHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -316,7 +313,7 @@ constructor(
     {
         viewModelScope.launch {
 
-            localRepository.getPageText(lastPageNumber,totalPages,muPDFCore
+            localRepository.getPageText(lastPageNumber,totalPages,muPDFCore,false
             ).collect {
 //                annotationInsertDeletePrivate.value = it
                 comfortListPrivate.value = it
@@ -330,15 +327,22 @@ constructor(
         var textToSpeech=textToConvert
         if(muPDFCore!=null)
         {
+            Log.d("SAKKKi","11111>>>")
+            Log.d("SAKKKi","11111>>>pageNumber"+pageNumber)
+
             viewModelScope.launch {
 
                 localRepository.getPageText(pageNumber,pageNumber,muPDFCore, isSinglePage = true
                 ).collect {
 //                annotationInsertDeletePrivate.value = it
+
                     if(it.size>0) {
                         val document = Jsoup.parse(it.get(0))
                         textToSpeech = document.text()
-                        ttsConversion(context,textToSpeech)
+
+                        ttsOutPutPrivate.value = TtsModel(textToSpeech, true)
+
+//                        ttsConversion(context,textToSpeech)
 
                     }
                 }
@@ -350,7 +354,8 @@ constructor(
             if (textToSpeech != null) {
                 Log.d("SADKKE","YOOOOOgoinggggggg");
 
-                ttsConversion(context,textToSpeech)
+                ttsOutPutPrivate.value = TtsModel(textToSpeech, true)
+
             } else {
                 ttsOutPutPrivate.value = TtsModel(null, false)
 
@@ -358,76 +363,6 @@ constructor(
         }
     }
 
-    private fun ttsConversion(context: Context,textToSpeech:String?) {
-        Log.d("SADKKE","YOOOOOfirst");
 
-        val outputDir = context.cacheDir // You can specify another directory if needed
-        val outputFile = File(outputDir, "tts_output.wav")
 
-        val ttsHelper = TextToSpeechHelper(context)
-        ttsHelper.convertTextToSpeech(textToSpeech!!, outputFile) { success ->
-            if (success) {
-                Log.d("SADKKE","YOOOOO");
-                // Audio file is ready, play it
-                ttsOutPutPrivate.value = TtsModel(outputFile, true)
-            } else {
-                Log.d("SADKKE","YOOOOOFFFFF");
-
-                // Handle failure
-                ttsOutPutPrivate.value = TtsModel(null, false)
-
-            }
-        }
-    }
-
-    fun CoroutineScope.readThePagdeOrLine(
-       context: Context,
-       textToConvert: String? = null,
-       muPDFCore: MuPDFCore? = null,
-       pageNumber: Int = -1
-   ) {
-       // Launch the coroutine
-       launch {
-           var textToSpeech = textToConvert
-
-           // Perform I/O operations like extracting text in Dispatchers.IO
-           withContext(Dispatchers.IO) {
-               if (muPDFCore != null) {
-                   val extractedText = String(muPDFCore.html(pageNumber), Charsets.UTF_8)
-                   val document = Jsoup.parse(extractedText)
-                   textToSpeech = document.text()
-               }
-           }
-
-           // Continue with the Text-to-Speech conversion
-           if (textToSpeech != null) {
-               // Switching back to I/O context to handle file operations
-               withContext(Dispatchers.IO) {
-                   val outputDir = context.cacheDir // You can specify another directory if needed
-                   val outputFile = File(outputDir, "tts_output.wav")
-
-                   val ttsHelper = TextToSpeechHelper(context)
-
-                   // Text-to-Speech conversion (could happen on any thread, not necessarily IO)
-                   ttsHelper.convertTextToSpeech(textToSpeech!!, outputFile) { success ->
-                       // Switch to the Main thread to update the UI or LiveData
-                       launch(Dispatchers.Main) {
-                           if (success) {
-                               // Audio file is ready, handle playback
-                               ttsOutPutPrivate.value = TtsModel(outputFile, true)
-                           } else {
-                               // Handle failure
-                               ttsOutPutPrivate.value = TtsModel(null, false)
-                           }
-                       }
-                   }
-               }
-           } else {
-               // Handle when textToSpeech is null (must happen on the main thread)
-               withContext(Dispatchers.Main) {
-                   ttsOutPutPrivate.value = TtsModel(null, false)
-               }
-           }
-       }
-   }
 }

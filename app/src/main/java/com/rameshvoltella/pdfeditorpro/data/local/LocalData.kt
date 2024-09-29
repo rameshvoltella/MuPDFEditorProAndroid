@@ -44,6 +44,7 @@ Log.d("las","lalal"+totalPages+"<>"+lastPageNumber)
                 } else {
                     pageStringData.add("")
                 }
+               return@withContext pageStringData
             }else {
                 if (lastPageNumber < totalPages) {
                     for (i in lastPageNumber until (lastPageNumber + 3)) {
@@ -60,9 +61,10 @@ Log.d("las","lalal"+totalPages+"<>"+lastPageNumber)
                         }
                     }
                 }
+                return@withContext pageStringData
+
             }
 
-            pageStringData
         }
     }
 

@@ -9,11 +9,15 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.common.MediaItem
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.widget.SeekBar
+import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.Player
+import com.rameshvoltella.pdfeditorpro.tts.TextToSpeechHelper
 import com.artifex.mupdfdemo.Hit
 import com.artifex.mupdfdemo.MuPDFCore
 import com.artifex.mupdfdemo.MuPDFPageAdapter
@@ -22,13 +26,12 @@ import com.artifex.mupdfdemo.MuPDFReaderViewListener
 import com.artifex.mupdfdemo.MuPDFView
 import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
-import com.artifex.mupdfdemo.PDFTextExtractor
+import com.artifex.mupdfdemo.ReaderView
 import com.artifex.mupdfdemo.SearchTaskResult
 import com.artifex.mupdfdemo.util.SearchTask
 import com.google.android.material.snackbar.Snackbar
 import com.rameshvoltella.pdfeditorpro.AcceptMode
-import com.rameshvoltella.pdfeditorpro.SearchDismissDialog
-import com.rameshvoltella.pdfeditorpro.TopBarMode
+import com.rameshvoltella.pdfeditorpro.R
 import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
@@ -44,7 +47,6 @@ import com.rameshvoltella.pdfeditorpro.utils.observe
 import com.rameshvoltella.pdfeditorpro.utils.showKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.io.File
 
 @AndroidEntryPoint
@@ -59,12 +61,13 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     private var mSearchTask: SearchTask? = null // Coroutine-based search task
     var resultt: SearchTaskResult?= null
     var oldScrollPosition=0;
-
+    private var handler: Handler? = null
+    private var updateSeekBarRunnable: Runnable? = null
     private var mAcceptMode: AcceptMode? = null
 
     private var addedAnnotationPages = ArrayList<Int>()
-
-
+    private lateinit var exoPlayer: ExoPlayer
+    private var isPlaying = false
     override fun getViewModelClass() = PdfViewModel::class.java
 
     override fun getViewBinding() = PdfViewProEditorLayoutBinding.inflate(layoutInflater)
@@ -79,9 +82,29 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     private fun handleTTSData(ttsModel: TtsModel) {
+if(ttsModel.status&&ttsModel.outPutString!=null) {
+    Toast.makeText(applicationContext,"Yoooooo"+ttsModel.outPutString,1).show()
 
-if(ttsModel.status&&ttsModel.outputPath!=null) {
-    playAudioFile(ttsModel.outputPath)
+    TextToSpeechHelper
+        .getInstance(this)
+        .registerLifecycle( this as LifecycleOwner)
+        .saveAsAudio(ttsModel.outPutString)
+        .onDone {
+            Log.d("poda", "speak: done")
+            runOnUiThread{
+                playAudioFile()
+            }
+
+
+//                    Toast.makeText(applicationContext,"OVERR",Toast.LENGTH_SHORT).show()
+
+        }
+        .onError {
+            Log.d("poda", "speak: error")
+
+//                    Toast.makeText(applicationContext,"Playback doesn't support in this device.",Toast.LENGTH_SHORT).show()
+
+        }
 }else
 {
     Toast.makeText(applicationContext,"TTSFAILED",1).show()
@@ -125,7 +148,55 @@ if(ttsModel.status&&ttsModel.outputPath!=null) {
 //                    binding.movableView.setProgress(0)
 
                 }
+
+
             }
+
+            exoPlayer = ExoPlayer.Builder(applicationContext).build()
+            // Play/Pause Button Click Listener
+            binding.playerbase.playerControlButton.setOnClickListener {
+                if (isPlaying) {
+                    exoPlayer.pause()
+                    binding.playerbase.playerControlButton.setImageResource(R.drawable.plus_ic)
+                    stopSeekBarUpdate()
+                } else {
+                    exoPlayer.play()
+                    binding.playerbase.playerControlButton.setImageResource(R.drawable.minus_ic)
+                    startSeekBarUpdate() // Start seek bar update only when playback starts
+                }
+                isPlaying = !isPlaying
+            }
+            // Make sure to release the player when playback finishes
+            exoPlayer.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    if (playbackState == Player.STATE_READY) {
+                        binding.playerbase.playerProgressBar.max = exoPlayer.duration.toInt()
+                    }
+                }
+
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    if (isPlaying) {
+                        binding.playerbase.playerControlButton.setImageResource(R.drawable.minus_ic)
+                        startSeekBarUpdate() // Ensure the handler runs when playback starts
+                    } else {
+                        binding.playerbase.playerControlButton.setImageResource(R.drawable.plus_ic)
+                        stopSeekBarUpdate()
+                    }
+                }
+            })
+
+            // SeekBar Change Listener
+            binding.playerbase.playerProgressBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    if (fromUser) {
+                        exoPlayer.seekTo(progress.toLong())
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
         } else {
             finish()
         }
@@ -181,6 +252,7 @@ if(ttsModel.status&&ttsModel.outputPath!=null) {
             }
 
             binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
+
 
         }
 
@@ -358,6 +430,8 @@ if(ttsModel.status&&ttsModel.outputPath!=null) {
             }
         }
     }
+
+
 
     override fun onPageChanged(page: Int) {
 //        onPageChanged
@@ -668,25 +742,58 @@ if(ttsModel.status&&ttsModel.outputPath!=null) {
 
     }
 
-    fun playAudioFile(file: File) {
-        val player = ExoPlayer.Builder(applicationContext).build()
-        val uri = Uri.fromFile(file)
+    fun playAudioFile() {
+stopSeekBarUpdate()
+        val uri = Uri.fromFile(File(
+            filesDir.absolutePath
+                    + "/pdfAudio/audio.wav"
+        ))
 
         val mediaItem = MediaItem.fromUri(uri)
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.play()
+        exoPlayer.setMediaItem(mediaItem)
+        exoPlayer.prepare()
+        exoPlayer.play()
+        startSeekBarUpdate()
 
-        // Make sure to release the player when playback finishes
-        player.addListener(object : Player.Listener {
-            override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_ENDED) {
-                    player.release()
+    }
+    // Function to start the SeekBar update
+    private fun startSeekBarUpdate() {
+        handler = Handler(Looper.getMainLooper())
+        updateSeekBarRunnable = object : Runnable {
+            override fun run() {
+                if (exoPlayer.isPlaying) {
+                    binding.playerbase.playerProgressBar.progress = exoPlayer.currentPosition.toInt()
+                    handler?.postDelayed(this, 1000)
                 }
             }
-        })
+        }
+        handler?.post(updateSeekBarRunnable!!)
     }
 
+    // Function to stop the SeekBar update
+    private fun stopSeekBarUpdate() {
+        handler?.removeCallbacks(updateSeekBarRunnable!!)
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopSeekBarUpdate() // Ensure handler stops when activity is destroyed
+        exoPlayer?.release() // Release player
+        if (binding.pdfReaderRenderView != null) {
+            binding.pdfReaderRenderView.applyToChildren(object : ReaderView.ViewMapper() {
+                override fun applyToView(view: View) {
+                    (view as MuPDFView).releaseBitmaps()
+                }
+            })
+        }
+        if (muPDFCore != null) muPDFCore?.onDestroy()
+        /* if (mAlertTask != null) {
+             mAlertTask.cancel(true)
+             mAlertTask = null
+         }*/
+        muPDFCore = null
+    }
 }
 
 
