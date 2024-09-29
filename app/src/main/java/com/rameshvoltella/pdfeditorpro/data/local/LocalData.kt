@@ -31,23 +31,33 @@ class LocalData@Inject constructor():LocalDataSource {
 
     }
 
-    override suspend fun getPageText(lastPageNumber: Int, totalPages: Int, muPDFCore: MuPDFCore): ArrayList<String> {
+    override suspend fun getPageText(lastPageNumber: Int, totalPages: Int, muPDFCore: MuPDFCore,isSinglePage:Boolean): ArrayList<String> {
         return withContext(Dispatchers.IO) {  // Switch context to IO
             val pageStringData = ArrayList<String>()
 Log.d("las","lalal"+totalPages+"<>"+lastPageNumber)
 //            Log.d("andi",""+String(muPDFCore.html(4), Charsets.UTF_8))
-            if (lastPageNumber < totalPages) {
-                for (i in lastPageNumber until (lastPageNumber + 3)) {
-                    Log.d("looping,","<><><>"+i)
-                    if (i < totalPages) {
-                        val extractedText = String(muPDFCore.html(i), Charsets.UTF_8)
-                        if (extractedText != null) {
-                            pageStringData.add(extractedText)
-                        }else{
-                            pageStringData.add("")
+            if (isSinglePage)
+            {
+                val extractedText = String(muPDFCore.html(lastPageNumber), Charsets.UTF_8)
+                if (extractedText != null) {
+                    pageStringData.add(extractedText)
+                } else {
+                    pageStringData.add("")
+                }
+            }else {
+                if (lastPageNumber < totalPages) {
+                    for (i in lastPageNumber until (lastPageNumber + 3)) {
+                        Log.d("looping,", "<><><>" + i)
+                        if (i < totalPages) {
+                            val extractedText = String(muPDFCore.html(i), Charsets.UTF_8)
+                            if (extractedText != null) {
+                                pageStringData.add(extractedText)
+                            } else {
+                                pageStringData.add("")
+                            }
+                        } else {
+                            break
                         }
-                    } else {
-                        break
                     }
                 }
             }

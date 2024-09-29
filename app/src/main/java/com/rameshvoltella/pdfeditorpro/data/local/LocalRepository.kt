@@ -10,7 +10,9 @@ import javax.inject.Singleton
 class LocalRepository@Inject constructor(
     val localRepoData: LocalData
 ):LocalRepositorySource {
-    override suspend fun getPageText(lastPageNumber: Int,totalPages: Int,muPDFCore: MuPDFCore): Flow<ArrayList<String>> {
+    override suspend fun getPageText(lastPageNumber: Int,totalPages: Int,muPDFCore: MuPDFCore,isSinglePage:Boolean): Flow<ArrayList<String>> {
         return flow {emit(localRepoData.getPageText(lastPageNumber,totalPages,muPDFCore))  }
     }
+
+
 }

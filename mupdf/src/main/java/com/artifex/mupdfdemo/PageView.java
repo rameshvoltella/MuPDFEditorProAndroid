@@ -50,7 +50,6 @@ public abstract class PageView extends ViewGroup {
     private static final int HIGHLIGHTED_SEARCHRESULT_COLOR = 0xFF33B5E5;
     private int LINK_COLOR;
     private static final int BOX_COLOR = -9868951;
-
     private static final int BOX_TRANSPARENT_COLOR = Color.TRANSPARENT;
     private int INK_COLOR;
     private float INK_THICKNESS;

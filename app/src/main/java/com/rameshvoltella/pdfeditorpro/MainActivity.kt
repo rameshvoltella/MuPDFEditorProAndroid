@@ -18,12 +18,12 @@ class MainActivity : ComponentActivity() {
         setContentView(R.layout.activity_main)
 
 //        copyFileFromAssetsToInternal(this, "example.pdf")
-        copyFileFromAssetsToInternal(this, "harrypotter.pdf")
+        copyFileFromAssetsToInternal(this, "testfile.pdf")
         startActivity(Intent(this@MainActivity, PdfEditorProActivity::class.java).apply {
-            putExtra(Constants.PDF_FILE_PATH, "${filesDir.path}/harrypotter.pdf")
+            putExtra(Constants.PDF_FILE_PATH, "${filesDir.path}/testfile.pdf")
             putExtra(Constants.DOC_ID, -1L)
             putExtra(Constants.DIRECT_DOC_EDIT_OPEN, false)
-            putExtra(Constants.DOC_NAME, "harrypotter.pdf")
+            putExtra(Constants.DOC_NAME, "testfile.pdf")
         })
         finish()
     }

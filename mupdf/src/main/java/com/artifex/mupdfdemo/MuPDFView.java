@@ -42,6 +42,8 @@ public interface MuPDFView
     boolean copySelection();
     boolean isTextSelected();
 
+    String getTextSelectedArea();
+
     ArrayList<PointF> markupSelection(final Annotation.Type p0);
 
     boolean markupFromDbSelection(final Annotation.Type p0, List<PointF> quadPoints);

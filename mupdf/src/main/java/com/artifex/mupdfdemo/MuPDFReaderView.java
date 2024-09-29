@@ -113,6 +113,17 @@ public class MuPDFReaderView extends ReaderView {
 
     }
 
+    public String getSelectedText()
+    {
+        final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+        if(pageView!=null) {
+            return pageView.getTextSelectedArea();
+        }else {
+            return "";
+        }
+
+    }
+
     public Mode getMode() {
         return mMode;
     }

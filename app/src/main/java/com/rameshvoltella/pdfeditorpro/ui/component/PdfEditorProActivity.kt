@@ -10,6 +10,10 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.MediaItem
+import android.net.Uri
+import androidx.media3.common.Player
 import com.artifex.mupdfdemo.Hit
 import com.artifex.mupdfdemo.MuPDFCore
 import com.artifex.mupdfdemo.MuPDFPageAdapter
@@ -28,6 +32,7 @@ import com.rameshvoltella.pdfeditorpro.TopBarMode
 import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
+import com.rameshvoltella.pdfeditorpro.data.dto.TtsModel
 import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
@@ -69,10 +74,20 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         observe(viewModel.annotationPerPage, ::handleAnnotationPerPage)
         observe(viewModel.annotationDrawPerPage,::handleDrawAnnotationPerPage)
         observe(viewModel.annotationInsertDelete,::handleOnInsertionDeletion)
+        observe(viewModel.ttsOutPut,::handleTTSData)
 
     }
 
+    private fun handleTTSData(ttsModel: TtsModel) {
 
+if(ttsModel.status&&ttsModel.outputPath!=null) {
+    playAudioFile(ttsModel.outputPath)
+}else
+{
+    Toast.makeText(applicationContext,"TTSFAILED",1).show()
+}
+
+    }
 
 
     override fun observeActivity() {
@@ -153,6 +168,20 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             } else {
                 Toast.makeText(applicationContext, "No text Selected", 1).show()
             }
+        }
+        binding.listenIv.setOnClickListener {
+
+            if (binding.pdfReaderRenderView.userSelectedText) {
+                Toast.makeText(applicationContext, binding.pdfReaderRenderView.selectedText+"<><", 1).show()
+
+                viewModel.readThePageOrLine(applicationContext,binding.pdfReaderRenderView.selectedText)
+
+            } else {
+                viewModel.readThePageOrLine(applicationContext, muPDFCore = muPDFCore, pageNumber = binding.pdfReaderRenderView.displayedViewIndex)
+            }
+
+            binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
+
         }
 
         binding.acceptBtn.setOnClickListener {
@@ -639,6 +668,24 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
     }
 
+    fun playAudioFile(file: File) {
+        val player = ExoPlayer.Builder(applicationContext).build()
+        val uri = Uri.fromFile(file)
+
+        val mediaItem = MediaItem.fromUri(uri)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
+
+        // Make sure to release the player when playback finishes
+        player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_ENDED) {
+                    player.release()
+                }
+            }
+        })
+    }
 
 }
 

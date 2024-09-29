@@ -101,6 +101,13 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.11.0")
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
     implementation ("com.github.hearsilent:DiscreteSlider:1.2.1")
+//    implementation ("androidx.media3:media3-exoplayer:1.4.3")
+//    implementation ("androidx.media3:media3-ui:1.4.3")
+    implementation ("org.jsoup:jsoup:1.14.3")
+
+    implementation("androidx.media3:media3-exoplayer:1.0.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.0")
+    implementation("androidx.media3:media3-ui:1.X.X")
 }
 kapt {
     correctErrorTypes = true

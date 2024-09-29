@@ -1,10 +1,12 @@
 package com.rameshvoltella.pdfeditorpro.viewmodel
 
+import android.content.Context
 import android.graphics.PointF
+import android.os.Build
+import android.text.Html
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
@@ -18,6 +20,7 @@ import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
 import com.rameshvoltella.pdfeditorpro.data.database.DatabaseRepository
+import com.rameshvoltella.pdfeditorpro.data.dto.TtsModel
 import com.rameshvoltella.pdfeditorpro.data.local.LocalRepository
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
 import com.rameshvoltella.pdfeditorpro.database.PdfDrawAnnotation
@@ -25,12 +28,14 @@ import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseViewModel
+import com.rameshvoltella.pdfeditorpro.utils.TextToSpeechHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
+import java.io.File
 import javax.inject.Inject
 @HiltViewModel
 class PdfViewModel@Inject
@@ -50,6 +55,9 @@ constructor(
 
     private val annotationDrawPerPagePrivate = MutableLiveData<List<QuadDrawPointsAndType>>()
     val annotationDrawPerPage: LiveData<List<QuadDrawPointsAndType>> get() = annotationDrawPerPagePrivate
+
+    private val ttsOutPutPrivate = MutableLiveData<TtsModel>()
+    val ttsOutPut: LiveData<TtsModel> get() = ttsOutPutPrivate
 
 
     private val comfortListPrivate = MutableLiveData<List<String>>()
@@ -316,4 +324,110 @@ constructor(
             }
         }
     }
+
+    fun readThePageOrLine(context: Context, textToConvert: String?=null,muPDFCore: MuPDFCore?=null,pageNumber: Int=-1)
+    {
+        var textToSpeech=textToConvert
+        if(muPDFCore!=null)
+        {
+            viewModelScope.launch {
+
+                localRepository.getPageText(pageNumber,pageNumber,muPDFCore, isSinglePage = true
+                ).collect {
+//                annotationInsertDeletePrivate.value = it
+                    if(it.size>0) {
+                        val document = Jsoup.parse(it.get(0))
+                        textToSpeech = document.text()
+                        ttsConversion(context,textToSpeech)
+
+                    }
+                }
+            }
+
+
+
+        }else {
+            if (textToSpeech != null) {
+                Log.d("SADKKE","YOOOOOgoinggggggg");
+
+                ttsConversion(context,textToSpeech)
+            } else {
+                ttsOutPutPrivate.value = TtsModel(null, false)
+
+            }
+        }
+    }
+
+    private fun ttsConversion(context: Context,textToSpeech:String?) {
+        Log.d("SADKKE","YOOOOOfirst");
+
+        val outputDir = context.cacheDir // You can specify another directory if needed
+        val outputFile = File(outputDir, "tts_output.wav")
+
+        val ttsHelper = TextToSpeechHelper(context)
+        ttsHelper.convertTextToSpeech(textToSpeech!!, outputFile) { success ->
+            if (success) {
+                Log.d("SADKKE","YOOOOO");
+                // Audio file is ready, play it
+                ttsOutPutPrivate.value = TtsModel(outputFile, true)
+            } else {
+                Log.d("SADKKE","YOOOOOFFFFF");
+
+                // Handle failure
+                ttsOutPutPrivate.value = TtsModel(null, false)
+
+            }
+        }
+    }
+
+    fun CoroutineScope.readThePagdeOrLine(
+       context: Context,
+       textToConvert: String? = null,
+       muPDFCore: MuPDFCore? = null,
+       pageNumber: Int = -1
+   ) {
+       // Launch the coroutine
+       launch {
+           var textToSpeech = textToConvert
+
+           // Perform I/O operations like extracting text in Dispatchers.IO
+           withContext(Dispatchers.IO) {
+               if (muPDFCore != null) {
+                   val extractedText = String(muPDFCore.html(pageNumber), Charsets.UTF_8)
+                   val document = Jsoup.parse(extractedText)
+                   textToSpeech = document.text()
+               }
+           }
+
+           // Continue with the Text-to-Speech conversion
+           if (textToSpeech != null) {
+               // Switching back to I/O context to handle file operations
+               withContext(Dispatchers.IO) {
+                   val outputDir = context.cacheDir // You can specify another directory if needed
+                   val outputFile = File(outputDir, "tts_output.wav")
+
+                   val ttsHelper = TextToSpeechHelper(context)
+
+                   // Text-to-Speech conversion (could happen on any thread, not necessarily IO)
+                   ttsHelper.convertTextToSpeech(textToSpeech!!, outputFile) { success ->
+                       // Switch to the Main thread to update the UI or LiveData
+                       launch(Dispatchers.Main) {
+                           if (success) {
+                               // Audio file is ready, handle playback
+                               ttsOutPutPrivate.value = TtsModel(outputFile, true)
+                           } else {
+                               // Handle failure
+                               ttsOutPutPrivate.value = TtsModel(null, false)
+                           }
+                       }
+                   }
+               }
+           } else {
+               // Handle when textToSpeech is null (must happen on the main thread)
+               withContext(Dispatchers.Main) {
+                   ttsOutPutPrivate.value = TtsModel(null, false)
+               }
+           }
+       }
+   }
 }

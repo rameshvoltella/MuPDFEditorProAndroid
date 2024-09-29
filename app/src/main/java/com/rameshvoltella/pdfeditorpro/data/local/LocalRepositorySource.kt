@@ -5,7 +5,7 @@ import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
 import kotlinx.coroutines.flow.Flow
 
 interface LocalRepositorySource {
-    suspend fun getPageText(lastPageNumber: Int,totalPages: Int,muPDFCore: MuPDFCore): Flow<ArrayList<String>>
+    suspend fun getPageText(lastPageNumber: Int,totalPages: Int,muPDFCore: MuPDFCore,isSinglePage:Boolean=false): Flow<ArrayList<String>>
 
 
 }

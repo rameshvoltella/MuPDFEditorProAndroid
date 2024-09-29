@@ -57,6 +57,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
     private AsyncTask<Void, Void, String> mCheckSignature;
     private AsyncTask<Void, Void, Boolean> mSign;
     private Runnable changeReporter;
+    private String selectedTextValue;
 
     public MuPDFPageView(final Context c, final MuPDFCore core, final Point parentSize, final Bitmap sharedHqBm) {
         super(c, parentSize, sharedHqBm);
@@ -351,10 +352,17 @@ public class MuPDFPageView extends PageView implements MuPDFView
         if (text.length() == 0) {
             return false;
         }
-        final ClipboardManager cm = (ClipboardManager)this.mContext.getSystemService("clipboard");
-        cm.setPrimaryClip(ClipData.newPlainText((CharSequence)"MuPDF", (CharSequence)text));
+        selectedTextValue=((CharSequence)text).toString();
+//        final ClipboardManager cm = (ClipboardManager)this.mContext.getSystemService("clipboard");
+//        cm.setPrimaryClip(ClipData.newPlainText((CharSequence)"MuPDF", (CharSequence)text));
         this.deselectText();
         return true;
+    }
+
+    public String getTextSelectedArea()
+    {
+        this.deselectText();
+        return selectedTextValue;
     }
 
     /* Todo: MuPDFPageView:: it use to copy text after user press comment from popup window in pdf screen */
@@ -386,8 +394,10 @@ public class MuPDFPageView extends PageView implements MuPDFView
         });
         if (text.length() == 0)
             return false;
-        android.content.ClipboardManager cm = (android.content.ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-        cm.setPrimaryClip(ClipData.newPlainText("MuPDF", text));
+        selectedTextValue=((CharSequence)text).toString();
+
+//        android.content.ClipboardManager cm = (android.content.ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+//        cm.setPrimaryClip(ClipData.newPlainText("MuPDF", text));
         return true;
     }
     @Override
