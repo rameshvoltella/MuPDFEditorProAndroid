@@ -32,7 +32,7 @@ class CustomVerticalMovableView @JvmOverloads constructor(
     var onBottomReached: (() -> Unit)? = null // Callback when the top is reached
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.BLACK
+        color = Color.WHITE
         textSize = 48f
         textAlign = Paint.Align.CENTER
     }
