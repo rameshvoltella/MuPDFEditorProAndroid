@@ -108,6 +108,7 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.0.0")
     implementation("androidx.media3:media3-exoplayer-dash:1.0.0")
     implementation("androidx.media3:media3-ui:1.X.X")
+    implementation ("io.github.chochanaresh:filepicker:0.1.9")
 }
 kapt {
     correctErrorTypes = true

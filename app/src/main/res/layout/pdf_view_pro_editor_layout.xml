@@ -62,12 +62,12 @@
             android:gravity="right">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/bookmark_btn"
+                android:id="@+id/listen_iv"
                 android:layout_width="45dp"
                 android:layout_height="match_parent"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:paddingHorizontal="10dp"
-                app:srcCompat="@drawable/bookmark_page"
+                app:srcCompat="@drawable/listen_audio"
                 android:visibility="visible"
                 android:layout_gravity="end"
                 />
@@ -180,18 +180,18 @@
             android:layout_height="match_parent"
             app:srcCompat="@drawable/draw_page_img"
             app:layout_constraintStart_toEndOf="@id/underline_iv"
-            app:layout_constraintEnd_toStartOf="@id/listen_iv"
+            app:layout_constraintEnd_toStartOf="@id/_a"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintWidth_percent="0.2" />
 
         <!-- androidx.appcompat.widget.AppCompatImageView 5 -->
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/listen_iv"
+            android:id="@+id/_a"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/listen_audio"
             android:padding="15dp"
+            android:visibility="gone"
             app:layout_constraintStart_toEndOf="@id/drawer_iv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

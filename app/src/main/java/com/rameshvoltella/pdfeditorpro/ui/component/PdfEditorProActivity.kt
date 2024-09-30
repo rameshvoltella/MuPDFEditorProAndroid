@@ -201,10 +201,10 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             finish()
         }
 
-        binding.bookmarkBtn.setOnClickListener {
+       /* binding.bookmarkBtn.setOnClickListener {
 //            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
 //            viewModel.getComfortModeData(0,binding.pdfReaderRenderView.adaptorCount,muPDFCore!!)
-        }
+        }*/
 
         binding.comfortBtn.setOnClickListener {
             startActivity(Intent(applicationContext,ComfortReadingModeActivity::class.java).putExtra(Constants.PDF_FILE_PATH,intent.getStringExtra(Constants.PDF_FILE_PATH)))
@@ -441,8 +441,8 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
             if (!addedAnnotationPages.contains(getPageViewMupdf()?.page)) {
                 Log.d("Pageis","CurrentPageIS goint :${getPageViewMupdf()?.page}")
-                viewModel.getAnnotations("test.pdf", getPageViewMupdf()?.page!!)
-                viewModel.getDrawAnnotations("test.pdf", getPageViewMupdf()?.page!!)
+                viewModel.getAnnotations(intent!!.extras!!.getString(Constants.DOC_NAME)!!, getPageViewMupdf()?.page!!)
+                viewModel.getDrawAnnotations(intent!!.extras!!.getString(Constants.DOC_NAME)!!, getPageViewMupdf()?.page!!)
 
             }
         }
@@ -453,7 +453,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
     }
 
     override fun onDeleteSelectedAnnotation() {
-        viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
+        viewModel.deleteAnnotation(getPageViewMupdf(),intent!!.extras!!.getString(Constants.DOC_NAME)!!,)
 
     }
 
@@ -495,7 +495,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
     }
 
     private fun selectAnnotationMode() {
-        viewModel.addAnnotation(getPageViewMupdf(), mAcceptMode, "test.pdf")
+        viewModel.addAnnotation(getPageViewMupdf(), mAcceptMode, intent!!.extras!!.getString(Constants.DOC_NAME)!!,)
 
     }
 
