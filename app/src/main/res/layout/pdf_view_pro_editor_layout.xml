@@ -61,16 +61,26 @@
             android:id="@+id/basic_ll"
             android:gravity="right">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/listen_iv"
+            <RelativeLayout
                 android:layout_width="45dp"
-                android:layout_height="match_parent"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:paddingHorizontal="10dp"
-                app:srcCompat="@drawable/listen_audio"
-                android:visibility="visible"
-                android:layout_gravity="end"
-                />
+                android:layout_height="wrap_content">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/listen_iv"
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="10dp"
+                    app:srcCompat="@drawable/listen_audio"
+                    android:visibility="visible"
+                    android:layout_gravity="end"
+                    />
+                <ProgressBar
+                    android:layout_width="45dp"
+                    android:id="@+id/audioviewProgress"
+                    android:visibility="gone"
+                    android:layout_height="match_parent"/>
+            </RelativeLayout>
+
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/search_btn"
                 android:layout_width="45dp"
@@ -213,12 +223,10 @@
     <include
         layout="@layout/player_view"
         android:id="@+id/playerbase"
-        android:layout_marginBottom="60dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_options"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

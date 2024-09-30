@@ -1,6 +1,7 @@
 package com.rameshvoltella.pdfeditorpro.ui.component
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,6 +17,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.SeekBar
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import com.rameshvoltella.pdfeditorpro.tts.TextToSpeechHelper
 import com.artifex.mupdfdemo.Hit
@@ -29,6 +31,7 @@ import com.artifex.mupdfdemo.OutlineActivityData
 import com.artifex.mupdfdemo.ReaderView
 import com.artifex.mupdfdemo.SearchTaskResult
 import com.artifex.mupdfdemo.util.SearchTask
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.R
@@ -42,11 +45,13 @@ import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
 import com.rameshvoltella.pdfeditorpro.setOnSingleClickListener
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
+import com.rameshvoltella.pdfeditorpro.utils.generateNormalThumbnail
 import com.rameshvoltella.pdfeditorpro.utils.hideKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.utils.observe
 import com.rameshvoltella.pdfeditorpro.utils.showKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.File
 
 @AndroidEntryPoint
@@ -68,6 +73,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     private var addedAnnotationPages = ArrayList<Int>()
     private lateinit var exoPlayer: ExoPlayer
     private var isPlaying = false
+    var thumbnail:Bitmap?=null
     override fun getViewModelClass() = PdfViewModel::class.java
 
     override fun getViewBinding() = PdfViewProEditorLayoutBinding.inflate(layoutInflater)
@@ -83,7 +89,6 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
     private fun handleTTSData(ttsModel: TtsModel) {
 if(ttsModel.status&&ttsModel.outPutString!=null) {
-    Toast.makeText(applicationContext,"Yoooooo"+ttsModel.outPutString,1).show()
 
     TextToSpeechHelper
         .getInstance(this)
@@ -101,6 +106,8 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
         }
         .onError {
             Log.d("poda", "speak: error")
+            binding.audioviewProgress.visibility=View.GONE
+
 
 //                    Toast.makeText(applicationContext,"Playback doesn't support in this device.",Toast.LENGTH_SHORT).show()
 
@@ -108,6 +115,8 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 }else
 {
     Toast.makeText(applicationContext,"TTSFAILED",1).show()
+    binding.audioviewProgress.visibility=View.GONE
+
 }
 
     }
@@ -119,7 +128,15 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             openPdfFile(intent.getStringExtra(Constants.PDF_FILE_PATH))
             initPdfCore()
             settingClicksToSearch()
+
             if(muPDFCore!=null) {
+                lifecycleScope.launch {
+//                    val pdfFilePath = "path_to_your_pdf_file.pdf" // Replace with your PDF file path
+                    thumbnail = generateNormalThumbnail(intent.getStringExtra(Constants.PDF_FILE_PATH)!!)
+                    // Load the thumbnail using Glide
+
+                }
+
                 binding.movableView.progressMax =
                     muPDFCore!!.countPages() // Set maximum progress to 200
 
@@ -157,11 +174,11 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             binding.playerbase.playerControlButton.setOnClickListener {
                 if (isPlaying) {
                     exoPlayer.pause()
-                    binding.playerbase.playerControlButton.setImageResource(R.drawable.plus_ic)
+                    binding.playerbase.playerControlButton.setImageResource(R.drawable.pause)
                     stopSeekBarUpdate()
                 } else {
                     exoPlayer.play()
-                    binding.playerbase.playerControlButton.setImageResource(R.drawable.minus_ic)
+                    binding.playerbase.playerControlButton.setImageResource(R.drawable.play)
                     startSeekBarUpdate() // Start seek bar update only when playback starts
                 }
                 isPlaying = !isPlaying
@@ -171,15 +188,19 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     if (playbackState == Player.STATE_READY) {
                         binding.playerbase.playerProgressBar.max = exoPlayer.duration.toInt()
+                    }else if(playbackState == Player.STATE_ENDED)
+                    {
+                        binding.playerbase.playerLayout.visibility=View.GONE
+
                     }
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     if (isPlaying) {
-                        binding.playerbase.playerControlButton.setImageResource(R.drawable.minus_ic)
+                        binding.playerbase.playerControlButton.setImageResource(R.drawable.pause)
                         startSeekBarUpdate() // Ensure the handler runs when playback starts
                     } else {
-                        binding.playerbase.playerControlButton.setImageResource(R.drawable.plus_ic)
+                        binding.playerbase.playerControlButton.setImageResource(R.drawable.play)
                         stopSeekBarUpdate()
                     }
                 }
@@ -241,9 +262,15 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             }
         }
         binding.listenIv.setOnClickListener {
+            binding.audioviewProgress.visibility=View.VISIBLE
+            thumbnail?.let {
+                Glide.with(this)
+                    .asBitmap()
+                    .load(it) // Load the Bitmap directly
+                    .into(binding.playerbase.playerThumbnail) // Set the ImageView to display the bitmap
+            }
 
             if (binding.pdfReaderRenderView.userSelectedText) {
-                Toast.makeText(applicationContext, binding.pdfReaderRenderView.selectedText+"<><", 1).show()
 
                 viewModel.readThePageOrLine(applicationContext,binding.pdfReaderRenderView.selectedText)
 
@@ -743,7 +770,12 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
     }
 
     fun playAudioFile() {
-stopSeekBarUpdate()
+        binding.playerbase.playerLayout.visibility=View.VISIBLE
+        stopSeekBarUpdate() // Ensure handler stops when activity is destroyed
+        exoPlayer?.release() // Release player
+        binding.audioviewProgress.visibility=View.GONE
+        binding.playerbase.playerTitle.text=intent.getStringExtra(Constants.DOC_NAME)
+            stopSeekBarUpdate()
         val uri = Uri.fromFile(File(
             filesDir.absolutePath
                     + "/pdfAudio/audio.wav"

@@ -8,6 +8,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.widget.Button
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import com.nareshchocha.filepickerlibrary.models.DocumentFilePickerConfig
@@ -45,6 +47,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val openfile = findViewById<Button>(R.id.openfile)
+        openfile.setOnClickListener {
+            requestManageExternalStoragePermission()
+
+        }
 
 
 
@@ -99,7 +106,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        requestManageExternalStoragePermission()
 
     }
 
