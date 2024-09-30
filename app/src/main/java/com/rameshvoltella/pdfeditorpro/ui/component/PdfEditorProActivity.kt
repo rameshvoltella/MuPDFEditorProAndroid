@@ -1,5 +1,6 @@
 package com.rameshvoltella.pdfeditorpro.ui.component
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -89,6 +90,7 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
     private fun handleTTSData(ttsModel: TtsModel) {
 if(ttsModel.status&&ttsModel.outPutString!=null) {
+    exoPlayer?.stop() // Release player
 
     TextToSpeechHelper
         .getInstance(this)
@@ -769,10 +771,11 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     fun playAudioFile() {
         binding.playerbase.playerLayout.visibility=View.VISIBLE
         stopSeekBarUpdate() // Ensure handler stops when activity is destroyed
-        exoPlayer?.release() // Release player
+        exoPlayer?.stop() // Release player
         binding.audioviewProgress.visibility=View.GONE
         binding.playerbase.playerTitle.text=intent.getStringExtra(Constants.DOC_NAME)
             stopSeekBarUpdate()
