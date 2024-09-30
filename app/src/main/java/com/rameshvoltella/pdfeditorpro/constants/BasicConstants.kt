@@ -32,6 +32,8 @@ object Constants {
     const val DOC_DELETE = "docDelete"
 
     const val PDF_FILE_PATH ="pdfFilePath"
+    const val PASSWORD ="pdfPassword"
+
     const val PDF_FOLDER_NAME ="folderName"
     const val CURRENT_FOLDER_POS ="currentPos"
     const val DOC_ID = "docId"

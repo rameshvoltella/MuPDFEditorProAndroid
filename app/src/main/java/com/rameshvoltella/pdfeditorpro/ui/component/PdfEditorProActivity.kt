@@ -54,6 +54,11 @@ import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
+import android.content.Context
+import android.text.InputType
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
+
 
 @AndroidEntryPoint
 class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfViewModel>(),
@@ -65,8 +70,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     var currentPageMode: String = PdfConstants.PAGE_MODE
     var currentBgColor = Color.WHITE
     private var mSearchTask: SearchTask? = null // Coroutine-based search task
-    var resultt: SearchTaskResult?= null
-    var oldScrollPosition=0;
+    var resultt: SearchTaskResult? = null
+    var oldScrollPosition = 0;
     private var handler: Handler? = null
     private var updateSeekBarRunnable: Runnable? = null
     private var mAcceptMode: AcceptMode? = null
@@ -74,7 +79,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     private var addedAnnotationPages = ArrayList<Int>()
     private lateinit var exoPlayer: ExoPlayer
     private var isPlaying = false
-    var thumbnail:Bitmap?=null
+    var thumbnail: Bitmap? = null
+
+    var password: String? = null
     override fun getViewModelClass() = PdfViewModel::class.java
 
     override fun getViewBinding() = PdfViewProEditorLayoutBinding.inflate(layoutInflater)
@@ -82,44 +89,9 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     override fun observeViewModel() {
         observe(viewModel.annotationResponse, ::handleAddCommentResponse)
         observe(viewModel.annotationPerPage, ::handleAnnotationPerPage)
-        observe(viewModel.annotationDrawPerPage,::handleDrawAnnotationPerPage)
-        observe(viewModel.annotationInsertDelete,::handleOnInsertionDeletion)
-        observe(viewModel.ttsOutPut,::handleTTSData)
-
-    }
-
-    private fun handleTTSData(ttsModel: TtsModel) {
-if(ttsModel.status&&ttsModel.outPutString!=null) {
-    exoPlayer?.stop() // Release player
-
-    TextToSpeechHelper
-        .getInstance(this)
-        .registerLifecycle( this as LifecycleOwner)
-        .saveAsAudio(ttsModel.outPutString)
-        .onDone {
-            Log.d("poda", "speak: done")
-            runOnUiThread{
-                playAudioFile()
-            }
-
-
-//                    Toast.makeText(applicationContext,"OVERR",Toast.LENGTH_SHORT).show()
-
-        }
-        .onError {
-            Log.d("poda", "speak: error")
-            binding.audioviewProgress.visibility=View.GONE
-
-
-//                    Toast.makeText(applicationContext,"Playback doesn't support in this device.",Toast.LENGTH_SHORT).show()
-
-        }
-}else
-{
-    Toast.makeText(applicationContext,"TTSFAILED",1).show()
-    binding.audioviewProgress.visibility=View.GONE
-
-}
+        observe(viewModel.annotationDrawPerPage, ::handleDrawAnnotationPerPage)
+        observe(viewModel.annotationInsertDelete, ::handleOnInsertionDeletion)
+        observe(viewModel.ttsOutPut, ::handleTTSData)
 
     }
 
@@ -128,13 +100,17 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
         if (intent.extras!!.containsKey(Constants.PDF_FILE_PATH)) {
             openPdfFile(intent.getStringExtra(Constants.PDF_FILE_PATH))
-            initPdfCore()
-            settingClicksToSearch()
-
-            if(muPDFCore!=null) {
+            if (muPDFCore?.needsPassword()!!) {
+                showPasswordDialog()
+            } else {
+                initPdfCore()
+                settingClicksToSearch()
+            }
+            if (muPDFCore != null) {
                 lifecycleScope.launch {
 //                    val pdfFilePath = "path_to_your_pdf_file.pdf" // Replace with your PDF file path
-                    thumbnail = generateNormalThumbnail(intent.getStringExtra(Constants.PDF_FILE_PATH)!!)
+                    thumbnail =
+                        generateNormalThumbnail(intent.getStringExtra(Constants.PDF_FILE_PATH)!!)
                     // Load the thumbnail using Glide
 
                 }
@@ -145,24 +121,23 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
                 binding.movableView.onProgressChanged = { progress ->
                     // Handle the progress change
                     Log.d("Progress", "Progress: $progress%")
-                    if(oldScrollPosition!=progress)
-                    {
-                        oldScrollPosition=progress;
+                    if (oldScrollPosition != progress) {
+                        oldScrollPosition = progress;
                         binding.pdfReaderRenderView.setDisplayedViewIndex(progress - 1)
 
                     }
                 }
 
-                binding.movableView.onTopReached={
+                binding.movableView.onTopReached = {
 //                    Toast.makeText(applicationContext,"TOP RECHED",1).show()
                     binding.pdfReaderRenderView.setDisplayedViewIndex(0)
 //                    binding.movableView.setProgress(0)
 
                 }
-                binding.movableView.onBottomReached={
+                binding.movableView.onBottomReached = {
 //                    Toast.makeText(applicationContext,"TOP RECHED",1).show()
 //                    if(muPDFCore!=null) {
-                        binding.pdfReaderRenderView.setDisplayedViewIndex(binding.pdfReaderRenderView.adaptorCount)
+                    binding.pdfReaderRenderView.setDisplayedViewIndex(binding.pdfReaderRenderView.adaptorCount)
 //                    }
 //                    binding.movableView.setProgress(0)
 
@@ -190,9 +165,8 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     if (playbackState == Player.STATE_READY) {
                         binding.playerbase.playerProgressBar.max = exoPlayer.duration.toInt()
-                    }else if(playbackState == Player.STATE_ENDED)
-                    {
-                        binding.playerbase.playerLayout.visibility=View.GONE
+                    } else if (playbackState == Player.STATE_ENDED) {
+                        binding.playerbase.playerLayout.visibility = View.GONE
 
                     }
                 }
@@ -209,8 +183,13 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             })
 
             // SeekBar Change Listener
-            binding.playerbase.playerProgressBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            binding.playerbase.playerProgressBar.setOnSeekBarChangeListener(object :
+                SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
                     if (fromUser) {
                         exoPlayer.seekTo(progress.toLong())
                     }
@@ -224,13 +203,18 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             finish()
         }
 
-       /* binding.bookmarkBtn.setOnClickListener {
-//            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
-//            viewModel.getComfortModeData(0,binding.pdfReaderRenderView.adaptorCount,muPDFCore!!)
-        }*/
+        /* binding.bookmarkBtn.setOnClickListener {
+ //            viewModel.deleteAnnotation(getPageViewMupdf(),"test.pdf")
+ //            viewModel.getComfortModeData(0,binding.pdfReaderRenderView.adaptorCount,muPDFCore!!)
+         }*/
 
         binding.comfortBtn.setOnClickListener {
-            startActivity(Intent(applicationContext,ComfortReadingModeActivity::class.java).putExtra(Constants.PDF_FILE_PATH,intent.getStringExtra(Constants.PDF_FILE_PATH)))
+            startActivity(
+                Intent(
+                    applicationContext,
+                    ComfortReadingModeActivity::class.java
+                ).putExtra(Constants.PDF_FILE_PATH, intent.getStringExtra(Constants.PDF_FILE_PATH)).putExtra(Constants.PASSWORD, password)
+            )
         }
 
         binding.highlighterIv.setOnClickListener {
@@ -264,7 +248,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             }
         }
         binding.listenIv.setOnClickListener {
-            binding.audioviewProgress.visibility=View.VISIBLE
+            binding.audioviewProgress.visibility = View.VISIBLE
             thumbnail?.let {
                 Glide.with(this)
                     .asBitmap()
@@ -274,10 +258,17 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
             if (binding.pdfReaderRenderView.userSelectedText) {
 
-                viewModel.readThePageOrLine(applicationContext,binding.pdfReaderRenderView.selectedText)
+                viewModel.readThePageOrLine(
+                    applicationContext,
+                    binding.pdfReaderRenderView.selectedText
+                )
 
             } else {
-                viewModel.readThePageOrLine(applicationContext, muPDFCore = muPDFCore, pageNumber = binding.pdfReaderRenderView.displayedViewIndex)
+                viewModel.readThePageOrLine(
+                    applicationContext,
+                    muPDFCore = muPDFCore,
+                    pageNumber = binding.pdfReaderRenderView.displayedViewIndex
+                )
             }
 
             binding.pdfReaderRenderView?.setMode(MuPDFReaderView.Mode.Viewing)
@@ -292,14 +283,14 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
         }
 
-     /*   binding.bookmarkBtn.setOnClickListener {
+        /*   binding.bookmarkBtn.setOnClickListener {
 
-            // Inside a CoroutineScope, like in a ViewModel or Activity/Fragment
-            lifecycleScope.launch {
-                val extractedText = PDFTextExtractor().extractText(muPDFCore,  pageNumber = 1)
-                Log.d("Extracted Text", extractedText ?: "No text extracted")
-            }
-        }*/
+               // Inside a CoroutineScope, like in a ViewModel or Activity/Fragment
+               lifecycleScope.launch {
+                   val extractedText = PDFTextExtractor().extractText(muPDFCore,  pageNumber = 1)
+                   Log.d("Extracted Text", extractedText ?: "No text extracted")
+               }
+           }*/
 
         binding.searchAction.searchClose.setOnClickListener {
             toggleOptionState(true)
@@ -308,8 +299,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
         binding.searchBtn.setOnClickListener {
 
-            if(binding.searchAction.searchViewCl.visibility==View.GONE)
-            {
+            if (binding.searchAction.searchViewCl.visibility == View.GONE) {
 
                 searchModeOn()
                 searchTaskClicks()
@@ -324,7 +314,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             binding.basicLl.visibility = View.GONE;
             binding.acceptModeLl.visibility = View.VISIBLE
             binding.bottomOptions.visibility = View.GONE
-            if(binding.searchAction.searchViewCl.visibility==View.VISIBLE) {
+            if (binding.searchAction.searchViewCl.visibility == View.VISIBLE) {
                 searchModeOff()
             }
             drawTextOnPage()
@@ -336,13 +326,11 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             if (binding.basicLl.visibility == View.VISIBLE) {
                 finish()
 
-            }
-            else if (binding.searchAction.searchViewCl.visibility == View.VISIBLE) {
-                binding.searchAction.searchViewCl.visibility=View.GONE
+            } else if (binding.searchAction.searchViewCl.visibility == View.VISIBLE) {
+                binding.searchAction.searchViewCl.visibility = View.GONE
                 searchModeOff()
                 toggleOptionState(true)
-            }
-            else {
+            } else {
                 cancellAllEdit()
             }
         }
@@ -413,7 +401,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             }
 
             override fun onHit(item: Hit) {
-                if(item==Hit.Annotation) {
+                if (item == Hit.Annotation) {
 
 //                    Toast.makeText(applicationContext, "Clickedon Annotaion", 1).show()
                 }
@@ -422,7 +410,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
             override fun onLongPress() {
                 Log.i("LONGPRESS", "onLongPress: hitting in Activity")
-                if(binding.searchAction.searchViewCl.visibility==View.VISIBLE) {
+                if (binding.searchAction.searchViewCl.visibility == View.VISIBLE) {
                     searchModeOff()
                 }
                 toggleOptionState(true)
@@ -461,17 +449,22 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
     }
 
 
-
     override fun onPageChanged(page: Int) {
 //        onPageChanged
-        Log.e("PageIs", "CurrentPageIS:${getPageViewMupdf()?.page}"+addedAnnotationPages)
+        Log.e("PageIs", "CurrentPageIS:${getPageViewMupdf()?.page}" + addedAnnotationPages)
         if (getPageViewMupdf() != null) {
             binding.movableView.setProgress(page)
 
             if (!addedAnnotationPages.contains(getPageViewMupdf()?.page)) {
-                Log.d("Pageis","CurrentPageIS goint :${getPageViewMupdf()?.page}")
-                viewModel.getAnnotations(intent!!.extras!!.getString(Constants.DOC_NAME)!!, getPageViewMupdf()?.page!!)
-                viewModel.getDrawAnnotations(intent!!.extras!!.getString(Constants.DOC_NAME)!!, getPageViewMupdf()?.page!!)
+                Log.d("Pageis", "CurrentPageIS goint :${getPageViewMupdf()?.page}")
+                viewModel.getAnnotations(
+                    intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                    getPageViewMupdf()?.page!!
+                )
+                viewModel.getDrawAnnotations(
+                    intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                    getPageViewMupdf()?.page!!
+                )
 
             }
         }
@@ -482,7 +475,10 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
     }
 
     override fun onDeleteSelectedAnnotation() {
-        viewModel.deleteAnnotation(getPageViewMupdf(),intent!!.extras!!.getString(Constants.DOC_NAME)!!,)
+        viewModel.deleteAnnotation(
+            getPageViewMupdf(),
+            intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+        )
 
     }
 
@@ -498,6 +494,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
         val file = File(path)
         if (file.exists()) {
             muPDFCore = openFile(path)
+
         }
 
 
@@ -524,7 +521,11 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
     }
 
     private fun selectAnnotationMode() {
-        viewModel.addAnnotation(getPageViewMupdf(), mAcceptMode, intent!!.extras!!.getString(Constants.DOC_NAME)!!,)
+        viewModel.addAnnotation(
+            getPageViewMupdf(),
+            mAcceptMode,
+            intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+        )
 
     }
 
@@ -568,11 +569,47 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
 
     }
+
+    private fun handleTTSData(ttsModel: TtsModel) {
+        if (ttsModel.status && ttsModel.outPutString != null) {
+            exoPlayer?.stop() // Release player
+
+            TextToSpeechHelper
+                .getInstance(this)
+                .registerLifecycle(this as LifecycleOwner)
+                .saveAsAudio(ttsModel.outPutString)
+                .onDone {
+                    Log.d("poda", "speak: done")
+                    runOnUiThread {
+                        playAudioFile()
+                    }
+
+
+//                    Toast.makeText(applicationContext,"OVERR",Toast.LENGTH_SHORT).show()
+
+                }
+                .onError {
+                    Log.d("poda", "speak: error")
+                    binding.audioviewProgress.visibility = View.GONE
+
+
+//                    Toast.makeText(applicationContext,"Playback doesn't support in this device.",Toast.LENGTH_SHORT).show()
+
+                }
+        } else {
+            Toast.makeText(applicationContext, "TTSFAILED", 1).show()
+            binding.audioviewProgress.visibility = View.GONE
+
+        }
+
+    }
+
+
     private fun handleDrawAnnotationPerPage(pdfDrawAnnotations: List<QuadDrawPointsAndType>) {
         for (annotation in pdfDrawAnnotations) {
             val quadPoints = getQuadPoints(annotation.quadPoints)
 
-            viewModel.addDrawAnnotationFromDatabase(getPageViewMupdf(),quadPoints)
+            viewModel.addDrawAnnotationFromDatabase(getPageViewMupdf(), quadPoints)
 //            viewModel.setDrawingAnnotation(pdfDrawAnnotations)
         }
 //        lifecycleScope.launch {
@@ -580,13 +617,17 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 //        }
 
     }
+
     private fun handleAnnotationPerPage(quadPointsAndTypes: List<QuadPointsAndType>) {
 
-        Log.d("Pageis","CurrentPageIS goint :${getPageViewMupdf()?.page}"+"<>"+quadPointsAndTypes.size)
+        Log.d(
+            "Pageis",
+            "CurrentPageIS goint :${getPageViewMupdf()?.page}" + "<>" + quadPointsAndTypes.size
+        )
 
         for (pointsData in quadPointsAndTypes) {
 //            Log.d("dbdata", "" + index.type + "<>" + index.quadPoints);
-            viewModel.addAnnotationFromDatabase( getPageViewMupdf(),pointsData)
+            viewModel.addAnnotationFromDatabase(getPageViewMupdf(), pointsData)
 
         }
         if (getPageViewMupdf() != null) {
@@ -601,7 +642,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
         if (annotationOperationResult.status) {
             Log.d("TAG", "handleAddCommentResponse:")
         }
-        if(!annotationOperationResult.isFromDb) {
+        if (!annotationOperationResult.isFromDb) {
             if (annotationOperationResult.acceptMode == AcceptMode.Ink) {
                 mAcceptMode = AcceptMode.None;
                 toggleOptionState(true)
@@ -629,7 +670,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
             override fun onTextNotFound(result: String) {
                 // Handle the case where text is not found
-                Snackbar.make(binding.border,"No text found", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.border, "No text found", Snackbar.LENGTH_LONG).show()
             }
         }
 
@@ -639,20 +680,21 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
         // Disable search buttons while search is in progress
 
     }
+
     private fun search(direction: Int) {
-        hideKeyboardFromView(applicationContext,binding.searchAction.searchText)
+        hideKeyboardFromView(applicationContext, binding.searchAction.searchText)
 
 //        hideKeyboard()
 
 //        val searchText = "Your search query"
 //        val currentDisplayPage = binding.pdfReaderRenderView?.displayedViewIndex ?: 0
 
-   /*     mSearchTask?.go(
-            text = searchText,
-            direction = 1,  // Forward direction, can be -1 for backward
-            displayPage = currentDisplayPage,
-            searchPage = -1 // You can customize this if needed
-        )*/
+        /*     mSearchTask?.go(
+                 text = searchText,
+                 direction = 1,  // Forward direction, can be -1 for backward
+                 displayPage = currentDisplayPage,
+                 searchPage = -1 // You can customize this if needed
+             )*/
         val displayPage = binding.pdfReaderRenderView?.displayedViewIndex
         val r = SearchTaskResult.get()
         val searchPage = r?.pageNumber ?: -1
@@ -725,11 +767,11 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
     }
 
     private fun searchModeOff() {
-        hideKeyboardFromView(applicationContext,binding.searchAction.searchText)
+        hideKeyboardFromView(applicationContext, binding.searchAction.searchText)
         binding.searchAction.searchText.text = null
         binding.searchAction.searchText.hint = "Enter Text"
         SearchTaskResult.set(null)
-        binding.searchAction.searchViewCl.visibility=View.GONE
+        binding.searchAction.searchViewCl.visibility = View.GONE
         // Make the ReaderView act on the change to mSearchTaskResult
         // via overridden onChildSetup method.
         binding.pdfReaderRenderView?.resetupChildren()
@@ -737,11 +779,11 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
     private fun searchModeOn() {
 
-            //Focus on EditTextWidget
-        binding.searchAction.searchViewCl.visibility=View.VISIBLE
-        binding.basicLl.visibility=View.GONE
-            binding.searchAction.searchText.requestFocus()
-            showKeyboardFromView(applicationContext,binding.searchAction.searchText)
+        //Focus on EditTextWidget
+        binding.searchAction.searchViewCl.visibility = View.VISIBLE
+        binding.basicLl.visibility = View.GONE
+        binding.searchAction.searchText.requestFocus()
+        showKeyboardFromView(applicationContext, binding.searchAction.searchText)
 
     }
 
@@ -751,6 +793,7 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
             mSearchTask?.stop()
         }
     }
+
     var word = ""
 
     private fun extractText() {
@@ -773,16 +816,18 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
 
     @SuppressLint("SuspiciousIndentation")
     fun playAudioFile() {
-        binding.playerbase.playerLayout.visibility=View.VISIBLE
+        binding.playerbase.playerLayout.visibility = View.VISIBLE
         stopSeekBarUpdate() // Ensure handler stops when activity is destroyed
         exoPlayer?.stop() // Release player
-        binding.audioviewProgress.visibility=View.GONE
-        binding.playerbase.playerTitle.text=intent.getStringExtra(Constants.DOC_NAME)
-            stopSeekBarUpdate()
-        val uri = Uri.fromFile(File(
-            filesDir.absolutePath
-                    + "/pdfAudio/audio.wav"
-        ))
+        binding.audioviewProgress.visibility = View.GONE
+        binding.playerbase.playerTitle.text = intent.getStringExtra(Constants.DOC_NAME)
+        stopSeekBarUpdate()
+        val uri = Uri.fromFile(
+            File(
+                filesDir.absolutePath
+                        + "/pdfAudio/audio.wav"
+            )
+        )
 
         val mediaItem = MediaItem.fromUri(uri)
         exoPlayer.setMediaItem(mediaItem)
@@ -791,13 +836,15 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
         startSeekBarUpdate()
 
     }
+
     // Function to start the SeekBar update
     private fun startSeekBarUpdate() {
         handler = Handler(Looper.getMainLooper())
         updateSeekBarRunnable = object : Runnable {
             override fun run() {
                 if (exoPlayer.isPlaying) {
-                    binding.playerbase.playerProgressBar.progress = exoPlayer.currentPosition.toInt()
+                    binding.playerbase.playerProgressBar.progress =
+                        exoPlayer.currentPosition.toInt()
                     handler?.postDelayed(this, 1000)
                 }
             }
@@ -829,6 +876,40 @@ if(ttsModel.status&&ttsModel.outPutString!=null) {
          }*/
         muPDFCore = null
     }
+
+
+    fun showPasswordDialog() {
+        // Create EditText for password input
+        val passwordEditText = EditText(this).apply {
+            hint = "Enter password"  // Set the hint for the EditText
+            inputType =
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD  // Input type for password
+        }
+
+        // Build the AlertDialog
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Password")
+            .setView(passwordEditText)  // Set the EditText inside the dialog
+            .setPositiveButton("OK") { dialog, _ ->
+                // Handle the OK button click
+                dialog.dismiss()
+                password = passwordEditText.text.toString()
+                muPDFCore?.authenticatePassword(password)
+                initPdfCore()
+                settingClicksToSearch()
+                // Do something with the password (e.g., validate it)
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                // Handle the Cancel button click (dismiss the dialog)
+                dialog.dismiss()
+                finish()
+            }
+            .create()
+
+        // Show the dialog
+        dialog.show()
+    }
+
 }
 
 

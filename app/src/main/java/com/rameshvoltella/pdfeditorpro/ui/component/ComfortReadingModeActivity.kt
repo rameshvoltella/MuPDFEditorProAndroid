@@ -55,7 +55,12 @@ class ComfortReadingModeActivity: BaseActivity<PdfComfortViewActivityBinding, Pd
 
 
         muPDFCore=openFile(intent.getStringExtra(Constants.PDF_FILE_PATH)!!)
+
         if(muPDFCore!=null) {
+            if(muPDFCore!!.needsPassword())
+            {
+                muPDFCore!!.authenticatePassword(intent.extras?.getString(Constants.PASSWORD))
+            }
             loadPageData()
         }
        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
