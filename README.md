@@ -19,6 +19,9 @@ PDF files are widely used for everything from professional reports to educationa
 | Comfort mode     | With a minimalistic and eye-friendly reading mode, this feature helps users reduce eye strain during long reading sessions by simplifying the page's visual appearance. |
 | Password support | Support pdf with Passwords also.                                                                                                                                        |
 
+## Video Preview
+
+click here -> [https://youtu.be/SpbM_RU25pQ](https://youtu.be/SpbM_RU25pQ)
 
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
