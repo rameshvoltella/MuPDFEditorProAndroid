@@ -9,14 +9,16 @@ PDF files are widely used for everything from professional reports to educationa
 
 
 
-| Features       | Description                                                                                                                                          |
-|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Highlighter    | Allows users to highlight important text, making it easier to review or revisit key sections in a document                                           |
-| Strike-through | For content that needs to be crossed out, such as outdated or irrelevant information, this feature helps users mark those sections with ease.        |
-| Underline      | A handy tool for underlining important text, ideal for students or professionals who frequently review dense material.                               |
-| Draw           | This feature allows users to draw directly on the document, making it possible to add sketches, hand-written notes, or emphasize key parts visually. |
-| Audio Reader   | An accessibility-focused feature, the audio reader allows users to listen to the document, enabling multitasking or aiding those with visual impairments.                                                                                                                                                    |
-| Comfort mode   | With a minimalistic and eye-friendly reading mode, this feature helps users reduce eye strain during long reading sessions by simplifying the page's visual appearance.                                                                                     |
+| Features         | Description                                                                                                                                                             |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Highlighter      | Allows users to highlight important text, making it easier to review or revisit key sections in a document                                                              |
+| Strike-through   | For content that needs to be crossed out, such as outdated or irrelevant information, this feature helps users mark those sections with ease.                           |
+| Underline        | A handy tool for underlining important text, ideal for students or professionals who frequently review dense material.                                                  |
+| Draw             | This feature allows users to draw directly on the document, making it possible to add sketches, hand-written notes, or emphasize key parts visually.                    |
+| Audio Reader     | An accessibility-focused feature, the audio reader allows users to listen to the document, enabling multitasking or aiding those with visual impairments.               |
+| Comfort mode     | With a minimalistic and eye-friendly reading mode, this feature helps users reduce eye strain during long reading sessions by simplifying the page's visual appearance. |
+| Password support | Support pdf with Passwords also.                                                                                                                                        |
+
 
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
@@ -39,7 +41,7 @@ PDF files are widely used for everything from professional reports to educationa
 
 ## Other Screenshots
 
-<img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194533.jpg" width="20%">
+<img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194533.jpg" width="20%"><br/>
 <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_195011.jpg" width="20%">
 
 ## MY GITHUB TROPHY
@@ -48,7 +50,7 @@ PDF files are widely used for everything from professional reports to educationa
 
 ## Contributing
 
-I am welcome contributions from the community to improve the Kerala AI Camera Tracker app.
+I am welcome contributions from the community to improve the MuPDFEditor.
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/improvement`).
