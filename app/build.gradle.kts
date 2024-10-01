@@ -111,6 +111,7 @@ dependencies {
     implementation ("io.github.chochanaresh:filepicker:0.1.9")
     implementation ("com.github.bumptech.glide:glide:4.15.0") // Check for the latest version
     kapt ("com.github.bumptech.glide:compiler:4.15.0") // If using Kotlin
+    implementation ("androidx.core:core-splashscreen:1.0.0-alpha02")
 }
 kapt {
     correctErrorTypes = true
