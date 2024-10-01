@@ -107,7 +107,7 @@ dependencies {
 
     implementation("androidx.media3:media3-exoplayer:1.0.0")
     implementation("androidx.media3:media3-exoplayer-dash:1.0.0")
-    implementation("androidx.media3:media3-ui:1.X.X")
+    implementation("androidx.media3:media3-ui:1.0.0")
     implementation ("io.github.chochanaresh:filepicker:0.1.9")
     implementation ("com.github.bumptech.glide:glide:4.15.0") // Check for the latest version
     kapt ("com.github.bumptech.glide:compiler:4.15.0") // If using Kotlin

@@ -48,12 +48,12 @@ import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
-import com.rameshvoltella.pdfeditorpro.setOnSingleClickListener
 import com.rameshvoltella.pdfeditorpro.tts.TextToSpeechHelper
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
 import com.rameshvoltella.pdfeditorpro.utils.generateNormalThumbnail
 import com.rameshvoltella.pdfeditorpro.utils.hideKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.utils.observe
+import com.rameshvoltella.pdfeditorpro.utils.setOnSingleClickListener
 import com.rameshvoltella.pdfeditorpro.utils.showKeyboardFromView
 import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -682,7 +682,6 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
                 }
         } else {
-            Toast.makeText(applicationContext, "TTSFAILED", 1).show()
             binding.audioviewProgress.visibility = View.GONE
 
         }

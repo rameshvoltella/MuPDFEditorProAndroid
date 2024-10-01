@@ -1,4 +1,5 @@
-package com.rameshvoltella.pdfeditorpro
+package com.rameshvoltella.pdfeditorpro.utils
+
 
 import android.os.SystemClock
 import android.view.View
