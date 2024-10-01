@@ -158,11 +158,11 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
                 if (exoPlayer.isPlaying) {
                     exoPlayer.pause()
                     isPlaying=false
-                    binding.playerbase.playerControlButton.setImageResource(R.drawable.pause)
+                    binding.playerbase.playerControlButton.setImageResource(R.drawable.play)
                     stopSeekBarUpdate()
                 } else {
                     exoPlayer.play()
-                    binding.playerbase.playerControlButton.setImageResource(R.drawable.play)
+                    binding.playerbase.playerControlButton.setImageResource(R.drawable.pause)
                     startSeekBarUpdate() // Start seek bar update only when playback starts
                     isPlaying=true
                 }
