@@ -155,16 +155,18 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
             exoPlayer = ExoPlayer.Builder(applicationContext).build()
             // Play/Pause Button Click Listener
             binding.playerbase.playerControlButton.setOnClickListener {
-                if (isPlaying) {
+                if (exoPlayer.isPlaying) {
                     exoPlayer.pause()
+                    isPlaying=false
                     binding.playerbase.playerControlButton.setImageResource(R.drawable.pause)
                     stopSeekBarUpdate()
                 } else {
                     exoPlayer.play()
                     binding.playerbase.playerControlButton.setImageResource(R.drawable.play)
                     startSeekBarUpdate() // Start seek bar update only when playback starts
+                    isPlaying=true
                 }
-                isPlaying = !isPlaying
+//                isPlaying = !isPlaying
             }
             // Make sure to release the player when playback finishes
             exoPlayer.addListener(object : Player.Listener {
@@ -306,21 +308,12 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
         binding.searchBtn.setOnClickListener {
 
-//            if (binding.searchAction.searchViewCl.visibility == View.GONE) {
-//
-//                searchModeOn()
-//                searchTaskClicks()
-//
-//            }
-            viewModel.getAnnotations(
-                intent!!.extras!!.getString(Constants.DOC_NAME)!!,
-                getPageViewMupdf()?.page!!
-            )
-            viewModel.getDrawAnnotations(
-                intent!!.extras!!.getString(Constants.DOC_NAME)!!,
-                getPageViewMupdf()?.page!!
-            )
-            Toast.makeText(applicationContext,""+binding.pdfReaderRenderView.displayedViewIndex,Toast.LENGTH_SHORT).show()
+            if (binding.searchAction.searchViewCl.visibility == View.GONE) {
+
+                searchModeOn()
+                searchTaskClicks()
+
+            }
 
         }
 
