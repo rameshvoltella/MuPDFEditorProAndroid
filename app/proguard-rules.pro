@@ -22,5 +22,5 @@
 
 -keep class com.artifex.mupdf.fitz.** { *; }
 -keep class com.artifex.mupdf.viewer.** { *; }
-#-keep class com.artifex.mupdfdemo.** { *; }
+-keep class com.artifex.mupdfdemo.** { *; }
 -keep class com.rameshvoltella.pdfeditorpro.** { *; }

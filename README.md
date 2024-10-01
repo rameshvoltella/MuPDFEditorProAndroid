@@ -1,5 +1,7 @@
 <h1> MuPDFEditorProAndroid</h1>
 
+![MuPDFEditorProAndroid Logo](https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/master/app/src/main/res/drawable/pdffile.png?raw=true)
+
 ## Project Overview: Advanced PDF Viewer
 
 This project, built over MuPDF, aims to enhance the PDF viewing experience by adding features that prioritize user comfort, accessibility, and interactivity. While there are many PDF viewers available, most of them lack advanced markup and accessibility features, which can be essential for users working with extensive documents, whether for studying, reviewing, or simply reading.
