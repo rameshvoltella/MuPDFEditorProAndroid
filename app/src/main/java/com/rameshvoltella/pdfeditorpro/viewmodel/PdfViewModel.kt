@@ -18,6 +18,8 @@ import com.rameshvoltella.pdfeditorpro.AcceptMode
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
 import com.rameshvoltella.pdfeditorpro.data.database.DatabaseRepository
+import com.rameshvoltella.pdfeditorpro.data.dto.ForceDrawPointsAnnotation
+import com.rameshvoltella.pdfeditorpro.data.dto.ForceQuadPointsAnnotation
 import com.rameshvoltella.pdfeditorpro.data.dto.TtsModel
 import com.rameshvoltella.pdfeditorpro.data.local.LocalRepository
 import com.rameshvoltella.pdfeditorpro.database.PdfAnnotation
@@ -48,6 +50,14 @@ constructor(
     private val annotationPerPagePrivate = MutableLiveData<List<QuadPointsAndType>>()
     val annotationPerPage: LiveData<List<QuadPointsAndType>> get() = annotationPerPagePrivate
 
+    private val annotationForcePerPagePrivate = MutableLiveData<ForceQuadPointsAnnotation>()
+    val annotationForcePerPage: LiveData<ForceQuadPointsAnnotation> get() = annotationForcePerPagePrivate
+
+    private val drawForcePerPagePrivate = MutableLiveData<ForceDrawPointsAnnotation>()
+    val drawForcePerPage: LiveData<ForceDrawPointsAnnotation> get() = drawForcePerPagePrivate
+
+
+
     val annotationInsertDelete: LiveData<Boolean> get() = annotationInsertDeletePrivate
 
     private val annotationDrawPerPagePrivate = MutableLiveData<List<QuadDrawPointsAndType>>()
@@ -62,27 +72,38 @@ constructor(
 
     var canLoadMore by mutableStateOf(true)
 
-    fun getAnnotations(pdfName:String,page:Int)
+    fun getAnnotations(pdfName:String,page:Int,isForceView: Boolean=false)
     {
 //        pdfDatabaseRepository.getQuadPointsAndTypeByPage(pdfName,1)
 
         viewModelScope.launch {
 
             pdfDatabaseRepository.getQuadPointsAndTypeByPage(pdfName,page).collect {
-                annotationPerPagePrivate.value = it
+                if(isForceView)
+                {
+                    annotationForcePerPagePrivate.value=ForceQuadPointsAnnotation(it,page)
+                }else {
+                    annotationPerPagePrivate.value = it
+                }
 
             }
         }
     }
 
-    fun getDrawAnnotations(pdfName:String,page:Int)
+    fun getDrawAnnotations(pdfName:String,page:Int,isForceView: Boolean=false)
     {
 //        pdfDatabaseRepository.getQuadPointsAndTypeByPage(pdfName,1)
 
         viewModelScope.launch {
 
             pdfDatabaseRepository.getDrawQuadPointsAndTypeByPage(pdfName,page).collect {
-                annotationDrawPerPagePrivate.value = it
+
+               if(isForceView)
+               {
+                   drawForcePerPagePrivate.value=ForceDrawPointsAnnotation(it,page)
+               }else {
+                   annotationDrawPerPagePrivate.value = it
+               }
 
             }
         }
@@ -90,6 +111,8 @@ constructor(
 
     fun addAnnotation(muPDFView: MuPDFView?,mAcceptMode: AcceptMode?,pdfName:String)
     {
+        Log.d("muPDFViewunda","<>current<>beginninganno")
+
 
         muPDFView?.let { pageView ->
             Log.d("muPDFViewunda","<>current<>"+muPDFView?.page)
@@ -249,6 +272,7 @@ constructor(
 
     fun addAnnotationFromDatabase(muPDFView: MuPDFView?,quadPoints:QuadPointsAndType )
     {
+        Log.d("muPDFViewunda","<>current<>beginning")
 
         muPDFView?.let { pageView ->
             Log.d("muPDFViewunda","<>current<>"+muPDFView?.page)

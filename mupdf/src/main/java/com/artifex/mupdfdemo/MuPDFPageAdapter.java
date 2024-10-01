@@ -104,6 +104,7 @@ public class MuPDFPageAdapter extends BaseAdapter implements SelectionListener {
                 @Override
                 protected void onPostExecute(PointF result) {
                     super.onPostExecute(result);
+//                    Log.d("PAG",">>>>"+position);
                     // We now know the page size
                     mPageSizes.put(position, result);
                     // Check that this view hasn't been reused for

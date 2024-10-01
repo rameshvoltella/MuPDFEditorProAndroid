@@ -688,8 +688,9 @@ public abstract class PageView extends ViewGroup {
     public void deselectText() {
         this.mSelectBox = null;
         Log.d("nullified", "yes2");
-
-        this.mSearchView.invalidate();
+if(mSearchView!=null) {
+    this.mSearchView.invalidate();
+}
         Log.d("INVALIDATEunda", "24");
 
     }
@@ -978,7 +979,9 @@ public abstract class PageView extends ViewGroup {
 
     public void cancelDraw() {
         this.mDrawing = null;
-        this.mSearchView.invalidate();
+        if(mSearchView!=null) {
+            this.mSearchView.invalidate();
+        }
         Log.d("INVALIDATEunda", "15");
 
     }

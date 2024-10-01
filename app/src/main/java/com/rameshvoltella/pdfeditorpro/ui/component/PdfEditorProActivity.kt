@@ -4,31 +4,33 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.common.MediaItem
-import android.net.Uri
-import android.os.Handler
-import android.os.Looper
+import android.widget.EditText
 import android.widget.SeekBar
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import com.rameshvoltella.pdfeditorpro.tts.TextToSpeechHelper
+import androidx.media3.exoplayer.ExoPlayer
 import com.artifex.mupdfdemo.Hit
 import com.artifex.mupdfdemo.MuPDFCore
 import com.artifex.mupdfdemo.MuPDFPageAdapter
 import com.artifex.mupdfdemo.MuPDFReaderView
 import com.artifex.mupdfdemo.MuPDFReaderViewListener
 import com.artifex.mupdfdemo.MuPDFView
-import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.OutlineActivityData
+import com.artifex.mupdfdemo.PageActionListener
 import com.artifex.mupdfdemo.ReaderView
 import com.artifex.mupdfdemo.SearchTaskResult
 import com.artifex.mupdfdemo.util.SearchTask
@@ -39,12 +41,15 @@ import com.rameshvoltella.pdfeditorpro.R
 import com.rameshvoltella.pdfeditorpro.constants.Constants
 import com.rameshvoltella.pdfeditorpro.constants.PdfConstants
 import com.rameshvoltella.pdfeditorpro.data.AnnotationOperationResult
+import com.rameshvoltella.pdfeditorpro.data.dto.ForceDrawPointsAnnotation
+import com.rameshvoltella.pdfeditorpro.data.dto.ForceQuadPointsAnnotation
 import com.rameshvoltella.pdfeditorpro.data.dto.TtsModel
 import com.rameshvoltella.pdfeditorpro.database.data.QuadDrawPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.data.QuadPointsAndType
 import com.rameshvoltella.pdfeditorpro.database.getQuadPoints
 import com.rameshvoltella.pdfeditorpro.databinding.PdfViewProEditorLayoutBinding
 import com.rameshvoltella.pdfeditorpro.setOnSingleClickListener
+import com.rameshvoltella.pdfeditorpro.tts.TextToSpeechHelper
 import com.rameshvoltella.pdfeditorpro.ui.base.BaseActivity
 import com.rameshvoltella.pdfeditorpro.utils.generateNormalThumbnail
 import com.rameshvoltella.pdfeditorpro.utils.hideKeyboardFromView
@@ -54,10 +59,6 @@ import com.rameshvoltella.pdfeditorpro.viewmodel.PdfViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
-import android.content.Context
-import android.text.InputType
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 
 
 @AndroidEntryPoint
@@ -92,8 +93,13 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         observe(viewModel.annotationDrawPerPage, ::handleDrawAnnotationPerPage)
         observe(viewModel.annotationInsertDelete, ::handleOnInsertionDeletion)
         observe(viewModel.ttsOutPut, ::handleTTSData)
+        observe(viewModel.drawForcePerPage, ::handleForceDrawAnnotationPerPage)
+        observe(viewModel.annotationForcePerPage, ::handleForcehandleAnnotationPerPage)
+
 
     }
+
+
 
 
     override fun observeActivity() {
@@ -213,7 +219,8 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
                 Intent(
                     applicationContext,
                     ComfortReadingModeActivity::class.java
-                ).putExtra(Constants.PDF_FILE_PATH, intent.getStringExtra(Constants.PDF_FILE_PATH)).putExtra(Constants.PASSWORD, password)
+                ).putExtra(Constants.PDF_FILE_PATH, intent.getStringExtra(Constants.PDF_FILE_PATH))
+                    .putExtra(Constants.PASSWORD, password)
             )
         }
 
@@ -299,12 +306,21 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 
         binding.searchBtn.setOnClickListener {
 
-            if (binding.searchAction.searchViewCl.visibility == View.GONE) {
-
-                searchModeOn()
-                searchTaskClicks()
-
-            }
+//            if (binding.searchAction.searchViewCl.visibility == View.GONE) {
+//
+//                searchModeOn()
+//                searchTaskClicks()
+//
+//            }
+            viewModel.getAnnotations(
+                intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                getPageViewMupdf()?.page!!
+            )
+            viewModel.getDrawAnnotations(
+                intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                getPageViewMupdf()?.page!!
+            )
+            Toast.makeText(applicationContext,""+binding.pdfReaderRenderView.displayedViewIndex,Toast.LENGTH_SHORT).show()
 
         }
 
@@ -453,22 +469,72 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
 //        onPageChanged
         Log.e("PageIs", "CurrentPageIS:${getPageViewMupdf()?.page}" + addedAnnotationPages)
         if (getPageViewMupdf() != null) {
-            binding.movableView.setProgress(page)
 
-            if (!addedAnnotationPages.contains(getPageViewMupdf()?.page)) {
-                Log.d("Pageis", "CurrentPageIS goint :${getPageViewMupdf()?.page}")
+            if(getPageViewMupdf()?.page==null)
+            {
+
+                preloadAnnotation()
+
+            }else {
+                binding.movableView.setProgress(page)
+
+                if (!addedAnnotationPages.contains(getPageViewMupdf()?.page)) {
+                    Log.d("Pageis", "CurrentPageIS goint :${getPageViewMupdf()?.page}")
+                    viewModel.getAnnotations(
+                        intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                        getPageViewMupdf()?.page!!
+                    )
+                    viewModel.getDrawAnnotations(
+                        intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                        getPageViewMupdf()?.page!!
+                    )
+                    preloadAnnotation(binding.pdfReaderRenderView.displayedViewIndex+1)
+
+
+                }
+            }
+        } else {
+        preloadAnnotation()
+
+        }
+
+    }
+
+    private fun preloadAnnotation( nextPostion:Int=-1) {
+        Log.d("pollapannokuuu", "preloadAnnotation:"+nextPostion)
+        if(nextPostion!=-1)
+        {
+            if (!addedAnnotationPages.contains(nextPostion)) {
+
                 viewModel.getAnnotations(
                     intent!!.extras!!.getString(Constants.DOC_NAME)!!,
-                    getPageViewMupdf()?.page!!
+                    nextPostion, isForceView = true
                 )
                 viewModel.getDrawAnnotations(
                     intent!!.extras!!.getString(Constants.DOC_NAME)!!,
-                    getPageViewMupdf()?.page!!
+                    nextPostion, isForceView = true
                 )
+                addedAnnotationPages.add(nextPostion)
 
             }
-        }
+        }else {
+            for (i in 0..1) {
+                println("Loop iteration $i")
+                if (!addedAnnotationPages.contains(i)) {
 
+                    viewModel.getAnnotations(
+                        intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                        i, isForceView = true
+                    )
+                    viewModel.getDrawAnnotations(
+                        intent!!.extras!!.getString(Constants.DOC_NAME)!!,
+                        i, isForceView = true
+                    )
+                    addedAnnotationPages.add(i)
+
+                }
+            }
+        }
     }
 
     override fun onPageChanged(page: Int, currentPageView: View?) {
@@ -530,9 +596,28 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
     }
 
     private fun getPageViewMupdf(): MuPDFView? {
+        Log.d("lokka", "<><><<><>")
+
         return try {
             binding.pdfReaderRenderView?.let {
                 val pageView = it.displayedView
+                if (pageView != null && pageView is MuPDFView) {
+                    return pageView
+                }
+            }
+            null
+        } catch (e: Exception) {
+            // Handle any other exceptions that may occur
+            Log.i("error", "getPageViewMupdf:${e.message.toString()} ")
+            null
+        }
+
+    }
+
+    private fun getForcedPageViewMupdf(position:Int): MuPDFView? {
+        return try {
+            binding.pdfReaderRenderView?.let {
+                val pageView = it.getManualPage(position)
                 if (pageView != null && pageView is MuPDFView) {
                     return pageView
                 }
@@ -603,13 +688,37 @@ class PdfEditorProActivity : BaseActivity<PdfViewProEditorLayoutBinding, PdfView
         }
 
     }
+    private fun handleForcehandleAnnotationPerPage(forceQuadPointsAnnotation: ForceQuadPointsAnnotation) {
+        Log.d("polappan",">>forceQuadPointsAnnotation>"+forceQuadPointsAnnotation.pageNumber+""+forceQuadPointsAnnotation.list)
 
+        for (pointsData in forceQuadPointsAnnotation.list) {
+            Log.d("dbdata", "" + pointsData.type + "<>" + pointsData.quadPoints);
+            viewModel.addAnnotationFromDatabase(getForcedPageViewMupdf(forceQuadPointsAnnotation.pageNumber) , pointsData)
+
+        }
+        if (getPageViewMupdf() != null) {
+            addedAnnotationPages.add(forceQuadPointsAnnotation.pageNumber)
+        }
+
+    }
+
+    private fun handleForceDrawAnnotationPerPage(forceDrawPointsAnnotation: ForceDrawPointsAnnotation) {
+        Log.d("polappan",">>forceDrawPointsAnnotation>"+forceDrawPointsAnnotation.pageNumber)
+
+        for (annotation in forceDrawPointsAnnotation.list) {
+            val quadPoints = getQuadPoints(annotation.quadPoints)
+            if (getForcedPageViewMupdf(forceDrawPointsAnnotation.pageNumber) != null) {
+                viewModel.addDrawAnnotationFromDatabase(getForcedPageViewMupdf(forceDrawPointsAnnotation.pageNumber) , quadPoints)
+            }
+//            viewModel.setDrawingAnnotation(pdfDrawAnnotations)
+        }    }
 
     private fun handleDrawAnnotationPerPage(pdfDrawAnnotations: List<QuadDrawPointsAndType>) {
         for (annotation in pdfDrawAnnotations) {
             val quadPoints = getQuadPoints(annotation.quadPoints)
-
-            viewModel.addDrawAnnotationFromDatabase(getPageViewMupdf(), quadPoints)
+            if (getPageViewMupdf() != null) {
+                viewModel.addDrawAnnotationFromDatabase(getPageViewMupdf(), quadPoints)
+            }
 //            viewModel.setDrawingAnnotation(pdfDrawAnnotations)
         }
 //        lifecycleScope.launch {

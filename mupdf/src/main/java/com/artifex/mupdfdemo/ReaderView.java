@@ -314,6 +314,21 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         }
     }
 
+
+    public View getMadnualPage(int postion)
+    {
+
+        Log.d("che","mchimChildViews.size()>"+mChildViews.size()+"<><>"+postion+"<><"+mViewCache.size());
+        if(mChildViews!=null&&mChildViews.size()>postion)
+        {
+            return (View)mChildViews.valueAt(postion);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public void refresh(final boolean reflow) {
         this.mReflow = reflow;
         this.mReflowChanged = true;
@@ -349,8 +364,21 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     public View getView(final int i) {
         return (View)this.mChildViews.get(i);
     }
+    public View getManualPage(int postion)
+    {
 
+        if(mChildViews!=null)
+        {
+            return (View)mChildViews.get(postion);
+        }
+        else
+        {
+            return null;
+        }
+    }
     public View getDisplayedView() {
+
+        Log.d("lokka","<><><"+mChildViews.size()+"<><>"+mCurrent+"<><>"+(View)this.mChildViews.get(this.mCurrent));
         return (View)this.mChildViews.get(this.mCurrent);
     }
 

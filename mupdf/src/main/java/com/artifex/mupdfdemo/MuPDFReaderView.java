@@ -98,6 +98,8 @@ public class MuPDFReaderView extends ReaderView {
         return ((MuPDFView) this.getCurrentView()).getCurrentScale();
     }
 
+
+
     public void setMode(final Mode m) {
         this.mMode = m;
     }
@@ -111,6 +113,17 @@ public class MuPDFReaderView extends ReaderView {
             return false;
         }
 
+    }
+
+
+    public MuPDFView getViewFromPosition(int position)
+    {
+        final MuPDFView pageView = (MuPDFView) this.getManualPage(position);
+        if(pageView!=null) {
+            return pageView;
+        }else {
+            return null;
+        }
     }
 
     public String getSelectedText()
