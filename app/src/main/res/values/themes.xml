@@ -16,4 +16,20 @@
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
+
+    <!-- Splash Screen Theme -->
+    <style name="Theme.MyApp.Splash" parent="Theme.SplashScreen">
+        <!-- Set your splash screen background -->
+        <item name="windowSplashScreenBackground">@color/muPDFReaderView_bg</item>
+
+        <!-- Optionally, add an animated icon for the splash screen -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/pdffile</item>
+
+        <!-- Set the duration of the icon animation -->
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+
+        <!-- Control the splash screen transition fade-out duration -->
+        <item name="postSplashScreenTheme">@style/Theme.MyApplication</item>
+    </style>
+
 </resources>
