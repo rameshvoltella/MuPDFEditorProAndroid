@@ -4,8 +4,12 @@
 
 package com.artifex.mupdfdemo;
 
+import static com.artifex.mupdfdemo.AnnotationHandlerPopUpKt.showPopupAtCenterTopOfRect;
+
 import android.os.Build;
 import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -53,6 +57,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
     private AsyncTask<Void, Void, String> mCheckSignature;
     private AsyncTask<Void, Void, Boolean> mSign;
     private Runnable changeReporter;
+    private String selectedTextValue;
 
     public MuPDFPageView(final Context c, final MuPDFCore core, final Point parentSize, final Bitmap sharedHqBm) {
         super(c, parentSize, sharedHqBm);
@@ -112,6 +117,10 @@ public class MuPDFPageView extends PageView implements MuPDFView
             }
         });
         this.mPasswordEntry = this.mPasswordEntryBuilder.create();
+    }
+
+    public MuPDFCore getMuPdfCore() {
+        return mCore;
     }
 
     private void signWithKeyFile(final Uri uri) {
@@ -235,7 +244,14 @@ public class MuPDFPageView extends PageView implements MuPDFView
                     case STRIKEOUT:
                     case INK: {
                         this.mSelectedAnnotationIndex = i;
+                        this.setItemDeleteBox(this.mAnnotations[i]);
                         this.setItemSelectBox(this.mAnnotations[i]);
+                        float recalculatedX0 = (mAnnotations[i].left * scale) + getLeft();
+                        float recalculatedY0 = (mAnnotations[i].top * scale) + getTop();
+                        float recalculatedX1 = (mAnnotations[i].right * scale) + getLeft();
+                        float recalculatedY1 = (mAnnotations[i].bottom * scale) + getTop();
+                        showPopupAtCenterTopOfRect(getContext(), new RectF(recalculatedX0,recalculatedY0,recalculatedX1,recalculatedY1),getRootView(),selectedListner);
+
                         return Hit.Annotation;
                     }
                 }
@@ -327,14 +343,26 @@ public class MuPDFPageView extends PageView implements MuPDFView
                 Log.d("ffnet", "onEndLine: "+line);
                 text.append((CharSequence)this.line);
             }
+
+            @Override
+            public void onEndText() {
+
+            }
         });
         if (text.length() == 0) {
             return false;
         }
-        final ClipboardManager cm = (ClipboardManager)this.mContext.getSystemService("clipboard");
-        cm.setPrimaryClip(ClipData.newPlainText((CharSequence)"MuPDF", (CharSequence)text));
+        selectedTextValue=((CharSequence)text).toString();
+//        final ClipboardManager cm = (ClipboardManager)this.mContext.getSystemService("clipboard");
+//        cm.setPrimaryClip(ClipData.newPlainText((CharSequence)"MuPDF", (CharSequence)text));
         this.deselectText();
         return true;
+    }
+
+    public String getTextSelectedArea()
+    {
+        this.deselectText();
+        return selectedTextValue;
     }
 
     /* Todo: MuPDFPageView:: it use to copy text after user press comment from popup window in pdf screen */
@@ -358,16 +386,74 @@ public class MuPDFPageView extends PageView implements MuPDFView
                     text.append('\n');
                 text.append(line);
             }
+
+            @Override
+            public void onEndText() {
+
+            }
         });
         if (text.length() == 0)
             return false;
-        android.content.ClipboardManager cm = (android.content.ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-        cm.setPrimaryClip(ClipData.newPlainText("MuPDF", text));
+        selectedTextValue=((CharSequence)text).toString();
+
+//        android.content.ClipboardManager cm = (android.content.ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+//        cm.setPrimaryClip(ClipData.newPlainText("MuPDF", text));
         return true;
     }
-
     @Override
-    public boolean markupSelection(final Annotation.Type type) {
+    public boolean markupFromDbSelection(final Annotation.Type type, List<PointF> quadPoints) {
+        /*ArrayList<PointF> quadPoints = new ArrayList<>();
+        quadPoints.add(new PointF(68.448f, 852.0528f));
+        quadPoints.add(new PointF(1128.5419f, 852.0528f));
+        quadPoints.add(new PointF(1128.5419f, 827.5517f));
+        quadPoints.add(new PointF(68.448f, 827.5517f));
+        quadPoints.add(new PointF(68.448f, 876.5928f));
+        quadPoints.add(new PointF(1107.5895f, 876.5928f));
+        quadPoints.add(new PointF(1107.5895f, 852.0917f));
+        quadPoints.add(new PointF(68.448f, 852.0917f));
+        quadPoints.add(new PointF(68.448f, 900.3528f));
+        quadPoints.add(new PointF(1077.5247f, 900.3528f));
+        quadPoints.add(new PointF(1077.5247f, 875.8517f));
+        quadPoints.add(new PointF(68.448f, 875.8517f));
+        quadPoints.add(new PointF(68.448f, 924.83276f));
+        quadPoints.add(new PointF(1058.3f, 924.83276f));
+        quadPoints.add(new PointF(1058.3f, 900.33167f));
+        quadPoints.add(new PointF(68.448f, 900.33167f));*/
+        // Adding the points from your log
+     /*   quadPoints.add(new PointF(327.30228f, 1349.8127f));
+        quadPoints.add(new PointF(392.0764f, 1349.8127f));
+        quadPoints.add(new PointF(392.0764f, 1325.3116f));
+        quadPoints.add(new PointF(327.30228f, 1325.3116f));*/
+//        quadPoints.add(new PointF(68.448f, 395.39285f));
+//        quadPoints.add(new PointF(1099.8542f, 395.39285f));
+//        quadPoints.add(new PointF(1099.8542f, 370.89175f));
+//        quadPoints.add(new PointF(68.448f, 370.89175f));
+//        quadPoints.add(new PointF(68.448f, 419.15286f));
+//        quadPoints.add(new PointF(1081.1471f, 419.15286f));
+//        quadPoints.add(new PointF(1081.1471f, 394.65176f));
+//        quadPoints.add(new PointF(68.448f, 394.65176f));
+//        quadPoints.add(new PointF(68.448f, 443.63284f));
+//        quadPoints.add(new PointF(152.016f, 443.63284f));
+//        quadPoints.add(new PointF(152.016f, 419.13174f));
+//        quadPoints.add(new PointF(68.448f, 419.13174f));
+//        2024-09-23 16:13:29.712 27245-27245 poinsyoyo               com.rameshvoltella.pdfeditorpro      D  [PointF(327.30228, 1349.8127), PointF(392.0764, 1349.8127), PointF(392.0764, 1325.3116), PointF(327.30228, 1325.3116)]
+
+        (this.mAddStrikeOut = new AsyncTask<Object, Void, Void>() {
+            protected Void doInBackground(final Object... params) {
+                MuPDFPageView.this.addMarkup(((PointF[][]) params[0])[0], type, (int)params[1]);
+                return null;
+            }
+
+            protected void onPostExecute(final Void result) {
+                MuPDFPageView.this.loadAnnotations();
+                MuPDFPageView.this.update();
+            }
+        }).execute(new PointF[][] { quadPoints.toArray(new PointF[quadPoints.size()]) }, getInkColor());
+        this.deselectText();
+        return true;
+    }
+    @Override
+    public ArrayList<PointF> markupSelection(final Annotation.Type type) {
         final ArrayList<PointF> quadPoints = new ArrayList<PointF>();
         this.processSelectedText(new TextProcessor() {
             RectF rect;
@@ -389,11 +475,18 @@ public class MuPDFPageView extends PageView implements MuPDFView
                     quadPoints.add(new PointF(this.rect.right, this.rect.bottom));
                     quadPoints.add(new PointF(this.rect.right, this.rect.top));
                     quadPoints.add(new PointF(this.rect.left, this.rect.top));
+
+                    Log.d("poinsyoyo",""+quadPoints);
                 }
+            }
+
+            @Override
+            public void onEndText() {
+
             }
         });
         if (quadPoints.size() == 0) {
-            return false;
+            return quadPoints;
         }
         (this.mAddStrikeOut = new AsyncTask<Object, Void, Void>() {
             protected Void doInBackground(final Object... params) {
@@ -407,7 +500,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
             }
         }).execute(new PointF[][] { quadPoints.toArray(new PointF[quadPoints.size()]) }, getInkColor());
         this.deselectText();
-        return true;
+        return quadPoints;
     }
 
     @Override
@@ -439,10 +532,31 @@ public class MuPDFPageView extends PageView implements MuPDFView
     }
 
     @Override
-    public boolean saveDraw() {
+    public boolean saveDrawFromDb(PointF[][] points) {
+        if (this.mAddInk != null) {
+            this.mAddInk.cancel(true);
+            this.mAddInk = null;
+        }
+        (this.mAddInk = new AsyncTask<Object, Void, Void>() {
+            protected Void doInBackground(final Object... params) {
+                MuPDFPageView.this.mCore.addInkAnnotation(MuPDFPageView.this.mPageNumber, (PointF[][])params[0], (int)params[1], (float)params[2]);
+                return null;
+            }
+
+            protected void onPostExecute(final Void result) {
+                MuPDFPageView.this.update();
+                MuPDFPageView.this.loadAnnotations();
+            }
+        }).execute(new Object[] { points, this.getInkColor(), this.getInkThickness() });
+        this.cancelDraw();
+        return true;
+    }
+
+    @Override
+    public PointF[][] saveDraw() {
         final PointF[][] path = this.getDraw();
         if (path == null) {
-            return false;
+            return null;
         }
         if (this.mAddInk != null) {
             this.mAddInk.cancel(true);
@@ -460,7 +574,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
             }
         }).execute(new Object[] { this.getDraw(), this.getInkColor(), this.getInkThickness() });
         this.cancelDraw();
-        return true;
+        return path;
     }
 
     @Override
@@ -503,7 +617,7 @@ public class MuPDFPageView extends PageView implements MuPDFView
 
     @Override
     protected void addMarkup(final PointF[] quadPoints, final Annotation.Type type , int color) {
-        Log.d("points",quadPoints.length+"");
+        Log.d("addingpoints",quadPoints+"");
 
 
         this.mCore.addMarkupAnnotation(this.mPageNumber, quadPoints, type , color);
@@ -600,4 +714,11 @@ public class MuPDFPageView extends PageView implements MuPDFView
             return false;
         }
     }
+    SelectionListener selectedListner=null;
+    public void setSelectionListener(SelectionListener selectedListner) {
+        this.selectedListner=selectedListner;
+
+    }
+
+
 }

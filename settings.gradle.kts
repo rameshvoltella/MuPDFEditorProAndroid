@@ -9,6 +9,15 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        google()
+        maven {
+            url = uri("https://www.jitpack.io")
+        }
+        maven {
+            url = uri("https://maven.ghostscript.com/")
+        }
+        jcenter()
+
     }
 }
 dependencyResolutionManagement {
@@ -16,6 +25,14 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
+        maven {
+            url = uri("https://www.jitpack.io")
+        }
+        maven {
+            url = uri("https://maven.ghostscript.com/")
+        }
+        jcenter()
     }
 }
 

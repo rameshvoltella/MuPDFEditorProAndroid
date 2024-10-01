@@ -8,7 +8,7 @@
     <string name="image_desc">pdfImage</string>
     <string name="format_string_text">%1$s%2$s</string>
     <string name="not_supported">File  format not supported </string>
-    <string name="serach_hint">Enter Text</string>
+    <string name="serach_hint">Search Text</string>
 
     <string name="cancel">Cancel</string>
     <string name="cannot_open_buffer">Can not  open buffer</string>

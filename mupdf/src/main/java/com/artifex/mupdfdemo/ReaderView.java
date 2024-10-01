@@ -5,6 +5,8 @@
 package com.artifex.mupdfdemo;
 
 import java.util.NoSuchElementException;
+
+import android.util.Log;
 import android.view.ViewGroup;
 
 import android.graphics.Point;
@@ -121,12 +123,28 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         return this.mCurrent;
     }
 
-    public void setDisplayedViewIndex(final int i) {
+    public void setDisplayeddViewIndex(final int i) {
         if (0 <= i && i < this.mAdapter.getCount()) {
             this.onMoveOffChild(this.mCurrent);
             this.onMoveToChild(this.mCurrent = i);
             this.mResetLayout = true;
             this.requestLayout();
+        }
+    }
+
+    public synchronized void setDisplayedViewIndex(final int i) {
+        if (0 <= i && i < this.mAdapter.getCount()) {
+            this.onMoveOffChild(this.mCurrent);
+            this.onMoveToChild(this.mCurrent = i);
+            this.mResetLayout = true;
+
+            // Request a layout update and force it to process immediately
+            this.requestLayout();   // Schedule a layout pass
+            this.invalidate();      // Redraw the view
+            this.forceLayout();     // Forces the view hierarchy to re-layout immediately
+
+            // Ensure the layout pass happens immediately
+            this.getViewTreeObserver().dispatchOnGlobalLayout();
         }
     }
 
@@ -296,6 +314,21 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         }
     }
 
+
+    public View getMadnualPage(int postion)
+    {
+
+        Log.d("che","mchimChildViews.size()>"+mChildViews.size()+"<><>"+postion+"<><"+mViewCache.size());
+        if(mChildViews!=null&&mChildViews.size()>postion)
+        {
+            return (View)mChildViews.valueAt(postion);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public void refresh(final boolean reflow) {
         this.mReflow = reflow;
         this.mReflowChanged = true;
@@ -331,8 +364,21 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     public View getView(final int i) {
         return (View)this.mChildViews.get(i);
     }
+    public View getManualPage(int postion)
+    {
 
+        if(mChildViews!=null)
+        {
+            return (View)mChildViews.get(postion);
+        }
+        else
+        {
+            return null;
+        }
+    }
     public View getDisplayedView() {
+
+        Log.d("lokka","<><><"+mChildViews.size()+"<><>"+mCurrent+"<><>"+(View)this.mChildViews.get(this.mCurrent));
         return (View)this.mChildViews.get(this.mCurrent);
     }
 
@@ -375,6 +421,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vl = (View)this.mChildViews.get(this.mCurrent + 1);
                     if (vl != null) {
+                        Log.d("smapp","Yaaa1111111");
                         this.slideViewOntoScreen(vl);
                         return true;
                     }
@@ -386,6 +433,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vl = (View)this.mChildViews.get(this.mCurrent + 1);
                     if (vl != null) {
+                        Log.d("smapp","Yaaa22222");
                         this.slideViewOntoScreen(vl);
                         return true;
                     }
@@ -397,6 +445,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vr = (View)this.mChildViews.get(this.mCurrent - 1);
                     if (vr != null) {
+                        Log.d("smapp","Yaaa33333");
                         this.slideViewOntoScreen(vr);
                         return true;
                     }
@@ -408,6 +457,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     }
                     final View vr = (View)this.mChildViews.get(this.mCurrent - 1);
                     if (vr != null) {
+                        Log.d("smapp","Yaaa55555");
                         this.slideViewOntoScreen(vr);
                         return true;
                     }
@@ -516,6 +566,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
             final View v = (View)this.mChildViews.get(this.mCurrent);
             if (v != null) {
                 if (this.mScroller.isFinished()) {
+                    Log.d("smapp","Yaaa66666666");
                     this.slideViewOntoScreen(v);
                 }
                 if (this.mScroller.isFinished()) {
@@ -646,13 +697,28 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 final Point corr = this.getCorrection(this.getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
                 cvRight += corr.x;
                 cvLeft += corr.x;
-                cvTop += corr.y;
+                if(mCurrent==0)
+                {
+
+                    cvTop=corr.y;
+                }else {
+
+                    cvTop += corr.y;
+                }
                 cvBottom += corr.y;
             }
             else if (cv.getMeasuredHeight() <= this.getHeight()) {
                 final Point corr = this.getCorrection(this.getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
                 if (this.HORIZONTAL_SCROLLING) {
-                    cvTop += corr.y;
+                    if(mCurrent==0)
+                    {
+                        Log.d("checking the top","<>222<>"+corr);
+
+                        cvTop=corr.y;
+
+                    }else {
+                        cvTop += corr.y;
+                    }
                     cvBottom += corr.y;
                 }
                 else {
@@ -660,7 +726,20 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                     cvLeft += corr.x;
                 }
             }
+            Log.d("chakkappa","cvLeft>"+cvLeft+"cvTop>"+cvTop+"cvRight>"+cvRight+"cvBottom>"+cvBottom);
+//            if(mCurrent==0&&!this.mUserInteracting) {
+//                cvLeft=0;
+//                cvTop=0;
+//                cvRight=1080;
+//                cvBottom=1527;
+////                1527
+//
+//
+//            }else{
+//
+//            }
             cv.layout(cvLeft, cvTop, cvRight, cvBottom);
+
             if (this.mCurrent > 0) {
                 final View lv = this.getOrCreateChild(this.mCurrent - 1);
                 final Point leftOffset = this.subScreenSizeOffset(lv);
@@ -686,6 +765,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
                 }
             }
             this.invalidate();
+
         }
     }
 
@@ -694,7 +774,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     public View getSelectedView() {
-        return null;
+        return mChildViews.get(mCurrent); //Can return null while waiting for onLayout()!
     }
 
     public void setAdapter(final Adapter adapter) {
@@ -703,6 +783,15 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
         }
         this.mAdapter = adapter;
         this.requestLayout();
+    }
+
+    public int getAdaptorCount()
+    {
+        if (null != this.mAdapter)
+        {
+            return this.mAdapter.getCount();
+        }
+        return 0;
     }
 
     public void setSelection(final int arg0) {
@@ -767,6 +856,12 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     private Point getCorrection(final Rect bounds) {
+        Log.d("TOP VALUE",">>>>>chl"+mCurrent);
+        if(mCurrent==0)
+        {
+        bounds.top=0;
+        }
+//        return new Point(0,0);
         return new Point(Math.min(Math.max(0, bounds.left), bounds.right), Math.min(Math.max(0, bounds.top), bounds.bottom));
     }
 
@@ -789,6 +884,7 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     private void slideViewOntoScreen(final View v) {
+        Log.d("smapp","Yaaa");
         final Point corr = this.getCorrection(this.getScrollBounds(v));
         if (corr.x != 0 || corr.y != 0) {
             final int n = 0;
@@ -800,7 +896,8 @@ public class ReaderView extends AdapterView<Adapter> implements GestureDetector.
     }
 
     private Point subScreenSizeOffset(final View v) {
-        return new Point(Math.max((this.getWidth() - v.getMeasuredWidth()) / 2, 0), Math.max((this.getHeight() - v.getMeasuredHeight()) / 2, 0));
+        return new Point(0,0);
+//        return new Point(Math.max((this.getWidth() - v.getMeasuredWidth()) / 2, 0), Math.max((this.getHeight() - v.getMeasuredHeight()) / 2, 0));
     }
 
     private static int directionOfTravel(final float vx, final float vy) {

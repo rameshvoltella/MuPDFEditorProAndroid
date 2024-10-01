@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:keepScreenOn="true"
+    >
+
+    <RelativeLayout
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:elevation="@dimen/_5sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:background="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/activity_back_btn"
+            android:layout_width="@dimen/_45sdp"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:elevation="@dimen/_5sdp"
+            android:focusable="true"
+            android:padding="18dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerHorizontal="true"
+            app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
+
+        <include
+            android:id="@+id/search_action"
+            layout="@layout/pdf_search_view" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_toEndOf="@id/activity_back_btn"
+            android:id="@+id/accept_mode_ll"
+            android:visibility="gone"
+            android:gravity="right">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/accept_btn"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:paddingHorizontal="10dp"
+                app:srcCompat="@drawable/accept_mode_tick"
+                android:visibility="visible"
+                android:layout_gravity="end"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_toEndOf="@id/activity_back_btn"
+            android:id="@+id/basic_ll"
+            android:gravity="right">
+
+            <RelativeLayout
+                android:layout_width="45dp"
+                android:layout_height="wrap_content">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/listen_iv"
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="10dp"
+                    app:srcCompat="@drawable/listen_audio"
+                    android:visibility="visible"
+                    android:layout_gravity="end"
+                    />
+                <ProgressBar
+                    android:layout_width="45dp"
+                    android:id="@+id/audioviewProgress"
+                    android:visibility="gone"
+                    android:layout_height="match_parent"/>
+            </RelativeLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/search_btn"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:paddingHorizontal="10dp"
+                app:srcCompat="@drawable/search_text_ic"
+                android:visibility="visible"
+                android:layout_gravity="end"
+                />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/comfort_btn"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:paddingHorizontal="10dp"
+                app:srcCompat="@drawable/comfort_view_img"
+                android:visibility="visible"
+                android:layout_gravity="end"
+                />
+       <!--     <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/delete_annotation_btn"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/image_desc"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:paddingHorizontal="10dp"
+                app:srcCompat="@drawable/delete_annotations"
+                android:visibility="visible"
+                android:layout_gravity="end"
+                />-->
+
+        </LinearLayout>
+
+    </RelativeLayout>
+    <View
+        android:id="@+id/border"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:background="#F4F1F1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_bar" />
+    <com.artifex.mupdfdemo.MuPDFReaderView
+        android:id="@+id/pdf_reader_render_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        android:paddingTop="60dp"
+        android:paddingBottom="60dp"
+        android:clipToPadding="false"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/bottom_options"
+        android:background="@color/white">
+
+        <!-- androidx.appcompat.widget.AppCompatImageView 1 -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/highlighter_iv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            app:srcCompat="@drawable/highlighter_page_img"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/strikethrough_iv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
+
+        <!-- androidx.appcompat.widget.AppCompatImageView 2 -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/strikethrough_iv"
+            android:layout_width="0dp"
+            android:padding="15dp"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/strikethrough_page_img"
+            app:layout_constraintStart_toEndOf="@id/highlighter_iv"
+            app:layout_constraintEnd_toStartOf="@id/underline_iv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
+
+        <!-- androidx.appcompat.widget.AppCompatImageView 3 -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/underline_iv"
+            android:layout_width="0dp"
+            android:padding="15dp"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/underline_ic"
+            app:layout_constraintStart_toEndOf="@id/strikethrough_iv"
+            app:layout_constraintEnd_toStartOf="@id/drawer_iv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
+
+        <!-- androidx.appcompat.widget.AppCompatImageView 4 -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/drawer_iv"
+            android:layout_width="0dp"
+            android:padding="15dp"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/draw_page_img"
+            app:layout_constraintStart_toEndOf="@id/underline_iv"
+            app:layout_constraintEnd_toStartOf="@id/_a"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
+
+        <!-- androidx.appcompat.widget.AppCompatImageView 5 -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/_a"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@id/drawer_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.rameshvoltella.pdfeditorpro.views.CustomVerticalMovableView
+        android:id="@+id/movableView"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/default_scroll_handle_right"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"/>
+
+    <include
+        layout="@layout/player_view"
+        android:id="@+id/playerbase"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/bottom_options"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,14 +2,19 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-parcelize")
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
+    kotlin("kapt")
+
+
 }
 
 android {
-    namespace = "com.example.myapplication"
+    namespace = "com.rameshvoltella.pdfeditorpro"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.rameshvoltella.pdfeditorpro"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -82,4 +87,31 @@ dependencies {
     implementation("com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:1.0.0")
 
     implementation(project(":mupdf"))
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+
+    // Room components
+    implementation (libs.androidx.room.runtime)
+    implementation (libs.androidx.room.ktx)
+    kapt (libs.androidx.room.compiler)
+//    implementation(libs.androidx.hilt.common)
+//    implementation(libs.androidx.hilt.work)
+//    implementation (libs.androidx.hilt.navigation.compose)
+    implementation ("com.google.code.gson:gson:2.11.0")
+    implementation ("androidx.recyclerview:recyclerview:1.2.1")
+    implementation ("com.github.hearsilent:DiscreteSlider:1.2.1")
+//    implementation ("androidx.media3:media3-exoplayer:1.4.3")
+//    implementation ("androidx.media3:media3-ui:1.4.3")
+    implementation ("org.jsoup:jsoup:1.14.3")
+
+    implementation("androidx.media3:media3-exoplayer:1.0.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.0")
+    implementation("androidx.media3:media3-ui:1.0.0")
+    implementation ("io.github.chochanaresh:filepicker:0.1.9")
+    implementation ("com.github.bumptech.glide:glide:4.15.0") // Check for the latest version
+    kapt ("com.github.bumptech.glide:compiler:4.15.0") // If using Kotlin
+}
+kapt {
+    correctErrorTypes = true
 }

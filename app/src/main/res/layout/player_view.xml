@@ -1,0 +1,67 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/playerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:visibility="gone"
+
+    >
+
+    <!-- ProgressBar (Seekable) -->
+    <SeekBar
+        android:id="@+id/playerProgressBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@android:color/darker_gray"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="@android:color/holo_blue_light"
+        android:thumb="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ImageView (Left) -->
+    <ImageView
+        android:id="@+id/playerThumbnail"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:contentDescription="Thumbnail"
+        android:src="@drawable/search"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playerProgressBar" />
+
+    <!-- TextView (Center) -->
+    <TextView
+        android:id="@+id/playerTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Media Title"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/playerThumbnail"
+        app:layout_constraintEnd_toStartOf="@id/playerControlButton"
+        app:layout_constraintStart_toEndOf="@id/playerThumbnail"
+        app:layout_constraintTop_toTopOf="@id/playerThumbnail" />
+
+    <!-- Play/Pause Button (Right) -->
+    <ImageView
+        android:id="@+id/playerControlButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="Play"
+        android:src="@drawable/play"
+        app:layout_constraintBottom_toBottomOf="@id/playerThumbnail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/playerThumbnail" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
