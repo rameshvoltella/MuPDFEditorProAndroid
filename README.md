@@ -14,19 +14,20 @@
 
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-    <div style="text-align: center;">
+    <div style="text-align: center; border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
         <h3>Highlight/Strike</h3>
         <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194545.jpg" alt="Highlight" style="width: 40%; height: 40%;">
-        <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194602.jpge" alt="Strike" style="width: 40%; height: 40%;">
+        <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194602.jpg" alt="Strike" style="width: 40%; height: 40%;">
     </div>
-    <div style="text-align: center;">
+    <div style="text-align: center; border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
         <h3>Underline / Draw</h3>
         <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194616.jpg" alt="Underline" style="width: 40%; height: 40%;">
         <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194628.jpg" alt="Draw" style="width: 40%; height: 40%;">
     </div>
-    <div style="text-align: center;">
+    <div style="text-align: center; border: 2px solid #ddd; padding: 10px; border-radius: 10px;">
         <h3>Full Mode/Comfort Mode</h3>
         <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194710.jpg" alt="fullmode" style="width: 40%; height: 40%;">
         <img src="https://github.com/rameshvoltella/MuPDFEditorProAndroid/blob/beta/mu/Screenshot_20241001_194948.jpg" alt="comfort" style="width: 40%; height: 40%;">
     </div>
 </div>
+
